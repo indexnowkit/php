@@ -1,11 +1,17 @@
 name: Split packages
 
-# On every tag (core@0.1.0, symfony-bundle@0.1.0, ...) and push to main, mirror each package into its own
-# read-only repository so Packagist can track it: indexnowkit/php-core, indexnowkit/php-doctrine, indexnowkit/php-symfony-bundle.
+# Mirrors each package into its own read-only repository (indexnowkit/php-core, php-doctrine, php-symfony-bundle)
+# on every push to main and on package tags (core@0.1.0, doctrine@0.1.0, symfony-bundle@0.1.0).
+# Authentication: one write-enabled deploy key per target repository, stored as SPLIT_SSH_KEY_<PACKAGE> secret here.
+# Packagist picks the pushes up through the webhooks it installed on the split repositories.
 on:
   push:
     branches: [main]
     tags: ['*@*']
+
+concurrency:
+  group: split-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   split:
@@ -13,24 +19,43 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        package: [core, doctrine, symfony-bundle]
+        include:
+          - package: core
+            secret: SPLIT_SSH_KEY_CORE
+          - package: doctrine
+            secret: SPLIT_SSH_KEY_DOCTRINE
+          - package: symfony-bundle
+            secret: SPLIT_SSH_KEY_SYMFONY_BUNDLE
     steps:
-      - uses: actions/checkout@v4
-        with: { fetch-depth: 0 }
       - name: Resolve tag for this package
         id: tag
         run: |
           if [[ "${GITHUB_REF}" == refs/tags/${{ matrix.package }}@* ]]; then
             echo "tag=${GITHUB_REF#refs/tags/${{ matrix.package }}@}" >> "$GITHUB_OUTPUT"
+          elif [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            echo "skip=1" >> "$GITHUB_OUTPUT"
           fi
-      - uses: symplify/monorepo-split-github-action@v2.3.0
-        if: github.ref_type == 'branch' || steps.tag.outputs.tag != ''
+      - uses: actions/checkout@v4
+        if: steps.tag.outputs.skip != '1'
+        with: { fetch-depth: 0 }
+      - uses: webfactory/ssh-agent@v0.9.1
+        if: steps.tag.outputs.skip != '1'
         with:
-          package_directory: packages/${{ matrix.package }}
-          repository_organization: indexnowkit
-          repository_name: php-${{ matrix.package }}
-          tag: ${{ steps.tag.outputs.tag }}
-          user_name: indexnowkit-bot
-          user_email: bot@indexnowkit.dev
+          ssh-private-key: ${{ secrets[matrix.secret] }}
+      - name: Split and push
+        if: steps.tag.outputs.skip != '1'
         env:
-          GITHUB_TOKEN: ${{ secrets.SPLIT_TOKEN }}
+          TARGET: git@github.com:indexnowkit/php-${{ matrix.package }}.git
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: |
+          set -euo pipefail
+          git config user.name "indexnowkit-bot"
+          git config user.email "bot@indexnowkit.dev"
+          sha="$(git subtree split --prefix="packages/${{ matrix.package }}")"
+          echo "split sha: ${sha}"
+          if [[ "${GITHUB_REF_TYPE}" == "branch" ]]; then
+            git push "${TARGET}" "${sha}:refs/heads/main"
+          fi
+          if [[ -n "${TAG}" ]]; then
+            git push "${TARGET}" "${sha}:refs/tags/${TAG}"
+          fi
