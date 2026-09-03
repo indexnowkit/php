@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Run PHP CLI inside Docker (no local PHP). Usage: bin/php [-v 8.2] <args>
+set -euo pipefail
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+VER="${PHP_VERSION:-8.3}"
+if [ "${1:-}" = "-v" ]; then VER="$2"; shift 2; fi
+exec docker run --rm -t -v "$ROOT:/app" -w /app -e COMPOSER_HOME=/tmp/composer "php:${VER}-cli" php "$@"

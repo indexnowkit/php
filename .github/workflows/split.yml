@@ -1,0 +1,36 @@
+name: Split packages
+
+# On every tag (core@0.1.0, symfony-bundle@0.1.0, ...) and push to main, mirror each package into its own
+# read-only repository so Packagist can track it: indexnowkit/php-core, indexnowkit/php-doctrine, indexnowkit/php-symfony-bundle.
+on:
+  push:
+    branches: [main]
+    tags: ['*@*']
+
+jobs:
+  split:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package: [core, doctrine, symfony-bundle]
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: Resolve tag for this package
+        id: tag
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/${{ matrix.package }}@* ]]; then
+            echo "tag=${GITHUB_REF#refs/tags/${{ matrix.package }}@}" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: symplify/monorepo-split-github-action@v2.3.0
+        if: github.ref_type == 'branch' || steps.tag.outputs.tag != ''
+        with:
+          package_directory: packages/${{ matrix.package }}
+          repository_organization: indexnowkit
+          repository_name: php-${{ matrix.package }}
+          tag: ${{ steps.tag.outputs.tag }}
+          user_name: indexnowkit-bot
+          user_email: bot@indexnowkit.dev
+        env:
+          GITHUB_TOKEN: ${{ secrets.SPLIT_TOKEN }}

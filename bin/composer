@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Run Composer inside Docker with a persistent cache volume.
+set -euo pipefail
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+exec docker run --rm -t -v "$ROOT:/app" -v indexnowkit-composer-cache:/tmp/composer -w /app -e COMPOSER_HOME=/tmp/composer composer:2 "$@"

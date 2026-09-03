@@ -1,0 +1,12 @@
+includes:
+    - vendor/phpstan/phpstan-phpunit/extension.neon
+parameters:
+    level: 9
+    paths:
+        - packages/core/src
+        - packages/doctrine/src
+        - packages/symfony-bundle/src
+    treatPhpDocTypesAsCertain: false
+    excludePaths:
+        # DBAL 3 flavour (bool return types) cannot be analysed against DBAL 4 signatures; covered by the DBAL 3 CI job
+        - packages/doctrine/src/Middleware/IndexNowConnectionV3.php
