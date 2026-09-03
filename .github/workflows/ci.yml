@@ -19,6 +19,8 @@ jobs:
             deps: lowest
           - php: '8.3'
             deps: dbal3
+          - php: '8.3'
+            deps: laravel11
     steps:
       - uses: actions/checkout@v4
       - uses: shivammathur/setup-php@v2
@@ -35,6 +37,9 @@ jobs:
       - name: Install (DBAL 3 / ORM 2 / Symfony 6.4)
         if: matrix.deps == 'dbal3'
         run: composer update --no-interaction --prefer-dist --with doctrine/dbal:^3.8 --with doctrine/orm:^2.19 --with symfony/framework-bundle:^6.4
+      - name: Install (Laravel 11 / Testbench 9)
+        if: matrix.deps == 'laravel11'
+        run: composer update --no-interaction --prefer-dist --with laravel/framework:^11.0 --with orchestra/testbench:^9.0
       - run: vendor/bin/phpunit
   quality:
     runs-on: ubuntu-latest
