@@ -21,6 +21,8 @@ jobs:
             deps: dbal3
           - php: '8.3'
             deps: laravel11
+          - php: '8.4'
+            deps: laravel13
     steps:
       - uses: actions/checkout@v4
       - uses: shivammathur/setup-php@v2
@@ -46,6 +48,10 @@ jobs:
       - name: Install (Laravel 11 / Testbench 9)
         if: matrix.deps == 'laravel11'
         run: composer config policy.advisories.block false && composer update --no-interaction --prefer-dist --with laravel/framework:^11.0 --with orchestra/testbench:^9.0
+      # The root platform is pinned to PHP 8.2 (Laravel 12); Laravel 13 needs PHP 8.3, so lift the pin for this job only.
+      - name: Install (Laravel 13 / Testbench 11)
+        if: matrix.deps == 'laravel13'
+        run: composer config platform.php 8.4.0 && composer update --no-interaction --prefer-dist --with laravel/framework:^13.0 --with orchestra/testbench:^11.0
       - run: vendor/bin/phpunit
         if: matrix.deps != 'lowest' && matrix.deps != 'dbal3'
       - run: vendor/bin/phpunit --exclude-testsuite laravel
