@@ -22,7 +22,7 @@
     },
     "require-dev": {
         "doctrine/dbal": "^3.8 || ^4.0",
-        "doctrine/doctrine-bundle": "^2.13",
+        "doctrine/doctrine-bundle": "^2.13 || ^3.0",
         "doctrine/orm": "^2.19 || ^3.0",
         "doctrine/persistence": "^3.0 || ^4.0",
         "friendsofphp/php-cs-fixer": "^3.75",
