@@ -17,7 +17,7 @@ bin/php vendor/bin/php-cs-fixer fix
 PHP_VERSION=8.2 bin/php vendor/bin/phpunit
 ```
 
-Mock IndexNow server for manual testing: `php -S 127.0.0.1:8089 tools/mock-server/router.php`
+Mock IndexNow server for manual testing: `php -S 127.0.0.1:8089 packages/core/tests/Support/mock-server/router.php`
 (scenario header `X-Mock-Scenario: ok200|pending202|forbidden403|ratelimit429|...`).
 
 Specification: [`../docs/spec`](../docs/spec).
