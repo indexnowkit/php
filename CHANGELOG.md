@@ -13,10 +13,14 @@ dry-run safety net. Breaking: `Url\Event` → `IndexNowKit\Event`, `ParamExtract
 
 ### doctrine@0.2.0
 - Uses `GuardedUrlResolver`: a typo in `#[IndexNow(when: ...)]` is logged instead of breaking the flush.
+- An invalid `#[IndexNow]` attribute (constructor error) is logged in `onFlush` instead of breaking the flush.
+- Staged URLs are discarded when `commit()` throws, so a reused connection never delivers them later.
+- Change classification (`when` transitions, `fields`) delegated to `Attribute\ChangeClassifier` from core.
 - Requires `indexnowkit/core ^0.2` (`IndexNowKit\Event`).
 
 ### symfony-bundle@0.2.0
 - `http.timeout` reaches the discovered HTTP client; throttle counts HTTP requests, not batches.
+- `indexnow:sitemap` reports an unreadable sitemap as a command error instead of a stack trace.
 - `hosts` accepts `host: {key, key_location}`; `kernel.environment` enables the dry-run safety net outside `prod`.
 - `SubmitterInterface`, `UrlNormalizerInterface`, `ThrottleInterface` and `AttributeReaderInterface` are container aliases.
 - Requires `indexnowkit/core ^0.2`, `indexnowkit/doctrine ^0.2`.
