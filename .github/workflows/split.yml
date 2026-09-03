@@ -1,7 +1,7 @@
 name: Split packages
 
 # Mirrors each package into its own read-only repository (indexnowkit/php-core, php-doctrine, php-symfony-bundle)
-# on every push to main and on package tags (core@0.1.0, doctrine@0.1.0, symfony-bundle@0.1.0).
+# on every push to main and on package tags (core@0.2.0, doctrine@0.2.0, symfony-bundle@0.2.0).
 # Authentication: one write-enabled deploy key per target repository, stored as SPLIT_SSH_KEY_<PACKAGE> secret here.
 # Packagist picks the pushes up through the webhooks it installed on the split repositories.
 on:
