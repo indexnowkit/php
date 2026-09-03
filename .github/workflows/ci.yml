@@ -53,9 +53,12 @@ jobs:
         if: matrix.deps == 'laravel13'
         run: composer config platform.php 8.4.0 && composer update --no-interaction --prefer-dist --with laravel/framework:^13.0 --with orchestra/testbench:^11.0
       - run: vendor/bin/phpunit
-        if: matrix.deps != 'lowest' && matrix.deps != 'dbal3'
+        if: matrix.deps != 'lowest' && matrix.deps != 'dbal3' && matrix.deps != 'laravel13'
       - run: vendor/bin/phpunit --exclude-testsuite laravel
         if: matrix.deps == 'lowest' || matrix.deps == 'dbal3'
+      # Lifting the pin also moves Symfony to 8, which the Doctrine/bundle suites do not support yet (DBAL 4.5): Laravel suite only.
+      - run: vendor/bin/phpunit --testsuite laravel
+        if: matrix.deps == 'laravel13'
   quality:
     runs-on: ubuntu-latest
     steps:
