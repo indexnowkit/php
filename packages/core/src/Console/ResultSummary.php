@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace IndexNowKit\SymfonyBundle\Command;
+namespace IndexNowKit\Console;
 
 use IndexNowKit\Result;
 use IndexNowKit\ResultStatus;
 
 /**
  * Aggregated output for commands that submit in many batches (`indexnow:sitemap`): results are folded into
- * (engine, host, status, http, reason) rows with URL counts as they arrive, so a million-URL run keeps a
- * handful of rows in memory instead of every Result with its URL list.
+ * (engine, host, status, http, reason) rows with URL counts as they arrive, so a million-URL run keeps a handful of
+ * rows in memory instead of every Result with its URL list.
  */
 final class ResultSummary
 {
