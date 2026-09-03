@@ -31,16 +31,25 @@ jobs:
       - name: Install (highest)
         if: matrix.deps == 'highest'
         run: composer update --no-interaction --prefer-dist
+      # Laravel 11/12 need Symfony >= 7.2 while these two jobs test the Symfony 6.4 floor: drop the Laravel packages here,
+      # the Laravel floor is covered by the laravel11 job.
+      - name: Drop the Laravel packages
+        if: matrix.deps == 'lowest' || matrix.deps == 'dbal3'
+        run: composer remove --no-update --no-interaction indexnowkit/laravel && composer remove --dev --no-update --no-interaction larastan/larastan orchestra/testbench
       - name: Install (lowest)
         if: matrix.deps == 'lowest'
         run: composer update --no-interaction --prefer-dist --prefer-lowest --prefer-stable
       - name: Install (DBAL 3 / ORM 2 / Symfony 6.4)
         if: matrix.deps == 'dbal3'
         run: composer update --no-interaction --prefer-dist --with doctrine/dbal:^3.8 --with doctrine/orm:^2.19 --with symfony/framework-bundle:^6.4
+      # Laravel 11 is past its security-fix window and every release carries advisories, which Composer >= 2.9 refuses to install by default.
       - name: Install (Laravel 11 / Testbench 9)
         if: matrix.deps == 'laravel11'
-        run: composer update --no-interaction --prefer-dist --with laravel/framework:^11.0 --with orchestra/testbench:^9.0
+        run: composer config policy.advisories.block false && composer update --no-interaction --prefer-dist --with laravel/framework:^11.0 --with orchestra/testbench:^9.0
       - run: vendor/bin/phpunit
+        if: matrix.deps != 'lowest' && matrix.deps != 'dbal3'
+      - run: vendor/bin/phpunit --exclude-testsuite laravel
+        if: matrix.deps == 'lowest' || matrix.deps == 'dbal3'
   quality:
     runs-on: ubuntu-latest
     steps:
