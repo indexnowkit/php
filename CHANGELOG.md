@@ -3,6 +3,26 @@
 All notable changes to the PHP packages are documented here, newest release wave first. Tags: `<package>@<version>`.
 Per-package detail (and the migration notes for every breaking change) lives in each package's own changelog.
 
+## 2026-09-05 — core@0.5.1, symfony-bundle@0.6.0, laravel@0.7.0, yii2@0.4.0
+
+The "adapter kit" wave C (docs/spec/16 §1.5/§1.7): `indexnowkit/sitemap` is an optional add-on again. **If you use
+the `sitemap` command, `composer require indexnowkit/sitemap`**; otherwise, after `composer update`, the command
+reports that the package is missing and exits 1. `sitemap` and `doctrine` are unchanged.
+
+### core@0.5.1
+
+`Check\StaticCheck` (one fixed line of `check`) and `Adapter\ConfigFactory(..., ignoreBlocks:)` (the block of an
+absent optional package is skipped by `unknownOptions()`); [docs/adapters.md](packages/core/docs/adapters.md) §2
+"Optional packages". Additive.
+
+### symfony-bundle@0.6.0, laravel@0.7.0, yii2@0.4.0
+
+`indexnowkit/sitemap` moved from `require` to `suggest` (kept in `require-dev`). The sitemap wiring lives behind one
+predicate per adapter (`SitemapServices`, `SitemapSupport`, `SitemapAction`); without the package the `sitemap`
+command prints `indexnowkit/sitemap is not installed: composer require indexnowkit/sitemap` and exits 1, `check`
+prints `sitemap: not installed (…)`, a `sitemap` block in the configuration is ignored without a warning, every
+other command works, and nothing is logged. Each adapter has a test set with the predicate forced to false.
+
 ## 2026-09-05 — core@0.5.0, sitemap@0.1.1, doctrine@0.3.1, symfony-bundle@0.5.0, laravel@0.6.0, yii2@0.3.0
 
 The "adapter kit" wave B (docs/spec/16). Additive in the core; every adapter of this wave requires `core ^0.5` and

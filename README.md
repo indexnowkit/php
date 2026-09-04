@@ -6,7 +6,7 @@ Packages are developed here and split into read-only repositories for Packagist.
 | Package | What |
 |---|---|
 | [`indexnowkit/core`](packages/core) | protocol client, batching, debounce, retry policy, the `#[IndexNow]` rule model, the adapter kit (`Adapter\ConfigFactory`, factories, command bodies) |
-| [`indexnowkit/sitemap`](packages/sitemap) | sitemap reader (index, gzip, text) and the `sitemap` command body used by every adapter |
+| [`indexnowkit/sitemap`](packages/sitemap) | optional add-on: sitemap reader (index, gzip, text) and the body of the `sitemap` command; `composer require indexnowkit/sitemap` next to an adapter |
 | [`indexnowkit/doctrine`](packages/doctrine) | Doctrine ORM listener plus a DBAL middleware, commit-safe |
 | [`indexnowkit/symfony-bundle`](packages/symfony-bundle) | Symfony bundle: config, Messenger, key file route, commands, profiler panel |
 | [`indexnowkit/laravel`](packages/laravel) | Laravel: Eloquent observer, queue dispatch, key file route, artisan commands (Laravel 12–13) |
