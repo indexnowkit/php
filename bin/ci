@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Run a package's pipeline the way .github/workflows/ci.yml does, in Docker:
-# link the siblings, install a dependency flavour, phpunit, phpstan (highest only).
+# link the siblings, install a dependency flavour, phpunit, phpstan.
 # Usage: bin/ci [package] [flavour]   default: every package, highest.
 #   bin/ci yii2                 bin/ci doctrine dbal3                 PHP_VERSION=8.2 bin/ci core lowest
 # Flavours are the ci:install:* scripts of the package's composer.json.
@@ -14,7 +14,7 @@ for pkg in "${packages[@]}"; do
     bin/link "$pkg"
     COMPOSER=composer.monorepo.json bin/composer -d "packages/$pkg" run "ci:install:$flavour"
     bin/php -C "packages/$pkg" vendor/bin/phpunit
-    if [ "$flavour" = highest ]; then
+    if [ "$pkg" != doctrine ] || [ "$flavour" = highest ]; then   # doctrine: DBAL 3 / ORM 2 docblock signatures contradict DBAL 4 / ORM 3
         bin/php -C "packages/$pkg" vendor/bin/phpstan analyse --memory-limit=1G
     fi
     echo "::endgroup::"
