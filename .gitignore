@@ -3,5 +3,6 @@
 /packages/*/composer.monorepo.json
 /packages/*/composer.monorepo.lock
 /packages/*/.phpunit.cache/
+/packages/*/coverage.xml
 /.php-cs-fixer.cache
 /var/

@@ -3,6 +3,32 @@
 All notable changes to the PHP packages are documented here, newest release wave first. Tags: `<package>@<version>`.
 Per-package detail (and the migration notes for every breaking change) lives in each package's own changelog.
 
+## 2026-09-05 — core@0.5.0, sitemap@0.1.1, doctrine@0.3.1, symfony-bundle@0.5.0, laravel@0.6.0, yii2@0.3.0
+
+The "adapter kit" wave B (docs/spec/16). Additive in the core; every adapter of this wave requires `core ^0.5` and
+`sitemap ^0.1.1`.
+
+### core@0.5.0
+
+See [packages/core/CHANGELOG.md](packages/core/CHANGELOG.md).
+
+- `Adapter\ServicesBuilder` / `Adapter\Services` (the lazy graph of a runtime-assembled container, parity with the
+  factories under test), `Hook\ObserverHelper`, `Retry\WorkerOutcome`, `Console\Definitions` with
+  `CommandDefinition`/`ArgumentDefinition`/`OptionDefinition`, `Testing\KeyFileAssertions` and
+  `Testing\CheckOutputAssertions`; a coverage floor in CI.
+
+### sitemap@0.1.1
+
+`Sitemap\Console\Definitions::sitemap()`; requires `core ^0.5`.
+
+### doctrine@0.3.1, symfony-bundle@0.5.0, laravel@0.6.0, yii2@0.3.0
+
+The adapters on wave B: observers over `ObserverHelper` (Laravel, Yii2), queue jobs over `WorkerOutcome` (all
+three; the Messenger line says "job {id}", the Yii2 line "will be retried"), command inputs from `Definitions`
+(the bundle's `configure()`, the artisan signatures, the Yii2 `options()`), H01–H05 tests through the assertion
+helpers; the Yii2 component on `ServicesBuilder` with a public `services()`. Configuration keys, commands, service
+ids, bindings and component properties are unchanged; a few command descriptions were unified.
+
 ## 2026-09-05 — core@0.4.0, sitemap@0.1.0, doctrine@0.3.0, symfony-bundle@0.4.0, laravel@0.5.0, yii2@0.2.0
 
 The "adapter kit" wave (docs/spec/16, wave A). **Upgrade the adapter, not the core alone**: adapters of the previous

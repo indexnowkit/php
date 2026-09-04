@@ -43,7 +43,11 @@ bin/ci yii2                              # one package
 bin/ci doctrine dbal3                    # a dependency flavour: the ci:install:* scripts of the package's composer.json
 PHP_VERSION=8.2 bin/ci core lowest       # the CI matrix runs 8.2-8.5
 bin/cs                                   # php-cs-fixer fix (bin/cs check = dry run)
+bin/php -C packages/core vendor/bin/phpunit --coverage-clover coverage.xml && bin/coverage-floor core packages/core/coverage.xml
 ```
+
+Coverage: the image ships pcov; `bin/coverage-floor <package> <clover> [--write]` compares the line coverage of core
+and sitemap with `packages/<package>/tests/coverage-floor.txt` (CI fails below it; `--write` records a new floor).
 
 Step by step, for one package:
 
@@ -95,7 +99,7 @@ php/
 │   ├── symfony-bundle/    # indexnowkit/symfony-bundle + docs/, recipe/, tests/Functional (H01-H06)
 │   ├── laravel/           # indexnowkit/laravel       + docs/, tests/
 │   └── yii2/              # indexnowkit/yii2          + docs/, tests/
-├── bin/                   # Docker wrappers: php, composer, link, ci, cs; release: tag, packagist-wait, release-notes
+├── bin/                   # Docker wrappers: php, composer, link, ci, cs, coverage-floor; release: tag, packagist-wait, release-notes
 ├── docker/php/            # development image (php:<version>-cli + Composer)
 ├── CHANGELOG.md           # monorepo changelog, per package
 ├── CONTRIBUTING.md
