@@ -2,10 +2,16 @@
 
 declare(strict_types=1);
 
-namespace IndexNowKit\Console;
+namespace IndexNowKit\Sitemap\Console;
 
 use DateTimeImmutable;
 use Exception;
+use IndexNowKit\Console\ExitCode;
+use IndexNowKit\Console\ResultFormatterInterface;
+use IndexNowKit\Console\ResultRenderer;
+use IndexNowKit\Console\ResultSummary;
+use IndexNowKit\Console\SubmitterFactory;
+use IndexNowKit\Console\SubmitterFactoryInterface;
 use IndexNowKit\Http\Exception\TransportException;
 use IndexNowKit\IndexNowKit;
 use IndexNowKit\Sitemap\SitemapEntry;
@@ -22,7 +28,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 final class SitemapRunner
 {
     /**
-     * @param string|null $defaultSitemap `sitemap.url` from the adapter config; falls back to <base_url>/sitemap.xml
+     * @param string|null $defaultSitemap   `sitemap.url` from the adapter config ({@see SitemapConfig::$url}); falls back to <base_url>/sitemap.xml
+     * @param string      $sitemapUrlOption how the adapter names that option (`indexnowkit.sitemap.url`), printed when no sitemap is known
      */
     public function __construct(
         private readonly IndexNowKit $indexNow,
@@ -30,7 +37,7 @@ final class SitemapRunner
         private readonly SubmitterFactoryInterface $submitters,
         private readonly ?string $defaultSitemap = null,
         private readonly ResultFormatterInterface $formatter = new ResultRenderer(),
-        private readonly Vocabulary $words = new Vocabulary(),
+        private readonly string $sitemapUrlOption = 'sitemap.url',
     ) {}
 
     /**
@@ -41,7 +48,7 @@ final class SitemapRunner
         $json = $options->json;
         $sitemap = $this->sitemapUrl($options->sitemap);
         if ($sitemap === null) {
-            $io->error(\sprintf('Give a sitemap URL, or configure %s or base_url.', $this->words->sitemapUrlOption));
+            $io->error(\sprintf('Give a sitemap URL, or configure %s or base_url.', $this->sitemapUrlOption));
 
             return ExitCode::INVALID;
         }

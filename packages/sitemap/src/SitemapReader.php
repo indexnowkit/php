@@ -81,6 +81,26 @@ final class SitemapReader implements SitemapSourceInterface
     }
 
     /**
+     * The reader an adapter wires from its `sitemap` block: every knob of {@see SitemapConfig} over the transport
+     * the adapter submits through (the same client, timeout and discovery), so the sitemap command needs no HTTP
+     * setup of its own.
+     */
+    public static function fromConfig(SitemapConfig $config, TransportInterface $transport, LoggerInterface $logger = new NullLogger()): self
+    {
+        return new self(
+            $transport,
+            maxDepth: $config->maxDepth,
+            logger: $logger,
+            maxSitemaps: $config->maxSitemaps,
+            maxXmlBytes: $config->maxBytes,
+            allowForeignHosts: $config->allowForeignHosts,
+            spool: $config->spool,
+            spoolDir: $config->spoolDir,
+            fetchRetries: $config->fetchRetries,
+        );
+    }
+
+    /**
      * @param string                 $sitemap           URL, or a local path / `file://` URL
      * @param DateTimeImmutable|null $changedSince      only entries whose <lastmod> is newer (entries without lastmod are skipped)
      * @param bool|null              $allowForeignHosts per-call override of the constructor default

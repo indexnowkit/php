@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace IndexNowKit\Console;
+namespace IndexNowKit\Sitemap\Console;
 
 /**
  * Raw command-line input of `sitemap`, before validation.

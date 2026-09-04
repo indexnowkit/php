@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace IndexNowKit\Tests\Unit;
+namespace IndexNowKit\Sitemap\Tests\Unit;
 
 use IndexNowKit\Http\Exception\TransportException;
 use IndexNowKit\Sitemap\Spool;

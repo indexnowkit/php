@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-namespace IndexNowKit\Tests\Unit;
+namespace IndexNowKit\Sitemap\Tests\Unit;
 
 use DateTimeImmutable;
 use IndexNowKit\Http\Exception\TransportException;
 use IndexNowKit\Http\Response;
 use IndexNowKit\Http\TransportInterface;
+use IndexNowKit\Sitemap\SitemapConfig;
 use IndexNowKit\Sitemap\SitemapReader;
 use IndexNowKit\Sitemap\SpoolMode;
 use IndexNowKit\Testing\ArrayLogger;
@@ -366,5 +367,29 @@ final class SitemapReaderTest extends TestCase
         $warning = implode('|', $logger->messages('warning'));
         self::assertStringNotContainsString("\n", $warning);
         self::assertStringContainsString('https://other.example.com/x\n[CRITICAL] forged line', $warning, 'the newline is escaped, the value is still recognizable');
+    }
+
+    public function testFromConfigAppliesEveryKnobOverTheGivenTransport(): void
+    {
+        $logger = new ArrayLogger();
+        $t = new FakeTransport();
+        $index = '<?xml version="1.0"?><sitemapindex ' . self::NS . '><sitemap><loc>https://cdn.example.net/s1.xml</loc></sitemap></sitemapindex>';
+        $t->onGet('https://www.example.com/sitemap.xml', new Response(200, $index));
+        $t->onGet('https://cdn.example.net/s1.xml', new Response(200, self::URLSET));
+
+        $reader = SitemapReader::fromConfig(SitemapConfig::fromArray(['allow_foreign_hosts' => true, 'spool' => 'memory', 'max_depth' => 1, 'fetch_retries' => 0]), $t, $logger);
+        self::assertCount(3, iterator_to_array($reader->read('https://www.example.com/sitemap.xml'), false), 'the CDN part is followed');
+
+        $strict = SitemapReader::fromConfig(new SitemapConfig(spool: SpoolMode::Memory, fetchRetries: 0), $t, $logger);
+        self::assertSame([], iterator_to_array($strict->read('https://www.example.com/sitemap.xml'), false), 'defaults: foreign hosts are skipped');
+        self::assertStringContainsString('not on the host', implode("\n", $logger->messages('warning')));
+
+        $t->onGet('https://www.example.com/flaky.xml', new Response(503));
+        try {
+            iterator_to_array(SitemapReader::fromConfig(SitemapConfig::fromArray(['fetch_retries' => 0, 'spool' => 'memory']), $t)->read('https://www.example.com/flaky.xml'), false);
+            self::fail('expected a TransportException');
+        } catch (TransportException $e) {
+            self::assertCount(1, array_filter($t->gets, static fn(string $url): bool => $url === 'https://www.example.com/flaky.xml'), 'fetch_retries: 0 means one attempt');
+        }
     }
 }

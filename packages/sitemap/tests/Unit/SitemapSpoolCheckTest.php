@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
-namespace IndexNowKit\Tests\Unit;
+namespace IndexNowKit\Sitemap\Tests\Unit;
 
 use IndexNowKit\Check\CheckLevel;
 use IndexNowKit\Check\CheckReport;
-use IndexNowKit\Check\SitemapSpoolCheck;
+use IndexNowKit\Sitemap\Check\SitemapSpoolCheck;
+use IndexNowKit\Sitemap\SitemapConfig;
 use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\TestCase;
 
@@ -15,25 +16,26 @@ final class SitemapSpoolCheckTest extends TestCase
     #[TestDox('disabled sitemaps print nothing; memory, a writable and an unwritable spool dir under auto and disk')]
     public function testLevels(): void
     {
-        self::assertSame([], self::levels(new SitemapSpoolCheck(['enabled' => false])));
+        self::assertSame([], self::levels(new SitemapSpoolCheck(SitemapConfig::disabled())));
+        self::assertSame([], self::levels(new SitemapSpoolCheck(SitemapConfig::fromArray(['enabled' => false, 'spool' => 'disk', 'spool_dir' => '/nonexistent/indexnow']))), 'enabled: false writes no line whatever the spool');
 
-        $check = new SitemapSpoolCheck(['spool' => 'memory', 'max_bytes' => 1024]);
+        $check = new SitemapSpoolCheck(SitemapConfig::fromArray(['spool' => 'memory', 'max_bytes' => 1024]));
         self::assertSame([CheckLevel::Ok], self::levels($check));
         self::assertStringContainsString('in memory (sitemap.spool: memory, at most 1 KiB', self::messages($check)[0]);
 
-        $check = new SitemapSpoolCheck(['spool' => 'auto', 'spool_dir' => sys_get_temp_dir()]);
+        $check = new SitemapSpoolCheck(SitemapConfig::fromArray(['spool' => 'auto', 'spool_dir' => sys_get_temp_dir()]));
         self::assertSame([CheckLevel::Ok], self::levels($check));
         self::assertStringContainsString('spooled to temp files in ' . sys_get_temp_dir(), self::messages($check)[0]);
 
-        $check = new SitemapSpoolCheck(['spool' => 'auto', 'spool_dir' => '/nonexistent/indexnow']);
+        $check = new SitemapSpoolCheck(SitemapConfig::fromArray(['spool' => 'auto', 'spool_dir' => '/nonexistent/indexnow']));
         self::assertSame([CheckLevel::Warning], self::levels($check));
         self::assertStringContainsString('at most 50 MiB each', self::messages($check)[0]);
 
-        $check = new SitemapSpoolCheck(['spool' => 'disk', 'spool_dir' => '/nonexistent/indexnow']);
+        $check = new SitemapSpoolCheck(SitemapConfig::fromArray(['spool' => 'disk', 'spool_dir' => '/nonexistent/indexnow']));
         self::assertSame([CheckLevel::Error], self::levels($check));
         self::assertStringContainsString('does not exist', self::messages($check)[0]);
 
-        self::assertSame([CheckLevel::Ok], self::levels(new SitemapSpoolCheck([])), 'defaults: auto mode, system temp dir');
+        self::assertSame([CheckLevel::Ok], self::levels(new SitemapSpoolCheck(new SitemapConfig())), 'defaults: auto mode, system temp dir');
     }
 
     /**

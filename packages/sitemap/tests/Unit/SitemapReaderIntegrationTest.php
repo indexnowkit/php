@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace IndexNowKit\Tests\Unit;
+namespace IndexNowKit\Sitemap\Tests\Unit;
 
 use IndexNowKit\Http\Psr18Transport;
 use IndexNowKit\Sitemap\SitemapReader;
-use IndexNowKit\Tests\Support\MockServer;
+use IndexNowKit\Sitemap\Tests\Support\MockServer;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
