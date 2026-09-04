@@ -2,11 +2,11 @@
 # Write packages/<name>/composer.monorepo.json for the given packages (default: all): the package manifest plus
 # path repositories for every sibling package, so `composer update` resolves the working copy of indexnowkit/*
 # instead of the Packagist release. Run Composer with COMPOSER=composer.monorepo.json afterwards.
-# PHP_VERSION (default 8.3) becomes config.platform.php. Uses the local php when there is one, Docker otherwise.
+# config.platform.php becomes the exact version of the PHP running the script: the local php when there is one
+# (CI: setup-php), otherwise the bin/php image selected by PHP_VERSION (default 8.3), i.e. the PHP the tests run on.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-PLATFORM="${PHP_VERSION:-8.3}"
 if command -v php >/dev/null 2>&1; then
-    exec php "$ROOT/bin/link.php" --platform="$PLATFORM" "$@"
+    exec php "$ROOT/bin/link.php" "$@"
 fi
-exec "$ROOT/bin/php" bin/link.php --platform="$PLATFORM" "$@"
+exec "$ROOT/bin/php" bin/link.php "$@"

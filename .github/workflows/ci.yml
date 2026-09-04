@@ -37,7 +37,6 @@ jobs:
           - { package: yii2, php: '8.2', deps: lowest }
     env:
       COMPOSER: composer.monorepo.json
-      PHP_VERSION: ${{ matrix.php }}
     defaults:
       run:
         working-directory: packages/${{ matrix.package }}

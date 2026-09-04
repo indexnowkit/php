@@ -7,24 +7,17 @@ declare(strict_types=1);
  *  - a path repository per sibling package, symlinked, with the version fixed to the sibling's branch alias
  *    (Composer would otherwise guess it from git and fail on a detached HEAD, which is what a pull request checkout is);
  *  - minimum-stability dev with prefer-stable, so only the linked siblings resolve to their dev version;
- *  - config.platform.php = --platform (bin/link passes PHP_VERSION, default 8.3), so the resolution matches the PHP
- *    the tests run on rather than the PHP of the Composer image.
+ *  - config.platform.php = the exact version of the PHP running this script (bin/link runs it on the PHP the tests
+ *    run on: PHP_VERSION image locally, setup-php in CI), so the resolution matches the test runtime rather than the
+ *    PHP of the Composer image. A short pin like 8.4 would mean 8.4.0 and resolve differently from a real 8.4.x.
  * composer.json itself stays untouched: it is what the split repositories and Packagist see.
  */
 
 $packagesDir = dirname(__DIR__) . '/packages';
-$platform = '8.3';
-$targets = [];
-foreach (array_slice($argv, 1) as $arg) {
-    if (str_starts_with($arg, '--platform=')) {
-        $platform = substr($arg, strlen('--platform='));
-    } else {
-        $targets[] = $arg;
-    }
-}
+$platform = PHP_VERSION;
 
 $all = array_map('basename', glob($packagesDir . '/*', GLOB_ONLYDIR) ?: []);
-$targets = $targets ?: $all;
+$targets = array_slice($argv, 1) ?: $all;
 
 $read = static function (string $package) use ($packagesDir): array {
     $file = $packagesDir . '/' . $package . '/composer.json';

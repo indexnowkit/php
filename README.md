@@ -53,8 +53,8 @@ bin/php -C packages/yii2 vendor/bin/phpstan analyse --memory-limit=1G
 ```
 
 `composer.monorepo.json` (git-ignored) is the package's `composer.json` plus path repositories for the sibling packages,
-`minimum-stability: dev` and `platform.php` pinned to `PHP_VERSION` (default 8.3) so the resolution matches the PHP
-the tests run on. `composer.json` itself is what the split repositories and Packagist ship. The GitHub workflow runs the
+`minimum-stability: dev` and `platform.php` pinned to the exact PHP that runs the tests (the `PHP_VERSION` image, default
+8.3), so the resolution does not follow the PHP of the Composer image. `composer.json` itself is what the split repositories and Packagist ship. The GitHub workflow runs the
 same steps per package; each split repository runs the same `ci:install:*` scripts with the siblings from Packagist.
 
 A mock IndexNow server is available for manual testing:
