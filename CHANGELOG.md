@@ -3,7 +3,7 @@
 All notable changes to the PHP packages are documented here, newest release wave first. Tags: `<package>@<version>`.
 Per-package detail (and the migration notes for every breaking change) lives in each package's own changelog.
 
-## 2026-09-04 — core@0.4.0, sitemap@0.1.0, doctrine@0.3.0, symfony-bundle@0.4.0, laravel@0.5.0, yii2@0.2.0
+## 2026-09-05 — core@0.4.0, sitemap@0.1.0, doctrine@0.3.0, symfony-bundle@0.4.0, laravel@0.5.0, yii2@0.2.0
 
 The "adapter kit" wave (docs/spec/16, wave A). **Upgrade the adapter, not the core alone**: adapters of the previous
 wave import classes that moved to `indexnowkit/sitemap`; every adapter of this wave requires `core ^0.4` and
