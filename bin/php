@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
-# Run PHP CLI inside Docker (no local PHP).
+# Run PHP CLI in the development image (no local PHP needed).
 # Usage: bin/php [-v 8.2] [-C packages/yii2] <args>   PHP_VERSION sets the default version (8.3).
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+# shellcheck source=lib/image.sh
+source "$ROOT/bin/lib/image.sh"
 VER="${PHP_VERSION:-8.3}"
 DIR="."
 while :; do
@@ -12,5 +14,6 @@ while :; do
         *) break ;;
     esac
 done
+IMAGE="$(image_for "$VER")"
 tty=(); [ -t 1 ] && tty=(-t)
-exec docker run --rm ${tty[@]+"${tty[@]}"} -v "$ROOT:/app" -w "/app/$DIR" "php:${VER}-cli" php "$@"
+exec docker run --rm ${tty[@]+"${tty[@]}"} -v "$ROOT:/app" -v indexnowkit-composer-cache:/tmp/composer -w "/app/$DIR" "$IMAGE" php "$@"

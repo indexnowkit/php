@@ -1,9 +1,13 @@
 #!/usr/bin/env bash
-# Run Composer inside Docker with a persistent cache volume. Composer's own -d selects the package:
+# Run Composer in the development image, on the same PHP the tests use (PHP_VERSION, default 8.3), with a persistent
+# cache volume. Composer's own -d selects the package:
 #   COMPOSER=composer.monorepo.json bin/composer -d packages/yii2 update
 # The COMPOSER variable (alternative manifest name, see bin/link) is passed through when set.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+# shellcheck source=lib/image.sh
+source "$ROOT/bin/lib/image.sh"
+IMAGE="$(image_for "${PHP_VERSION:-8.3}")"
 env=(); [ -n "${COMPOSER:-}" ] && env=(-e "COMPOSER=$COMPOSER")
 tty=(); [ -t 1 ] && tty=(-t)
-exec docker run --rm ${tty[@]+"${tty[@]}"} ${env[@]+"${env[@]}"} -v "$ROOT:/app" -v indexnowkit-composer-cache:/tmp/composer -w /app -e COMPOSER_HOME=/tmp/composer composer:2 "$@"
+exec docker run --rm ${tty[@]+"${tty[@]}"} ${env[@]+"${env[@]}"} -v "$ROOT:/app" -v indexnowkit-composer-cache:/tmp/composer -w /app "$IMAGE" composer "$@"

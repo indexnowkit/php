@@ -32,7 +32,8 @@ Russian READMEs exist for every package (`README.ru.md`); the specification unde
 
 ## Development
 
-No local PHP needed: the `bin/` scripts run everything in Docker. Each package is installed and tested **on its own**,
+No local PHP needed: the `bin/` scripts run everything in the development image (`docker/php/Dockerfile`: `php:<version>-cli`
+plus Composer, built on first use per `PHP_VERSION`). Each package is installed and tested **on its own**,
 in `packages/<name>`, against the working copy of its `indexnowkit/*` siblings; there is no root `composer.json`.
 
 ```bash
@@ -52,10 +53,10 @@ bin/php -C packages/yii2 vendor/bin/phpunit
 bin/php -C packages/yii2 vendor/bin/phpstan analyse --memory-limit=1G
 ```
 
-`composer.monorepo.json` (git-ignored) is the package's `composer.json` plus path repositories for the sibling packages,
-`minimum-stability: dev` and `platform.php` pinned to the exact PHP that runs the tests (the `PHP_VERSION` image, default
-8.3), so the resolution does not follow the PHP of the Composer image. `composer.json` itself is what the split repositories and Packagist ship. The GitHub workflow runs the
-same steps per package; each split repository runs the same `ci:install:*` scripts with the siblings from Packagist.
+`composer.monorepo.json` (git-ignored) is the package's `composer.json` plus path repositories for the sibling packages
+and `minimum-stability: dev`; Composer and the tests run on the same PHP, so no platform pin is needed. `composer.json`
+itself is what the split repositories and Packagist ship. The GitHub workflow runs the same steps per package; each split
+repository runs the same `ci:install:*` scripts with the siblings from Packagist.
 
 A mock IndexNow server is available for manual testing:
 
@@ -78,6 +79,7 @@ php/
 │   ├── laravel/           # indexnowkit/laravel       + docs/, tests/
 │   └── yii2/              # indexnowkit/yii2          + docs/, tests/
 ├── bin/                   # Docker wrappers: php, composer, link, ci, cs
+├── docker/php/            # development image (php:<version>-cli + Composer)
 ├── CHANGELOG.md           # monorepo changelog, per package
 ├── CONTRIBUTING.md
 └── SECURITY.md
