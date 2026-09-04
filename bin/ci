@@ -14,7 +14,7 @@ for pkg in "${packages[@]}"; do
     bin/link "$pkg"
     COMPOSER=composer.monorepo.json bin/composer -d "packages/$pkg" run "ci:install:$flavour"
     bin/php -C "packages/$pkg" vendor/bin/phpunit
-    if [ "$flavour" = dbal3 ]; then   # doctrine: the DBAL 3 connection instead of the DBAL 4 one
+    if [ "$pkg" = doctrine ] && [ "$flavour" != highest ]; then   # lowest and dbal3 install DBAL 3 / ORM 2: the V3 connection instead of the DBAL 4 one
         bin/php -C "packages/$pkg" vendor/bin/phpstan analyse --memory-limit=1G -c phpstan.dbal3.neon
     else
         bin/php -C "packages/$pkg" vendor/bin/phpstan analyse --memory-limit=1G
