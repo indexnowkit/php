@@ -3,6 +3,28 @@
 All notable changes to the PHP packages are documented here, newest release wave first. Tags: `<package>@<version>`.
 Per-package detail (and the migration notes for every breaking change) lives in each package's own changelog.
 
+## 2026-09-05 — symfony-bundle@0.6.1, yii2@0.5.0
+
+The debts left after the "adapter kit" waves (docs/spec/16). `core`, `sitemap`, `doctrine` and `laravel` are not
+released: the core gets a docblock, doctrine a phpstan run on its DBAL 3 / ORM 2 flavour, the split workflow mirrors
+in dependency stages and waits for Packagist's dev-main so the split CI of an adapter never builds against a stale
+core.
+
+### symfony-bundle@0.6.1
+
+Internal refactor, no API change: `IndexNowKitLoader::load()` split into one private method per block of services;
+`ContainerShapeTest` pins ids, classes, tags, aliases and their order per configuration variant.
+
+### yii2@0.5.0
+
+- **`Queue\SubmitUrlsJob` honours `Retry-After` and `retry.*`**: after a 429/5xx it re-pushes the rejected URLs as a
+  new job with the policy's delay, the same `id` and `attempt + 1`, and ends; it no longer throws, so the queue's own
+  `attempts`/`ttr` do not limit them (migration: set `retry.max_attempts` in the component options). The sync driver
+  ignores the delay (attempts run back-to-back). [docs/queue.md](packages/yii2/docs/queue.md).
+- `php yii help indexnow/<action>` describes the options with the texts and defaults of `Console\Definitions`.
+- Internal: `Wiring` (the `ServicesBuilder` description and the check lines) and `References` out of
+  `IndexNowComponent`; the component's public surface is unchanged.
+
 ## 2026-09-05 — core@0.5.1, symfony-bundle@0.6.0, laravel@0.7.0, yii2@0.4.0
 
 The "adapter kit" wave C (docs/spec/16 §1.5/§1.7): `indexnowkit/sitemap` is an optional add-on again. **If you use
