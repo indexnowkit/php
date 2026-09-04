@@ -1,70 +1,68 @@
 name: CI
 
+# Each package is installed and tested on its own, in packages/<name>, against the working copy of its indexnowkit/*
+# siblings (bin/link writes composer.monorepo.json with path repositories). Dependency flavours are the
+# ci:install:* scripts of the package's composer.json; the split repositories run the same scripts.
+
 on:
   push:
     branches: [main]
   pull_request:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   tests:
-    name: PHP ${{ matrix.php }} / ${{ matrix.deps }}
+    name: ${{ matrix.package }} / PHP ${{ matrix.php }} / ${{ matrix.deps }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
+        package: [core, doctrine, symfony-bundle, laravel, yii2]
         php: ['8.2', '8.3', '8.4', '8.5']
         deps: [highest]
         include:
-          - php: '8.2'
-            deps: lowest
-          - php: '8.3'
-            deps: dbal3
-          - php: '8.3'
-            deps: laravel11
-          - php: '8.4'
-            deps: laravel13
+          - { package: core, php: '8.2', deps: lowest }
+          - { package: doctrine, php: '8.2', deps: lowest }
+          - { package: doctrine, php: '8.3', deps: dbal3 }
+          - { package: symfony-bundle, php: '8.2', deps: lowest }
+          - { package: symfony-bundle, php: '8.3', deps: symfony64 }
+          # Laravel 12 is what "highest" resolves to on PHP 8.2, Laravel 13 on 8.3+; the floor is a flavour of its own.
+          - { package: laravel, php: '8.3', deps: laravel11 }
+          - { package: yii2, php: '8.2', deps: lowest }
+    env:
+      COMPOSER: composer.monorepo.json
+      PHP_VERSION: ${{ matrix.php }}
+    defaults:
+      run:
+        working-directory: packages/${{ matrix.package }}
     steps:
       - uses: actions/checkout@v4
       - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: pdo_sqlite, intl
+          extensions: pdo_sqlite, intl, xmlreader, zlib
           coverage: none
-      - name: Install (highest)
-        if: matrix.deps == 'highest'
-        run: composer update --no-interaction --prefer-dist
-      # Laravel 11/12 need Symfony >= 7.2 while these two jobs test the Symfony 6.4 floor: drop the Laravel packages here,
-      # the Laravel floor is covered by the laravel11 job.
-      - name: Drop the Laravel packages
-        if: matrix.deps == 'lowest' || matrix.deps == 'dbal3'
-        run: composer remove --no-update --no-interaction indexnowkit/laravel && composer remove --dev --no-update --no-interaction larastan/larastan orchestra/testbench
-      - name: Install (lowest)
-        if: matrix.deps == 'lowest'
-        run: composer update --no-interaction --prefer-dist --prefer-lowest --prefer-stable
-      - name: Install (DBAL 3 / ORM 2 / Symfony 6.4)
-        if: matrix.deps == 'dbal3'
-        run: composer update --no-interaction --prefer-dist --with doctrine/dbal:^3.8 --with doctrine/orm:^2.19 --with symfony/framework-bundle:^6.4
-      # Laravel 11 is past its security-fix window and every release carries advisories, which Composer >= 2.9 refuses to install by default.
-      - name: Install (Laravel 11 / Testbench 9)
-        if: matrix.deps == 'laravel11'
-        run: composer config policy.advisories.block false && composer update --no-interaction --prefer-dist --with laravel/framework:^11.0 --with orchestra/testbench:^9.0
-      # The root platform is pinned to PHP 8.2 (Laravel 12); Laravel 13 needs PHP 8.3, so lift the pin for this job only.
-      - name: Install (Laravel 13 / Testbench 11)
-        if: matrix.deps == 'laravel13'
-        run: composer config platform.php 8.4.0 && composer update --no-interaction --prefer-dist --with laravel/framework:^13.0 --with orchestra/testbench:^11.0
+      - name: Link the sibling packages
+        run: ../../bin/link ${{ matrix.package }}
+      - name: Install (${{ matrix.deps }})
+        run: composer run ci:install:${{ matrix.deps }}
       - run: vendor/bin/phpunit
-        if: matrix.deps != 'lowest' && matrix.deps != 'dbal3' && matrix.deps != 'laravel13'
-      - run: vendor/bin/phpunit --exclude-testsuite laravel
-        if: matrix.deps == 'lowest' || matrix.deps == 'dbal3'
-      # Lifting the pin also moves Symfony to 8, which the Doctrine/bundle suites do not support yet (DBAL 4.5): Laravel suite only.
-      - run: vendor/bin/phpunit --testsuite laravel
-        if: matrix.deps == 'laravel13'
+      - run: vendor/bin/phpstan analyse --memory-limit=1G
+        if: matrix.deps == 'highest'
+
   quality:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: shivammathur/setup-php@v2
         with: { php-version: '8.3', coverage: none }
-      - run: composer update --no-interaction --prefer-dist
-      - run: vendor/bin/phpstan analyse --memory-limit=1G
-      - run: vendor/bin/php-cs-fixer fix --dry-run --diff
+      - name: Validate the package manifests
+        run: for p in packages/*/; do composer validate --strict --no-check-lock --working-dir "$p"; done
+      - name: Coding standard
+        run: bin/cs check

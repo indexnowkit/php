@@ -1,7 +1,7 @@
-/vendor/
-/.phpunit.cache/
-/.php-cs-fixer.cache
 /packages/*/vendor/
 /packages/*/composer.lock
-/composer.lock
+/packages/*/composer.monorepo.json
+/packages/*/composer.monorepo.lock
+/packages/*/.phpunit.cache/
+/.php-cs-fixer.cache
 /var/

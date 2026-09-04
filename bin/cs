@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# php-cs-fixer from its official image over .php-cs-fixer.dist.php. Sequential: the parallel runner corrupted
+# files on 3.95. Usage: bin/cs [check]   (default: fix)
+set -euo pipefail
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+IMAGE="ghcr.io/php-cs-fixer/php-cs-fixer:${CS_FIXER_VERSION:-3.95-php8.3}"
+args=(fix --sequential)
+[ "${1:-}" = check ] && args+=(--dry-run --diff)
+tty=(); [ -t 1 ] && tty=(-t)
+exec docker run --rm ${tty[@]+"${tty[@]}"} -v "$ROOT:/code" "$IMAGE" "${args[@]}"

@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-$finder = PhpCsFixer\Finder::create()->in([__DIR__.'/packages/*/src', __DIR__.'/packages/*/tests']);
+$finder = PhpCsFixer\Finder::create()
+    ->in([__DIR__.'/packages/*/src', __DIR__.'/packages/*/tests'])
+    ->append([__DIR__.'/bin/link.php']);
 
 return (new PhpCsFixer\Config())
     ->setRiskyAllowed(true)

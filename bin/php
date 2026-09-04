@@ -1,7 +1,16 @@
 #!/usr/bin/env bash
-# Run PHP CLI inside Docker (no local PHP). Usage: bin/php [-v 8.2] <args>
+# Run PHP CLI inside Docker (no local PHP).
+# Usage: bin/php [-v 8.2] [-C packages/yii2] <args>   PHP_VERSION sets the default version (8.3).
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 VER="${PHP_VERSION:-8.3}"
-if [ "${1:-}" = "-v" ]; then VER="$2"; shift 2; fi
-exec docker run --rm -t -v "$ROOT:/app" -w /app -e COMPOSER_HOME=/tmp/composer "php:${VER}-cli" php "$@"
+DIR="."
+while :; do
+    case "${1:-}" in
+        -v) VER="$2"; shift 2 ;;
+        -C) DIR="$2"; shift 2 ;;
+        *) break ;;
+    esac
+done
+tty=(); [ -t 1 ] && tty=(-t)
+exec docker run --rm ${tty[@]+"${tty[@]}"} -v "$ROOT:/app" -w "/app/$DIR" "php:${VER}-cli" php "$@"

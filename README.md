@@ -32,16 +32,30 @@ Russian READMEs exist for every package (`README.ru.md`); the specification unde
 
 ## Development
 
-No local PHP needed — the helper scripts run everything in Docker.
+No local PHP needed: the `bin/` scripts run everything in Docker. Each package is installed and tested **on its own**,
+in `packages/<name>`, against the working copy of its `indexnowkit/*` siblings; there is no root `composer.json`.
 
 ```bash
-bin/composer install
-bin/php vendor/bin/phpunit                                                # all packages
-bin/php vendor/bin/phpunit --testsuite core                               # one suite
-bin/php -d memory_limit=1G vendor/bin/phpstan analyse --memory-limit=1G   # level 9
-bin/php vendor/bin/php-cs-fixer fix
-PHP_VERSION=8.2 bin/php vendor/bin/phpunit                                # the CI matrix runs 8.2-8.4
+bin/ci                                   # every package: link, composer update, phpunit, phpstan
+bin/ci yii2                              # one package
+bin/ci doctrine dbal3                    # a dependency flavour: the ci:install:* scripts of the package's composer.json
+PHP_VERSION=8.2 bin/ci core lowest       # the CI matrix runs 8.2-8.5
+bin/cs                                   # php-cs-fixer fix (bin/cs check = dry run)
 ```
+
+Step by step, for one package:
+
+```bash
+bin/link yii2                                                       # writes packages/yii2/composer.monorepo.json
+COMPOSER=composer.monorepo.json bin/composer -d packages/yii2 update
+bin/php -C packages/yii2 vendor/bin/phpunit
+bin/php -C packages/yii2 vendor/bin/phpstan analyse --memory-limit=1G
+```
+
+`composer.monorepo.json` (git-ignored) is the package's `composer.json` plus path repositories for the sibling packages,
+`minimum-stability: dev` and `platform.php` pinned to `PHP_VERSION` (default 8.3) so the resolution matches the PHP
+the tests run on. `composer.json` itself is what the split repositories and Packagist ship. The GitHub workflow runs the
+same steps per package; each split repository runs the same `ci:install:*` scripts with the siblings from Packagist.
 
 A mock IndexNow server is available for manual testing:
 
@@ -59,8 +73,11 @@ loopback hosts only.
 php/
 ├── packages/
 │   ├── core/              # indexnowkit/core          + docs/, tests/Conformance (C01-C22)
-│   ├── doctrine/          # indexnowkit/doctrine      + tests/ (A01-A14)
-│   └── symfony-bundle/    # indexnowkit/symfony-bundle + docs/, recipe/, tests/Functional (H01-H06)
+│   ├── doctrine/          # indexnowkit/doctrine      + tests/ (A01-A21)
+│   ├── symfony-bundle/    # indexnowkit/symfony-bundle + docs/, recipe/, tests/Functional (H01-H06)
+│   ├── laravel/           # indexnowkit/laravel       + docs/, tests/
+│   └── yii2/              # indexnowkit/yii2          + docs/, tests/
+├── bin/                   # Docker wrappers: php, composer, link, ci, cs
 ├── CHANGELOG.md           # monorepo changelog, per package
 ├── CONTRIBUTING.md
 └── SECURITY.md
