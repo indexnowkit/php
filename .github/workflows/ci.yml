@@ -32,8 +32,8 @@ jobs:
           - { package: doctrine, php: '8.3', deps: dbal3 }
           - { package: symfony-bundle, php: '8.2', deps: lowest }
           - { package: symfony-bundle, php: '8.3', deps: symfony64 }
-          # Laravel 12 is what "highest" resolves to on PHP 8.2, Laravel 13 on 8.3+; the floor is a flavour of its own.
-          - { package: laravel, php: '8.3', deps: laravel11 }
+          # highest = Laravel 12 on PHP 8.2, Laravel 13 on 8.3+; lowest = Testbench 10.0 and the oldest Laravel 12 without security advisories.
+          - { package: laravel, php: '8.2', deps: lowest }
           - { package: yii2, php: '8.2', deps: lowest }
     env:
       COMPOSER: composer.monorepo.json
