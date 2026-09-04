@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# Print the <version> section of a package CHANGELOG as GitHub release notes: relative links become absolute links
+# into the split repository (indexnowkit/php-<package>) at that tag. With --create, the release is created there
+# through the gh CLI (bin/tag first; the split workflow must have pushed the tag).
+#
+# Usage: bin/release-notes <package> <version> [--create]     bin/release-notes core 0.4.0 --create
+set -euo pipefail
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+pkg="${1:?usage: bin/release-notes <package> <version> [--create]}"
+ver="${2:?usage: bin/release-notes <package> <version> [--create]}"
+create="${3:-}"
+changelog="$ROOT/packages/$pkg/CHANGELOG.md"
+repo="indexnowkit/php-$pkg"
+[ -f "$changelog" ] || { echo "release-notes: no $changelog" >&2; exit 1; }
+body="$(awk -v ver="$ver" '
+    /^## / { if (found) exit; found = ($0 ~ "^## \\[?" ver "\\]? — [0-9-]+$") ; next }
+    found { print }
+' "$changelog" | sed '/./,$!d' | sed -e :a -e '/^\n*$/{$d;N;ba' -e '}')"
+[ -n "$body" ] || { echo "release-notes: $changelog has no section '## [$ver] — YYYY-MM-DD'" >&2; exit 1; }
+body="$(printf '%s\n' "$body" | perl -pe "s{\]\((?!https?://)([^)]+)\)}{](https://github.com/$repo/blob/$ver/\$1)}g")"
+if [ "$create" = "--create" ]; then
+    printf '%s\n' "$body" | gh release create "$ver" -R "$repo" -t "$ver" -F -
+    echo "release $ver created on $repo"
+else
+    printf '%s\n' "$body"
+fi

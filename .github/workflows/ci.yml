@@ -23,11 +23,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        package: [core, doctrine, symfony-bundle, laravel, yii2]
+        package: [core, sitemap, doctrine, symfony-bundle, laravel, yii2]
         php: ['8.2', '8.3', '8.4', '8.5']
         deps: [highest]
         include:
           - { package: core, php: '8.2', deps: lowest }
+          - { package: sitemap, php: '8.2', deps: lowest }
           - { package: doctrine, php: '8.2', deps: lowest }
           - { package: doctrine, php: '8.3', deps: dbal3 }
           - { package: symfony-bundle, php: '8.2', deps: lowest }

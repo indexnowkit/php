@@ -5,7 +5,8 @@ Packages are developed here and split into read-only repositories for Packagist.
 
 | Package | What |
 |---|---|
-| [`indexnowkit/core`](packages/core) | protocol client, batching, debounce, retry policy, the `#[IndexNow]` rule model |
+| [`indexnowkit/core`](packages/core) | protocol client, batching, debounce, retry policy, the `#[IndexNow]` rule model, the adapter kit (`Adapter\ConfigFactory`, factories, command bodies) |
+| [`indexnowkit/sitemap`](packages/sitemap) | sitemap reader (index, gzip, text) and the `sitemap` command body used by every adapter |
 | [`indexnowkit/doctrine`](packages/doctrine) | Doctrine ORM listener plus a DBAL middleware, commit-safe |
 | [`indexnowkit/symfony-bundle`](packages/symfony-bundle) | Symfony bundle: config, Messenger, key file route, commands, profiler panel |
 | [`indexnowkit/laravel`](packages/laravel) | Laravel: Eloquent observer, queue dispatch, key file route, artisan commands (Laravel 12–13) |
@@ -68,17 +69,33 @@ Pick a behaviour with the `X-Mock-Scenario` header: `ok200`, `pending202`, `forb
 others listed in the router. Point `engines` at `http://127.0.0.1:8089/indexnow` — plain HTTP is accepted on
 loopback hosts only.
 
+## Releasing
+
+One package at a time, in dependency order (core, then sitemap, then the adapters), each with a `CHANGELOG.md` section
+`## [x.y.z] — YYYY-MM-DD` and the `branch-alias` bumped in `composer.json`:
+
+```bash
+bin/tag core 0.4.0                      # push the php/ subtree, tag core@0.4.0 there; split.yml tags indexnowkit/php-core
+bin/packagist-wait core 0.4.0           # poll Packagist before tagging the packages that require the new version
+bin/release-notes core 0.4.0 --create   # GitHub release on the split repository from the changelog section
+```
+
+A new package needs its read-only repository `indexnowkit/php-<name>`, a write deploy key stored as the
+`SPLIT_SSH_KEY_<NAME>` secret of `indexnowkit/php`, an entry in `.github/workflows/split.yml`, and the Packagist
+registration after the first split push.
+
 ## Layout
 
 ```
 php/
 ├── packages/
 │   ├── core/              # indexnowkit/core          + docs/, tests/Conformance (C01-C22)
+│   ├── sitemap/           # indexnowkit/sitemap       + docs/, tests/
 │   ├── doctrine/          # indexnowkit/doctrine      + tests/ (A01-A21)
 │   ├── symfony-bundle/    # indexnowkit/symfony-bundle + docs/, recipe/, tests/Functional (H01-H06)
 │   ├── laravel/           # indexnowkit/laravel       + docs/, tests/
 │   └── yii2/              # indexnowkit/yii2          + docs/, tests/
-├── bin/                   # Docker wrappers: php, composer, link, ci, cs
+├── bin/                   # Docker wrappers: php, composer, link, ci, cs; release: tag, packagist-wait, release-notes
 ├── docker/php/            # development image (php:<version>-cli + Composer)
 ├── CHANGELOG.md           # monorepo changelog, per package
 ├── CONTRIBUTING.md
