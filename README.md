@@ -8,8 +8,8 @@ Packages are developed here and split into read-only repositories for Packagist.
 | [`indexnowkit/core`](packages/core) | protocol client, batching, debounce, retry policy, the `#[IndexNow]` rule model |
 | [`indexnowkit/doctrine`](packages/doctrine) | Doctrine ORM listener plus a DBAL middleware, commit-safe |
 | [`indexnowkit/symfony-bundle`](packages/symfony-bundle) | Symfony bundle: config, Messenger, key file route, commands, profiler panel |
-| `indexnowkit/laravel` | 0.3.0 on Packagist |
-| `indexnowkit/yii2` | 0.1.0 on Packagist |
+| [`indexnowkit/laravel`](packages/laravel) | Laravel: Eloquent observer, queue dispatch, key file route, artisan commands (Laravel 12–13) |
+| [`indexnowkit/yii2`](packages/yii2) | Yii2: ActiveRecord events with verify-on-commit, yii2-queue, key file route, console controller |
 
 Start with the package you will actually install. A Symfony application only needs the bundle README; the core
 README is the reference for everything underneath it.
