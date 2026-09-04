@@ -85,6 +85,10 @@ bin/packagist-wait core 0.4.0           # poll Packagist before tagging the pack
 bin/release-notes core 0.4.0 --create   # GitHub release on the split repository from the changelog section
 ```
 
+The split workflow mirrors in the same order (core, then sitemap, then the adapters) and, before pushing a package's
+main, waits (`bin/packagist-wait-main`) until Packagist's dev-main of its indexnowkit/* dependencies is the sha just
+pushed, so the split CI of an adapter never resolves a stale core.
+
 A new package needs its read-only repository `indexnowkit/php-<name>`, a write deploy key stored as the
 `SPLIT_SSH_KEY_<NAME>` secret of `indexnowkit/php`, an entry in `.github/workflows/split.yml`, and the Packagist
 registration after the first split push.

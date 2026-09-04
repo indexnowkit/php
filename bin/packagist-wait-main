@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+# Wait until Packagist's dev-main of every indexnowkit/* dependency of <package> points at the sha the split of that
+# dependency produces here. The split workflow runs it before pushing a package's main: an adapter's split CI
+# resolves indexnowkit/core ^x to dev-main, and Packagist learns the new dev-main from the webhook of the php-core
+# push, so without this wait the adapter built against the previous core (wave B and C: "Class ... not found").
+#
+# The dependencies come from the package's composer.json (require + require-dev, only those that live in packages/);
+# `git subtree split` is deterministic, so the sha computed here equals the one the dependency's job pushed.
+# A timeout is a warning, not a failure: Packagist must not block the mirroring.
+#
+# Usage: bin/packagist-wait-main <package> [max_seconds]     bin/packagist-wait-main yii2
+# Exit 0 always (0 when every dependency is visible, or after the timeout with a ::warning:: line).
+set -euo pipefail
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+pkg="${1:?usage: bin/packagist-wait-main <package> [max_seconds]}"
+max="${2:-300}"
+interval=15
+manifest="$ROOT/packages/$pkg/composer.json"
+[ -f "$manifest" ] || { echo "packagist-wait-main: no $manifest" >&2; exit 1; }
+cd "$ROOT"
+prefix="$(git rev-parse --show-prefix)"   # empty in the split repository, php/ in the monorepo
+top="$(git rev-parse --show-toplevel)"    # git subtree split runs from the toplevel only
+
+deps=()
+while IFS= read -r dep; do
+    [ -d "packages/$dep" ] && deps+=("$dep")
+done < <(jq -r '((.require // {}) + (."require-dev" // {})) | keys[] | select(startswith("indexnowkit/")) | ltrimstr("indexnowkit/")' "$manifest")
+if [ "${#deps[@]}" -eq 0 ]; then
+    echo "packagist-wait-main: $pkg has no indexnowkit/* dependency in packages/, nothing to wait for"
+    exit 0
+fi
+
+for dep in "${deps[@]}"; do
+    want="$(git -C "$top" subtree split --prefix="${prefix}packages/$dep" -q)"
+    url="https://repo.packagist.org/p2/indexnowkit/${dep}~dev.json"
+    t=0
+    while :; do
+        have="$(curl -fsS "$url" 2>/dev/null | jq -r --arg p "indexnowkit/$dep" 'first(.packages[$p][] | select(.version == "dev-main")) | .source.reference // empty' 2>/dev/null || true)"
+        if [ "$have" = "$want" ]; then
+            echo "packagist-wait-main: indexnowkit/$dep dev-main is ${want:0:7} after ${t}s"
+            break
+        fi
+        if [ "$t" -ge "$max" ]; then
+            echo "::warning::packagist-wait-main: indexnowkit/$dep dev-main is ${have:0:7}, expected ${want:0:7}, after ${max}s; pushing $pkg anyway ($url)"
+            break
+        fi
+        sleep "$interval"
+        t=$((t + interval))
+    done
+done
