@@ -46,8 +46,9 @@ bin/cs                                   # php-cs-fixer fix (bin/cs check = dry 
 bin/php -C packages/core vendor/bin/phpunit --coverage-clover coverage.xml && bin/coverage-floor core packages/core/coverage.xml
 ```
 
-Coverage: the image ships pcov; `bin/coverage-floor <package> <clover> [--write]` compares the line coverage of core
-and sitemap with `packages/<package>/tests/coverage-floor.txt` (CI fails below it; `--write` records a new floor).
+Coverage: the image ships pcov and intl, like the CI runners, so the numbers match; `bin/coverage-floor <package>
+<clover> [--write]` compares the line coverage of core and sitemap with `packages/<package>/tests/coverage-floor.txt`
+(CI fails below it; `--write` records a new floor, in a commit of its own when it lowers the floor).
 
 Step by step, for one package:
 
