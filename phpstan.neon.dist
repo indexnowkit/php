@@ -9,7 +9,10 @@ parameters:
         - packages/doctrine/src
         - packages/symfony-bundle/src
         - packages/laravel/src
+        - packages/yii2/src
     treatPhpDocTypesAsCertain: false
+    scanFiles:
+        - vendor/yiisoft/yii2/Yii.php
     ignoreErrors:
         # larastan resolves facade roots through @mixin, which makes phpstan-strict-rules see their methods as static
         - identifier: staticMethod.dynamicCall

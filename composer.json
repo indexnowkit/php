@@ -1,6 +1,6 @@
 {
     "name": "indexnowkit/php-monorepo",
-    "description": "Development monorepo for indexnowkit PHP packages (core, doctrine, symfony-bundle, laravel)",
+    "description": "Development monorepo for indexnowkit PHP packages (core, doctrine, symfony-bundle, laravel, yii2)",
     "type": "project",
     "license": "MIT",
     "minimum-stability": "stable",
@@ -19,7 +19,8 @@
         "indexnowkit/core": "@dev",
         "indexnowkit/doctrine": "@dev",
         "indexnowkit/symfony-bundle": "@dev",
-        "indexnowkit/laravel": "@dev"
+        "indexnowkit/laravel": "@dev",
+        "indexnowkit/yii2": "@dev"
     },
     "require-dev": {
         "doctrine/dbal": "^3.8 || ^4.0",
@@ -43,20 +44,25 @@
         "symfony/messenger": "^6.4 || ^7.0",
         "symfony/twig-bundle": "^6.4 || ^7.0",
         "symfony/web-profiler-bundle": "^6.4 || ^7.0",
-        "symfony/yaml": "^6.4 || ^7.0"
+        "symfony/yaml": "^6.4 || ^7.0",
+        "yidas/yii2-composer-bower-skip": "^2.0",
+        "yiisoft/yii2": "^2.0.45",
+        "yiisoft/yii2-queue": "^2.3"
     },
     "autoload-dev": {
         "psr-4": {
             "IndexNowKit\\Tests\\": "packages/core/tests/",
             "IndexNowKit\\Doctrine\\Tests\\": "packages/doctrine/tests/",
             "IndexNowKit\\SymfonyBundle\\Tests\\": "packages/symfony-bundle/tests/",
-            "IndexNowKit\\Laravel\\Tests\\": "packages/laravel/tests/"
+            "IndexNowKit\\Laravel\\Tests\\": "packages/laravel/tests/",
+            "IndexNowKit\\Yii2\\Tests\\": "packages/yii2/tests/"
         }
     },
     "config": {
         "sort-packages": true,
         "allow-plugins": {
-            "php-http/discovery": true
+            "php-http/discovery": true,
+            "yiisoft/yii2-composer": true
         },
         "platform": {
             "php": "8.2.0"
