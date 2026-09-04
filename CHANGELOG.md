@@ -3,6 +3,38 @@
 All notable changes to the PHP packages are documented here, newest release wave first. Tags: `<package>@<version>`.
 Per-package detail (and the migration notes for every breaking change) lives in each package's own changelog.
 
+## 2026-09-04 — core@0.4.0, sitemap@0.1.0, doctrine@0.3.0, symfony-bundle@0.4.0, laravel@0.5.0, yii2@0.2.0
+
+The "adapter kit" wave (docs/spec/16, wave A). **Upgrade the adapter, not the core alone**: adapters of the previous
+wave import classes that moved to `indexnowkit/sitemap`; every adapter of this wave requires `core ^0.4` and
+`sitemap ^0.1`.
+
+### core@0.4.0
+
+See [packages/core/CHANGELOG.md](packages/core/CHANGELOG.md).
+
+- **Breaking:** the sitemap reader, `IndexNowKit::sitemap()`, `Console\SitemapRunner`/`SitemapOptions`,
+  `Check\SitemapSpoolCheck` and `Vocabulary::$sitemapUrlOption` moved to `indexnowkit/sitemap`; `Result::urlsOf()`
+  removed; `create()` refuses a queue dispatch mode without a `$dispatcher`.
+- `Config`: `key_file.enabled`, `key_file.cache_max_age`, `debounce.store`, `http.client`, `keyFileHeaders()`;
+  `Adapter\ConfigFactory`; `Http\TransportFactory`, `Debounce\DebounceStoreFactory`, `Dispatch\DispatcherFactory`,
+  `fromConfig()` constructors; `Console\ClassNameResolver`, `Check\DebounceStoreCheck`,
+  `ArrayResolverLocator(locate:, hint:)`, `Url\RuleAwareUrlResolverInterface`, public `CheckReport` writers,
+  `IndexNowKit::submitAll()`/`urlsForAll()`.
+
+### sitemap@0.1.0
+
+See [packages/sitemap/CHANGELOG.md](packages/sitemap/CHANGELOG.md). First release: the reader, `SitemapConfig`,
+`SitemapReader::fromConfig()`, the `sitemap` command body and the spool check, over `core ^0.4`.
+
+### doctrine@0.3.0, symfony-bundle@0.4.0, laravel@0.5.0, yii2@0.2.0
+
+The adapters on the kit: their `ConfigFactory` classes are declarations of `Adapter\ConfigFactory`, their graphs are
+the core factories, `ContainerResolverLocator`/`CacheCheck`/`CacheStoreCheck` are gone (core `ArrayResolverLocator`
+and `DebounceStoreCheck` with a probe), a typo inside `key_file`/`sitemap` is warned about again, `sitemap` wiring
+goes through `SitemapConfig`. Configuration keys, commands, service ids, bindings and component properties are
+unchanged. Yii2 gains `docs/troubleshooting.md`. phpstan runs on every CI flavour.
+
 ## 2026-09-04 — laravel@0.4.0, symfony-bundle@0.3.1
 
 ### laravel@0.4.0
