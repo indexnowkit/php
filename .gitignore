@@ -1,8 +1,9 @@
-/packages/*/vendor/
+.quickstart-yii2/
+/.php-cs-fixer.cache
+/packages/*/.phpunit.cache/
 /packages/*/composer.lock
 /packages/*/composer.monorepo.json
 /packages/*/composer.monorepo.lock
-/packages/*/.phpunit.cache/
 /packages/*/coverage.xml
-/.php-cs-fixer.cache
+/packages/*/vendor/
 /var/
