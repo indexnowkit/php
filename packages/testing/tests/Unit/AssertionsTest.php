@@ -2,11 +2,10 @@
 
 declare(strict_types=1);
 
-namespace IndexNowKit\Tests\Unit\Testing;
+namespace IndexNowKit\Testing\Tests\Unit;
 
-use IndexNowKit\Testing\CheckOutputAssertions;
-use IndexNowKit\Testing\KeyFileAssertions;
-use IndexNowKit\Tests\Support\Factory;
+use IndexNowKit\Testing\Conformance\CheckOutputAssertions;
+use IndexNowKit\Testing\Conformance\KeyFileAssertions;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\TestCase;
@@ -16,12 +15,14 @@ use PHPUnit\Framework\TestCase;
  */
 final class AssertionsTest extends TestCase
 {
+    private const KEY = 'abcdef1234567890abcdef1234567890';
+
     #[TestDox('assertKeyFileResponse accepts the response of every adapter: header names in any case, directives in any order, list values')]
     public function testKeyFileResponseAccepts(): void
     {
-        KeyFileAssertions::assertKeyFileResponse(200, ['Content-Type' => 'text/plain; charset=utf-8', 'Cache-Control' => 'max-age=300, public', 'Vary' => 'Host'], Factory::KEY, Factory::KEY, 300, true);
-        KeyFileAssertions::assertKeyFileResponse(200, ['content-type' => ['text/plain; charset=utf-8'], 'cache-control' => ['public, max-age=60'], 'vary' => ['Accept-Encoding, Host']], Factory::KEY, Factory::KEY, 60, true);
-        KeyFileAssertions::assertKeyFileResponse(200, ['Content-Type' => 'text/plain; charset=utf-8', 'Cache-Control' => 'public, max-age=300'], Factory::KEY, Factory::KEY);
+        KeyFileAssertions::assertKeyFileResponse(200, ['Content-Type' => 'text/plain; charset=utf-8', 'Cache-Control' => 'max-age=300, public', 'Vary' => 'Host'], self::KEY, self::KEY, 300, true);
+        KeyFileAssertions::assertKeyFileResponse(200, ['content-type' => ['text/plain; charset=utf-8'], 'cache-control' => ['public, max-age=60'], 'vary' => ['Accept-Encoding, Host']], self::KEY, self::KEY, 60, true);
+        KeyFileAssertions::assertKeyFileResponse(200, ['Content-Type' => 'text/plain; charset=utf-8', 'Cache-Control' => 'public, max-age=300'], self::KEY, self::KEY);
         KeyFileAssertions::assertNotServed(404);
         $this->addToAssertionCount(1);
     }
@@ -31,17 +32,17 @@ final class AssertionsTest extends TestCase
     {
         $ok = ['Content-Type' => 'text/plain; charset=utf-8', 'Cache-Control' => 'public, max-age=300', 'Vary' => 'Host'];
         $cases = [
-            'status' => [404, $ok, Factory::KEY, 300, true],
+            'status' => [404, $ok, self::KEY, 300, true],
             'body' => [200, $ok, 'other', 300, true],
-            'content type' => [200, ['Content-Type' => 'text/html'] + $ok, Factory::KEY, 300, true],
-            'max-age' => [200, $ok, Factory::KEY, 60, true],
-            'public' => [200, ['Cache-Control' => 'max-age=300, private'] + $ok, Factory::KEY, 300, true],
-            'missing Vary' => [200, ['Content-Type' => $ok['Content-Type'], 'Cache-Control' => $ok['Cache-Control']], Factory::KEY, 300, true],
-            'unexpected Vary' => [200, $ok, Factory::KEY, 300, false],
+            'content type' => [200, ['Content-Type' => 'text/html'] + $ok, self::KEY, 300, true],
+            'max-age' => [200, $ok, self::KEY, 60, true],
+            'public' => [200, ['Cache-Control' => 'max-age=300, private'] + $ok, self::KEY, 300, true],
+            'missing Vary' => [200, ['Content-Type' => $ok['Content-Type'], 'Cache-Control' => $ok['Cache-Control']], self::KEY, 300, true],
+            'unexpected Vary' => [200, $ok, self::KEY, 300, false],
         ];
         foreach ($cases as $name => [$status, $headers, $body, $maxAge, $vary]) {
             try {
-                KeyFileAssertions::assertKeyFileResponse($status, $headers, $body, Factory::KEY, $maxAge, $vary);
+                KeyFileAssertions::assertKeyFileResponse($status, $headers, $body, self::KEY, $maxAge, $vary);
                 self::fail($name . ' should fail');
             } catch (AssertionFailedError $e) {
                 self::assertNotSame($name . ' should fail', $e->getMessage(), $name);

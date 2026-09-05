@@ -1,6 +1,6 @@
 # Working in this repository (for coding agents and humans alike)
 
-This is the monorepo of the `indexnowkit/*` PHP packages: `packages/{core,sitemap,doctrine,symfony-bundle,laravel,yii2}`.
+This is the monorepo of the `indexnowkit/*` PHP packages: `packages/{core,testing,sitemap,doctrine,symfony-bundle,laravel,yii2}`.
 Each package is published as a read-only split (`indexnowkit/php-<package>`) and on Packagist; issues and pull
 requests live here. The specification the code follows is `docs/spec/` in the private workspace this repository is
 mirrored from — the README and `docs/*.md` of each package are the public contract.
@@ -23,8 +23,10 @@ Everything runs in Docker through `bin/*`:
 ## Before you change code
 
 - Read the package README and `docs/*.md` for the area; the behaviour is specified there, not only in tests.
-- Adapter behaviour is covered by shared conformance kits from the core (`IndexNowKit\Testing\Conformance\*`, ids
-  C01–C22, A01–A21, H01–H06): a change in an adapter must keep them green unchanged.
+- Adapter behaviour is covered by the shared conformance kits of `indexnowkit/testing` (`IndexNowKit\Testing\Conformance\*`,
+  ids C01–C22, A01–A21, H01–H06): a change in an adapter must keep them green unchanged. The core never depends on
+  `testing` (its tests use the `IndexNowKit\Testing` doubles only): the split of the core aliases the previous minor
+  until it is tagged, so the dependency would be a bootstrap cycle.
 - The core is framework-agnostic: nothing under `packages/core/src` imports Symfony, Laravel, Yii or Doctrine
   classes (`symfony/console` is a documented exception until the `console` package exists).
 - Keys are never logged or printed in full: `KeyValidator::mask()`.

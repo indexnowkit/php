@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace IndexNowKit\Testing;
+namespace IndexNowKit\Testing\Conformance;
 
 use IndexNowKit\Config;
 use PHPUnit\Framework\Assert;
