@@ -27,7 +27,7 @@
     },
     "require": {
         "php": "^8.2",
-        "indexnowkit/core": "^0.8"
+        "indexnowkit/core": "^0.9"
     },
     "require-dev": {
         "phpstan/phpstan": "^2.2.13",
@@ -63,7 +63,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "0.1.x-dev"
+            "dev-main": "0.2.x-dev"
         }
     }
 }
