@@ -3,6 +3,25 @@
 All notable changes to the PHP packages are documented here, newest release wave first. Tags: `<package>@<version>`.
 Per-package detail (and the migration notes for every breaking change) lives in each package's own changelog.
 
+## 2026-09-06 — core@0.8.0, console@0.2.0, testing@0.1.1, sitemap@0.4.0, doctrine@0.6.0, symfony-bundle@0.9.0, laravel@0.10.0, yii2@0.8.0
+
+Wave E of docs/spec/17 ("operations and SEO"). `check` becomes a healthcheck: every line carries a stable code
+(core/docs/check-codes.md), `--json` follows console/docs/check.schema.json, `--strict` fails on warnings, `--host`
+repeats, and the key file's `Content-Type`, `Cache-Control`/`Age`, `robots.txt` and `previous_key` are checked
+(`Http\Response` exposes headers). `key:generate --force` keeps the old key as `INDEXNOW_PREVIOUS_KEY` and refuses a
+second rotation. The 403 escalation counts in the PSR-16 cache behind `debounce.store`, once per fleet.
+`Submission\SubmissionStoreInterface` (+ `NullSubmissionStore`) is the hook the history package fills. URLs are
+canonical before dedup and debounce: tracking parameters stripped by default (`normalizer.*`, `UrlNormalizerFactory`).
+`Attribute\Param\Condition`/`FieldCondition`: `Equals` is a condition, `when` is `string|Condition|Closure`, `explain`
+shows the values and has `--json`. `indexnow:config --json` prints the effective configuration, keys masked. Laravel
+publishes results as events and has an `about` section; Yii2 raises `EVENT_RESULT` and takes `-v/-vv/-vvv`. `Reason`
+reserves the verify cases. Breaking (with migrations in the package changelogs): `Equals` in `params`, a `ParamValue`
+in `when`, the Yii2 `--verbose` option; behaviour change: `strip_tracking_params` on.
+
+### core@0.8.0, console@0.2.0, testing@0.1.1, sitemap@0.4.0, doctrine@0.6.0, symfony-bundle@0.9.0, laravel@0.10.0, yii2@0.8.0
+
+See the package changelogs; the constraints move to `core ^0.8`, `console ^0.2`, `sitemap ^0.4`, `doctrine ^0.6`.
+
 ## 2026-09-06 — core@0.7.0, testing@0.1.0, console@0.1.0, sitemap@0.3.0, doctrine@0.5.0, symfony-bundle@0.8.0, laravel@0.9.0, yii2@0.7.0
 
 Wave D of docs/spec/17 ("the composition of the core") plus the documentation wave 0b. Two packages leave the core
