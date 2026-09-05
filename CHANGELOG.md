@@ -3,6 +3,44 @@
 All notable changes to the PHP packages are documented here, newest release wave first. Tags: `<package>@<version>`.
 Per-package detail (and the migration notes for every breaking change) lives in each package's own changelog.
 
+## 2026-09-05 — core@0.6.0, symfony-bundle@0.7.0, laravel@0.8.0, yii2@0.6.0, doctrine@0.4.0, sitemap@0.2.0
+
+Wave 0a of docs/spec/17 ("PHP family to 1.0"): the one audit finding with irreversible consequences, and everything
+`bc.md` allows in a minor. **`check` is red on a staging copy that has the production key and no `dry_run` setting**
+— that copy submits real URLs. Add `dry_run: false` (Laravel: `INDEXNOW_DRY_RUN=0`) where an environment submits on
+purpose; the line becomes a warning. Everything else is additive.
+
+### core@0.6.0
+
+- `check`: the environment line with four states (unset / staging without dry_run = error / explicit `dry_run: false`
+  = warning / production = ok); `Config::$dryRunExplicit`.
+- Debounce fix with several engines: a URL one engine still has to retry (429/5xx/transport) is not marked; a
+  permanent refusal (403/422) at one engine still is.
+- `Engine::InternetArchive`, `Engine::Amazon` (registry snapshot 2026-09-05); `INDEXNOW_PREVIOUS_KEY` in `fromEnv()`.
+- Twelve error texts rewritten (fact, what is allowed, how to fix); `check` ends with a "Next:" line; the key file
+  mismatch prints the body's start and the catch-all-route hint; `RetryingSubmitter` docblock.
+
+### symfony-bundle@0.7.0, laravel@0.8.0, yii2@0.6.0
+
+- `core ^0.6`; the staging failure of `check` in every adapter (functional tests). Bundle: the `dry_run` node has no
+  default; the `debounce` line of `check` through the core `DebounceStoreCheck` + `CacheProbe` (parity with Laravel
+  and Yii2). Laravel: `config/indexnow.php` reads `env('INDEXNOW_DRY_RUN')` without a cast (a config file published
+  earlier gets the warning instead of the error until re-published); Laravel 12 | 13 in the badge and CONTRIBUTING.
+- README defects of the audit fixed; "Why this over X"; "Notification, not indexing"; `docs/bc.md` per adapter.
+
+### doctrine@0.4.0, sitemap@0.2.0
+
+- `core ^0.6` only; sitemap gets `psalm.xml` and the weekly taint-analysis workflow, and the `--changed-since` /
+  `lastmod` paragraph.
+
+### Monorepo
+
+- `bin/packagist-check <pkg>` (split tag vs Packagist p2 vs the package page; called at the end of `bin/tag`),
+  `.github/dependabot.yml` (composer per package + github-actions, weekly, grouped), `composer audit` in CI,
+  `roave/security-advisories: dev-latest` in every `require-dev`, issue and PR templates, `CODE_OF_CONDUCT.md`,
+  SECURITY.md response times, `authors` / `allow-plugins` / `psr-18` `psr-3` keywords in the adapters' composer.json,
+  badges in one order (`coverage ≥ NN% enforced` from `tests/coverage-floor.txt`, `phpstan level 9`, license).
+
 ## 2026-09-05 — symfony-bundle@0.6.1, yii2@0.5.0
 
 The debts left after the "adapter kit" waves (docs/spec/16). `core`, `sitemap`, `doctrine` and `laravel` are not
