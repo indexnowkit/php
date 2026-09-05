@@ -1,0 +1,55 @@
+name: Docs site
+
+# Builds https://indexnowkit.github.io/php from the package READMEs and docs (bin/docs-collect + MkDocs Material),
+# checks the links (lychee: internal links are strict, external ones tolerate rate limiting) and deploys to GitHub
+# Pages on main. Pages must be enabled once in the repository settings with "GitHub Actions" as the source.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: docs-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: pip install mkdocs-material==9.*
+      - name: Collect the pages
+        run: bin/docs-collect
+      - name: Build (strict: a broken internal link fails)
+        run: mkdocs build --strict -f docs-site/mkdocs.yml -d site
+      - name: Check links
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: >-
+            --no-progress --accept 200..=299,403,429 --max-retries 2 --timeout 20
+            --exclude '^https://packagist\.org' --exclude '^https://www\.example\.com' --exclude 'example\.(com|de)'
+            --exclude 'localhost' --exclude '^https://yandex\.com/indexnow' --exclude 'indexnow\.org/indexnow$'
+            'docs-site/site/**/*.html'
+          fail: true
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: docs-site/site }
+
+  deploy:
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
