@@ -3,6 +3,30 @@
 All notable changes to the PHP packages are documented here, newest release wave first. Tags: `<package>@<version>`.
 Per-package detail (and the migration notes for every breaking change) lives in each package's own changelog.
 
+## Unreleased — core@0.9.0, console@0.3.0, testing@0.2.0, verify@0.1.0, history@0.1.0, sitemap@0.5.0, doctrine@0.7.0, symfony-bundle@0.10.0, laravel@0.11.0, yii2@0.9.0
+
+Wave F of docs/spec/17 ("new optional packages"). Two packages join the family, both off until configured:
+**`indexnowkit/verify`** — one GET of every URL before it is submitted (`Verify\VerifyingSubmitter`, a decorator
+around the adapter's submitter, so sync flushes, queue workers and the commands verify): `noindex` (meta and
+`X-Robots-Tag`), `robots.txt`, a canonical pointing elsewhere (`non_canonical: skip|replace`), redirects
+(`redirect: skip|follow`; 301/308 submit both URLs), origin errors (`origin_error: skip|send`); 404/410 pass as
+deletions; `check --sample=<url>` / `--sample-class=<class>` reports the same signals as warnings; `sitemap
+--no-verify` skips the pre-flight. **`indexnowkit/history`** — `Psr16SubmissionStore` (a ring buffer in the debounce
+cache) and `Pdo\PdoSubmissionStore` (a table, migration snippets for Doctrine Migrations, Laravel and Yii2), the
+`history` (`--host`, `--status`, `--url`, `--since`, `--json`, `--purge`) and `status` (`--json` per
+`status.schema.json`: switches, dispatch and queue, debounce store, the 403 counter per host, the last successful
+submission, history size) commands, `history.store`/`history.records` lines of `check`, a "Recent submissions" table
+in the Symfony profiler. Core 0.9.0 is additive only: `Retry\ForbiddenCounter` (the 403 logic of `Client`, now
+readable by `status`), `TransportFactory::lazy(..., $extraHeaders)`, `Psr18Transport::discover(..., $extraHeaders)`.
+Console 0.3.0: `check --sample*`, `ConfigRunner::run(..., $packages)`. Testing 0.2.0: `SubmissionStoreConformanceTestCase`
+(S01–S08). The three adapters wire both packages behind `Adapter\OptionalPackage`, print `verify: not installed …` /
+`history: not installed …` without them, and ship stub commands that exit 1 with the install line.
+
+### core@0.9.0, console@0.3.0, testing@0.2.0, verify@0.1.0, history@0.1.0, sitemap@0.5.0, doctrine@0.7.0, symfony-bundle@0.10.0, laravel@0.11.0, yii2@0.9.0
+
+See the package changelogs; the constraints move to `core ^0.9`, `console ^0.3`, `testing ^0.2`, `sitemap ^0.5`,
+`doctrine ^0.7`, and the adapters `suggest` (and test against) `verify ^0.1` and `history ^0.1`.
+
 ## 2026-09-06 — core@0.8.0, console@0.2.0, testing@0.1.1, sitemap@0.4.0, doctrine@0.6.0, symfony-bundle@0.9.0, laravel@0.10.0, yii2@0.8.0
 
 Wave E of docs/spec/17 ("operations and SEO"). `check` becomes a healthcheck: every line carries a stable code

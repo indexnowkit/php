@@ -9,6 +9,8 @@ Packages are developed here and split into read-only repositories for Packagist.
 | [`indexnowkit/console`](packages/console) | the bodies of the `check`, `submit`, `submit-<subject>`, `explain` and `key:generate` commands and their definitions (`symfony/console`); required by every framework adapter |
 | [`indexnowkit/testing`](packages/testing) | `require-dev`: the conformance kits (C01–C22, A01–A21), the H01–H05 assertions, `ReadmeAssertions`, the mock IndexNow server |
 | [`indexnowkit/sitemap`](packages/sitemap) | optional add-on: sitemap reader (index, gzip, text) and the body of the `sitemap` command; `composer require indexnowkit/sitemap` next to an adapter |
+| [`indexnowkit/verify`](packages/verify) | optional add-on: one GET before every submission (noindex, robots.txt, canonical, redirects, origin errors) and `check --sample`; `verify.enabled: true` |
+| [`indexnowkit/history`](packages/history) | optional add-on: PSR-16 and PDO implementations of `SubmissionStoreInterface`, the `history` and `status` commands, the profiler table; `history.store: psr16|pdo` |
 | [`indexnowkit/doctrine`](packages/doctrine) | Doctrine ORM listener plus a DBAL middleware, commit-safe |
 | [`indexnowkit/symfony-bundle`](packages/symfony-bundle) | Symfony bundle: config, Messenger, key file route, commands, profiler panel |
 | [`indexnowkit/laravel`](packages/laravel) | Laravel: Eloquent observer, queue dispatch, key file route, artisan commands (Laravel 12–13) |
@@ -105,6 +107,8 @@ php/
 │   ├── console/           # indexnowkit/console       + docs/, tests/ (the command runners and definitions)
 │   ├── testing/           # indexnowkit/testing       + docs/, resources/mock-server/, tests/ (the conformance kits)
 │   ├── sitemap/           # indexnowkit/sitemap       + docs/, tests/
+│   ├── verify/            # indexnowkit/verify        + docs/, tests/
+│   ├── history/           # indexnowkit/history       + docs/, tests/ (S01-S08 against both stores)
 │   ├── doctrine/          # indexnowkit/doctrine      + tests/ (A01-A21)
 │   ├── symfony-bundle/    # indexnowkit/symfony-bundle + docs/, recipe/, tests/Functional (H01-H06)
 │   ├── laravel/           # indexnowkit/laravel       + docs/, tests/
