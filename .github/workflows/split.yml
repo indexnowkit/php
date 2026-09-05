@@ -41,10 +41,10 @@ jobs:
           elif [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
             echo "skip=1" >> "$GITHUB_OUTPUT"
           fi
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         if: steps.tag.outputs.skip != '1'
         with: { fetch-depth: 0 }
-      - uses: webfactory/ssh-agent@v0.9.1
+      - uses: webfactory/ssh-agent@v0.10.0
         if: steps.tag.outputs.skip != '1'
         with:
           ssh-private-key: ${{ secrets[matrix.secret] }}
@@ -87,10 +87,10 @@ jobs:
           elif [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
             echo "skip=1" >> "$GITHUB_OUTPUT"
           fi
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         if: steps.tag.outputs.skip != '1'
         with: { fetch-depth: 0 }
-      - uses: webfactory/ssh-agent@v0.9.1
+      - uses: webfactory/ssh-agent@v0.10.0
         if: steps.tag.outputs.skip != '1'
         with:
           ssh-private-key: ${{ secrets[matrix.secret] }}
@@ -139,10 +139,10 @@ jobs:
           elif [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
             echo "skip=1" >> "$GITHUB_OUTPUT"
           fi
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         if: steps.tag.outputs.skip != '1'
         with: { fetch-depth: 0 }
-      - uses: webfactory/ssh-agent@v0.9.1
+      - uses: webfactory/ssh-agent@v0.10.0
         if: steps.tag.outputs.skip != '1'
         with:
           ssh-private-key: ${{ secrets[matrix.secret] }}
