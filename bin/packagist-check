@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 # Compare what a package looks like from three places: the newest tag of its split repository
 # (github.com/indexnowkit/php-<package>), the Composer metadata Packagist serves to `composer`
-# (repo.packagist.org/p2/indexnowkit/<package>.json) and the Packagist package page / API
-# (packagist.org/packages/indexnowkit/<package>.json). p2 updates within seconds of the webhook; the page
-# lags until Packagist's crawler runs or someone presses "Update" on the package page. A difference is a warning.
+# (repo.packagist.org/p2/indexnowkit/<package>.json) and the Packagist package page
+# (packagist.org/packages/indexnowkit/<package>, the HTML: its JSON twin `<package>.json` sits behind a 12-hour CDN
+# cache and is useless for this). p2 updates within seconds of the webhook; the page lags until Packagist's crawler
+# runs or someone presses "Update" on it. A difference is a warning.
 #
 # Usage: bin/packagist-check <package> [--strict]     bin/packagist-check core
 # Exit 0 (warnings printed), 1 with --strict when the three disagree or a source is unreachable.
@@ -12,13 +13,13 @@ pkg="${1:?usage: bin/packagist-check <package> [--strict]}"
 strict="${2:-}"
 repo="https://github.com/indexnowkit/php-${pkg}.git"
 p2="https://repo.packagist.org/p2/indexnowkit/${pkg}.json"
-page="https://packagist.org/packages/indexnowkit/${pkg}.json"
+page="https://packagist.org/packages/indexnowkit/${pkg}"
 
 highest() { sort -t. -k1,1n -k2,2n -k3,3n | tail -1; }
 
 split_tag="$(git ls-remote --tags "$repo" 2>/dev/null | sed -n 's|.*refs/tags/\([0-9][0-9.]*\)$|\1|p' | highest || true)"
 p2_ver="$(curl -fsS "$p2" 2>/dev/null | grep -oE '"version": ?"[0-9][0-9.]*"' | grep -oE '[0-9][0-9.]*' | highest || true)"
-page_ver="$(curl -fsS "$page" 2>/dev/null | grep -oE '"version": ?"[0-9][0-9.]*"' | grep -oE '[0-9][0-9.]*' | highest || true)"
+page_ver="$(curl -fsS "$page" 2>/dev/null | grep -oE '"version-number">[0-9][0-9.]*<' | grep -oE '[0-9][0-9.]*' | highest || true)"
 
 printf 'indexnowkit/%s\n  split tag   %s\n  p2          %s\n  package page %s\n' "$pkg" "${split_tag:-?}" "${p2_ver:-?}" "${page_ver:-?}"
 
