@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace IndexNowKit\Tests\Unit\Console;
+namespace IndexNowKit\Console\Tests\Unit;
 
 use IndexNowKit\Adapter\SubmitterFactory;
 use IndexNowKit\Attribute\AttributeReader;
@@ -20,6 +20,7 @@ use IndexNowKit\Console\SubjectLoaderInterface;
 use IndexNowKit\Console\SubmitRunner;
 use IndexNowKit\Console\SubmitSubjectsOptions;
 use IndexNowKit\Console\SubmitSubjectsRunner;
+use IndexNowKit\Console\Tests\Support\Factory;
 use IndexNowKit\Console\Vocabulary;
 use IndexNowKit\Debounce\MemoryDebounceStore;
 use IndexNowKit\Event;
@@ -30,7 +31,6 @@ use IndexNowKit\IndexNowKit;
 use IndexNowKit\Key\KeyValidator;
 use IndexNowKit\Submission\ResultSummary;
 use IndexNowKit\Testing\FakeTransport;
-use IndexNowKit\Tests\Support\Factory;
 use IndexNowKit\Throttle\NullThrottle;
 use IndexNowKit\Url\AttributeUrlResolver;
 use IndexNowKit\Url\UrlNormalizer;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace IndexNowKit\Tests\Unit\Console;
+namespace IndexNowKit\Console\Tests\Unit;
 
 use IndexNowKit\Console\ClassNameResolver;
 use IndexNowKit\Exception\InvalidArgumentException;
@@ -14,7 +14,7 @@ final class ClassNameResolverTest extends TestCase
 {
     private static function resolver(): ClassNameResolver
     {
-        return new ClassNameResolver(['Nope\\Models', 'IndexNowKit\\Tests\\Unit\\Console'], static fn(string $class): bool => is_subclass_of($class, TestCase::class), 'a test case');
+        return new ClassNameResolver(['Nope\\Models', 'IndexNowKit\\Console\\Tests\\Unit'], static fn(string $class): bool => is_subclass_of($class, TestCase::class), 'a test case');
     }
 
     #[TestDox('an FQCN (with or without a leading backslash) and a short name under the namespaces resolve; the accepted class is returned qualified')]

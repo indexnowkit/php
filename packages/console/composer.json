@@ -1,19 +1,18 @@
 {
-    "name": "indexnowkit/sitemap",
-    "description": "Sitemap reader for indexnowkit: streams sitemap indexes, gzip and text sitemaps into IndexNow submissions; the sitemap command of every adapter",
+    "name": "indexnowkit/console",
+    "description": "Console runners for indexnowkit: the bodies of the check, submit, submit-<subject>, explain and key:generate commands of every framework adapter, and the one declaration of their arguments and options (symfony/console)",
     "type": "library",
     "license": "MIT",
     "minimum-stability": "dev",
     "prefer-stable": true,
     "keywords": [
         "indexnow",
-        "sitemap",
-        "seo",
-        "yandex",
-        "bing",
-        "indexing"
+        "console",
+        "cli",
+        "symfony-console",
+        "seo"
     ],
-    "homepage": "https://indexnowkit.github.io/php/sitemap/",
+    "homepage": "https://indexnowkit.github.io/php/console/",
     "authors": [
         {
             "name": "Igor Pinchuk",
@@ -22,39 +21,30 @@
     ],
     "support": {
         "issues": "https://github.com/indexnowkit/php/issues",
-        "source": "https://github.com/indexnowkit/php-sitemap",
-        "docs": "https://github.com/indexnowkit/php-sitemap/blob/main/README.md",
-        "security": "https://github.com/indexnowkit/php-sitemap/blob/main/SECURITY.md"
+        "source": "https://github.com/indexnowkit/php-console",
+        "docs": "https://github.com/indexnowkit/php-console/blob/main/README.md",
+        "security": "https://github.com/indexnowkit/php-console/blob/main/SECURITY.md"
     },
     "require": {
         "php": "^8.2",
-        "ext-xmlreader": "*",
-        "indexnowkit/console": "^0.1",
         "indexnowkit/core": "^0.7",
-        "psr/log": "^2.0 || ^3.0",
         "symfony/console": "^6.4 || ^7.0 || ^8.0"
     },
     "require-dev": {
-        "indexnowkit/testing": "^0.1",
-        "nyholm/psr7": "^1.8",
         "phpstan/phpstan": "^2.2.13",
         "phpstan/phpstan-phpunit": "^2.0.18",
         "phpstan/phpstan-strict-rules": "^2.0.12",
         "phpunit/phpunit": "^11.5",
-        "roave/security-advisories": "dev-latest",
-        "symfony/http-client": "^6.4 || ^7.0"
-    },
-    "suggest": {
-        "ext-zlib": "Reading gzip-compressed sitemaps"
+        "roave/security-advisories": "dev-latest"
     },
     "autoload": {
         "psr-4": {
-            "IndexNowKit\\Sitemap\\": "src/"
+            "IndexNowKit\\Console\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "IndexNowKit\\Sitemap\\Tests\\": "tests/"
+            "IndexNowKit\\Console\\Tests\\": "tests/"
         }
     },
     "scripts": {
@@ -71,7 +61,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "0.2.x-dev"
+            "dev-main": "0.1.x-dev"
         }
     }
 }

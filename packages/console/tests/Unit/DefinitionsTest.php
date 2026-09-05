@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace IndexNowKit\Tests\Unit\Console;
+namespace IndexNowKit\Console\Tests\Unit;
 
 use IndexNowKit\Console\ArgumentDefinition;
 use IndexNowKit\Console\CommandDefinition;
