@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 use IndexNowKit\Config;
 use IndexNowKit\Sitemap\SitemapConfig;
+use IndexNowKit\Verify\VerifyConfig;
 use IndexNowKit\SymfonyBundle\DependencyInjection\IndexNowKitConfiguration;
 use Symfony\Component\Config\Definition\ArrayNode;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -122,7 +123,7 @@ function config_table_render(): string
             $bundle[$key] = ['default' => config_table_render_default($value), 'symfony' => isset($bundle[$key])];
         }
     }
-    $bundleOnly = array_values(array_filter(array_keys($bundle), static fn(string $k): bool => !\in_array($k, Config::OPTIONS, true) && !\in_array($k, SitemapConfig::OPTIONS, true) && !str_starts_with($k, 'sitemap.') && $k !== 'hosts' && $k !== 'serve_key_file'));
+    $bundleOnly = array_values(array_filter(array_keys($bundle), static fn(string $k): bool => !\in_array($k, Config::OPTIONS, true) && !\in_array($k, SitemapConfig::OPTIONS, true) && !str_starts_with($k, 'sitemap.') && !\in_array($k, VerifyConfig::OPTIONS, true) && !str_starts_with($k, 'verify.') && !str_starts_with($k, 'history.') && $k !== 'hosts' && $k !== 'serve_key_file'));
 
     $lines = [];
     $lines[] = CONFIG_TABLE_START;
@@ -148,6 +149,10 @@ function config_table_render(): string
     $lines[] = '### Sitemap keys (`indexnowkit/sitemap`)';
     $lines[] = '';
     $lines[] = 'The `sitemap` block is the same in the three adapters and is owned by the sitemap package: ' . implode(', ', array_map(static fn(string $k): string => '`' . $k . '`', SitemapConfig::OPTIONS)) . '.';
+    $lines[] = '';
+    $lines[] = '### Verify keys (`indexnowkit/verify`)';
+    $lines[] = '';
+    $lines[] = 'The `verify` block is the same in the three adapters and is owned by the verify package (its `docs/configuration.md` has the table): ' . implode(', ', array_map(static fn(string $k): string => '`' . $k . '`', VerifyConfig::OPTIONS)) . '.';
     $lines[] = '';
     $lines[] = '### One concept, three keys';
     $lines[] = '';
