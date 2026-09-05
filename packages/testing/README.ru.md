@@ -23,7 +23,7 @@ composer require --dev indexnowkit/testing      # тянет indexnowkit/core; P
 
 ## Киты соответствия
 
-Два абстрактных тест-кейса превращают [docs/spec/03](https://github.com/indexnowkit/spec/blob/main/03-conformance.md)
+Три абстрактных тест-кейса превращают [docs/spec/03](https://github.com/indexnowkit/spec/blob/main/03-conformance.md)
 в исполняемые сценарии против фасада, который собрал ваш контейнер:
 
 ```php
@@ -39,6 +39,10 @@ final class CoreConformanceTest extends CoreConformanceTestCase
 }
 ```
 
+- `SubmissionStoreConformanceTestCase` (S01–S08): верните свежее `Submission\SubmissionStoreInterface` из
+  `createStore()` (`supportsPurge()`, если есть `purge()` из `indexnowkit/history`): S01 запись и чтение, S02 новые
+  первыми, S03 фильтр по хосту, S04 по статусу, S05 `lastFor()`, S06 лимит, S07 несколько URL одного Result, S08
+  пустое хранилище и `purge()`.
 - `CoreConformanceTestCase` (C01, C03, C04, C06, C09–C12, C14, C19, C20): верните фасад и `FakeTransport`, к которому
   он подключён; сценарии берут свежие URL, окно дебаунса не мешает.
 - `OrmConformanceTestCase` (A01–A21 плюс A05b/A05c): реализуйте драйвер — транзакционные глаголы вашего слоя данных

@@ -30,7 +30,7 @@ Everything lives under `IndexNowKit\Testing\Conformance\`.
 
 ## Conformance kits
 
-Two abstract test cases turn [docs/spec/03](https://github.com/indexnowkit/spec/blob/main/03-conformance.md) into
+Three abstract test cases turn [docs/spec/03](https://github.com/indexnowkit/spec/blob/main/03-conformance.md) into
 runnable scenarios against the facade your container built:
 
 ```php
@@ -48,6 +48,10 @@ final class CoreConformanceTest extends CoreConformanceTestCase
 
 - `CoreConformanceTestCase` (C01, C03, C04, C06, C09–C12, C14, C19, C20): return the facade and the `FakeTransport`
   it is wired to; the scenarios use fresh URLs, so the debounce window is irrelevant.
+- `SubmissionStoreConformanceTestCase` (S01–S08): return a fresh `Submission\SubmissionStoreInterface` from
+  `createStore()` (`supportsPurge()` when it has the `purge()` of `indexnowkit/history`): S01 record and read back,
+  S02 newest first, S03 host filter, S04 status filter, S05 `lastFor()`, S06 limit, S07 several URLs of one Result,
+  S08 empty store and `purge()`.
 - `OrmConformanceTestCase` (A01–A21, plus A05b/A05c): implement the driver — the transaction verbs of your data layer
   (`begin()`, `commit()`, `rollback()`), the end of a unit of work (`flush()`, `collectedCount()`), and fixtures
   with fixed rule shapes (`createPost()`, `createMultiPost()`, `createCategorizedPost()`, `createTag()`,

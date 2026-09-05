@@ -6,7 +6,7 @@
 | Tier | Members |
 |---|---|
 | **Call** — signatures only grow by appended, defaulted parameters; pass anything past the first argument by name | `KeyFileAssertions::*`, `CheckOutputAssertions::*`, `ReadmeAssertions::*` and their constants (`SECTION_EN`, `SECTION_RU`, `FAMILY_COMMANDS`, `CROSS_ADAPTER_KEYS` grow, never shrink) |
-| **Extend** — the abstract driver methods of a kit only grow by appended methods with a default implementation; a scenario is only added, never removed or renumbered, in a minor | `CoreConformanceTestCase`, `OrmConformanceTestCase` |
+| **Extend** — the abstract driver methods of a kit only grow by appended methods with a default implementation; a scenario is only added, never removed or renumbered, in a minor | `CoreConformanceTestCase`, `OrmConformanceTestCase`, `SubmissionStoreConformanceTestCase` |
 | **Resource** — the file path and the scenario names are stable; scenarios are added, not renamed | `resources/mock-server/router.php` (`X-Mock-Scenario`: `ok200`, `pending202`, `bad400`, `forbidden403`, `unprocessable422`, `ratelimit429`, `ratelimit429-then-ok`, `flaky500-then-ok`, `timeout`; `GET /_mock/requests`, `DELETE /_mock/requests`; `MOCK_KEYS`) |
 
 The conformance identifiers (C01–C22, A01–A21, H01–H06) are a cross-language contract of the specification: they are

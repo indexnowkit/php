@@ -3,6 +3,21 @@
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: SemVer; until 1.0 minor versions may
 contain breaking changes, listed under "Changed". What the compatibility promise covers: [docs/bc.md](docs/bc.md).
 
+## [0.2.0] — Unreleased
+
+### Added
+
+- **`SubmissionStoreConformanceTestCase` (S01–S08)**: the kit every `Submission\SubmissionStoreInterface`
+  implementation runs (`createStore()`, `supportsPurge()` for the `purge()` of `indexnowkit/history`): S01 record and
+  read back, S02 newest first, S03 host filter, S04 status filter (skipped results are records), S05 `lastFor()` after
+  two records of one URL, S06 limit, S07 several URLs of one Result stay one record, S08 empty store and `purge()`.
+  The ids are frozen with C01–C22, A01–A21 and H01–H06.
+- `ReadmeAssertions::FAMILY_COMMANDS` knows `indexnow:history`, `indexnow:status`, `indexnow/history`, `indexnow/status`.
+
+### Changed
+
+- Requires `indexnowkit/core ^0.9`.
+
 ## [0.1.1] — 2026-09-06
 
 ### Changed
