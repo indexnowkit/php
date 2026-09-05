@@ -1,13 +1,13 @@
 name: Split packages
 
 # Mirrors each package into its own read-only repository (indexnowkit/php-core, php-testing, php-console, php-sitemap,
-# php-doctrine, php-symfony-bundle, php-laravel, php-yii2) on every push to main and on package tags (core@0.7.0,
-# testing@0.1.0, console@0.1.0, sitemap@0.3.0, doctrine@0.5.0, ...).
+# php-verify, php-history, php-doctrine, php-symfony-bundle, php-laravel, php-yii2) on every push to main and on
+# package tags (core@0.9.0, testing@0.2.0, console@0.3.0, sitemap@0.5.0, verify@0.1.0, history@0.1.0, ...).
 # Authentication: one write-enabled deploy key per target repository, stored as SPLIT_SSH_KEY_<PACKAGE> secret here.
 # Packagist picks the pushes up through the webhooks it installed on the split repositories.
 #
-# Four stages in dependency order (core; then testing and console; then sitemap; then the adapters) instead of one
-# parallel matrix: the CI of a split repository resolves `indexnowkit/core ^x` to dev-main between releases, and Packagist learns the new
+# Four stages in dependency order (core; then testing and console; then the optional packages sitemap, verify and
+# history, which require console or test against it; then the adapters) instead of one parallel matrix: the CI of a split repository resolves `indexnowkit/core ^x` to dev-main between releases, and Packagist learns the new
 # dev-main only from the webhook of the php-core push. Pushed in parallel, an adapter's CI ran against the previous
 # core ("Class IndexNowKit\Check\StaticCheck not found" on wave C). So each stage waits for the previous one
 # (`needs`) and, before pushing main, bin/packagist-wait-main polls Packagist until dev-main of every indexnowkit/*
@@ -117,7 +117,7 @@ jobs:
             git push "${TARGET}" "${sha}:refs/tags/${TAG}"
           fi
 
-  sitemap:
+  optional:
     needs: [core, addons]
     runs-on: ubuntu-latest
     strategy:
@@ -126,6 +126,10 @@ jobs:
         include:
           - package: sitemap
             secret: SPLIT_SSH_KEY_SITEMAP
+          - package: verify
+            secret: SPLIT_SSH_KEY_VERIFY
+          - package: history
+            secret: SPLIT_SSH_KEY_HISTORY
     steps:
       - name: Resolve tag for this package
         id: tag
@@ -164,7 +168,7 @@ jobs:
           fi
 
   adapters:
-    needs: [core, addons, sitemap]
+    needs: [core, addons, optional]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false

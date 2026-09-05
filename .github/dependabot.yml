@@ -32,6 +32,20 @@ updates:
       sitemap: { patterns: ["*"] }
     commit-message: { prefix: "build(sitemap)" }
   - package-ecosystem: composer
+    directory: /packages/verify
+    schedule: { interval: weekly, day: monday }
+    open-pull-requests-limit: 3
+    groups:
+      verify: { patterns: ["*"] }
+    commit-message: { prefix: "build(verify)" }
+  - package-ecosystem: composer
+    directory: /packages/history
+    schedule: { interval: weekly, day: monday }
+    open-pull-requests-limit: 3
+    groups:
+      history: { patterns: ["*"] }
+    commit-message: { prefix: "build(history)" }
+  - package-ecosystem: composer
     directory: /packages/doctrine
     schedule: { interval: weekly, day: monday }
     open-pull-requests-limit: 3
