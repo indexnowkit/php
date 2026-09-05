@@ -55,6 +55,9 @@ final readonly class HistoryConfig
         if ($keyPrefix !== null && preg_match('/[{}()\/\\\\@:]/', $keyPrefix) === 1) {
             throw new ConfigurationException(\sprintf('"history.key_prefix" must not contain the PSR-6 reserved characters {}()/\\@:, got "%s".', $keyPrefix));
         }
+        if ($pdoDsn !== null && $pdoService !== null) {
+            throw new ConfigurationException('"history.pdo.dsn" and "history.pdo.service" cannot both be set: name the connection or give a DSN.');
+        }
         if (preg_match('/^[A-Za-z_][A-Za-z0-9_]*$/', $pdoTable) !== 1) {
             throw new ConfigurationException(\sprintf('"history.pdo.table" must match [A-Za-z_][A-Za-z0-9_]*, got "%s".', $pdoTable));
         }

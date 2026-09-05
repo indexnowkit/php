@@ -12,6 +12,7 @@ use IndexNowKit\Console\ExitCode;
 use IndexNowKit\History\HistoryConfig;
 use IndexNowKit\History\HistoryStoreInterface;
 use IndexNowKit\ResultStatus;
+use IndexNowKit\Submission\NullSubmissionStore;
 use IndexNowKit\Submission\SubmissionRecord;
 use IndexNowKit\Submission\SubmissionStoreInterface;
 use IndexNowKit\Url\UrlNormalizerInterface;
@@ -74,7 +75,11 @@ final class HistoryRunner
             return ExitCode::SUCCESS;
         }
         if ($records === []) {
-            $io->text('No records' . ($this->store instanceof HistoryStoreInterface && $this->store->count() === 0 ? ' yet: nothing was submitted since the history was switched on.' : ' match.'));
+            $io->text(match (true) {
+                $this->store instanceof NullSubmissionStore => 'No records: history.store is null, nothing is recorded (set history.store to psr16 or pdo).',
+                $this->store instanceof HistoryStoreInterface && $this->store->count() === 0 => 'No records yet: nothing was submitted since the history was switched on.',
+                default => 'No records match.',
+            });
 
             return ExitCode::SUCCESS;
         }

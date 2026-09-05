@@ -189,7 +189,25 @@ final class RunnersTest extends TestCase
         $none->run($this->io());
         self::assertStringContainsString('history: not configured (history.store)', $this->output->fetch());
 
-        $custom = new StatusRunner($config, StaticKeyProvider::fromConfig($config), $counter, 'memory', new NullSubmissionStore());
+        $null = new StatusRunner($config, StaticKeyProvider::fromConfig($config), $counter, 'memory', new NullSubmissionStore());
+        $null->run($this->io(), true);
+        $decoded = json_decode($this->output->fetch(), true, flags: JSON_THROW_ON_ERROR);
+        self::assertArrayHasKey('store', $decoded['history']);
+        self::assertNull($decoded['history']['store'], 'the core null store is "no store", not a custom one');
+
+        $custom = new StatusRunner($config, StaticKeyProvider::fromConfig($config), $counter, 'memory', new class implements SubmissionStoreInterface {
+            public function record(Result $result, DateTimeImmutable $at): void {}
+
+            public function recent(int $limit = 100, ?string $host = null, ?ResultStatus $status = null): iterable
+            {
+                return [];
+            }
+
+            public function lastFor(string $url): ?SubmissionRecord
+            {
+                return null;
+            }
+        });
         $custom->run($this->io(), true);
         $decoded = json_decode($this->output->fetch(), true, flags: JSON_THROW_ON_ERROR);
         self::assertSame('custom', $decoded['history']['store'] ?? null);

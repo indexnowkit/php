@@ -25,12 +25,13 @@ final class HistoryConfigTest extends TestCase
         self::assertNull(HistoryConfig::disabled()->store);
         self::assertSame(['store' => null, 'limit' => 500, 'key_prefix' => null, 'pdo' => ['dsn' => null, 'service' => null, 'table' => 'indexnow_submissions'], 'retention_days' => 90], $config->toArray());
 
-        $config = HistoryConfig::fromArray(['store' => 'PDO', 'limit' => '10', 'key_prefix' => 'app_', 'pdo' => ['dsn' => 'sqlite::memory:', 'service' => 'db', 'table' => 'seo_log'], 'retention_days' => '7']);
+        $config = HistoryConfig::fromArray(['store' => 'PDO', 'limit' => '10', 'key_prefix' => 'app_', 'pdo' => ['dsn' => 'sqlite::memory:', 'table' => 'seo_log'], 'retention_days' => '7']);
         self::assertSame('pdo', $config->store);
         self::assertSame(10, $config->limit);
         self::assertSame('app_', $config->keyPrefix);
         self::assertSame('sqlite::memory:', $config->pdoDsn);
-        self::assertSame('db', $config->pdoService);
+        self::assertNull($config->pdoService);
+        self::assertSame('db', HistoryConfig::fromArray(['pdo' => ['service' => 'db']])->pdoService);
         self::assertSame('seo_log', $config->pdoTable);
         self::assertSame(7, $config->retentionDays);
         self::assertCount(7, HistoryConfig::OPTIONS);
@@ -46,6 +47,7 @@ final class HistoryConfigTest extends TestCase
         yield 'limit text' => [['limit' => 'many'], '"history.limit" must be an integer, got "many".'];
         yield 'key_prefix' => [['key_prefix' => 'app:'], '"history.key_prefix" must not contain the PSR-6 reserved characters {}()/\\@:, got "app:".'];
         yield 'table' => [['pdo' => ['table' => '1bad']], '"history.pdo.table" must match [A-Za-z_][A-Za-z0-9_]*, got "1bad".'];
+        yield 'dsn and service' => [['store' => 'pdo', 'pdo' => ['dsn' => 'sqlite::memory:', 'service' => 'default']], '"history.pdo.dsn" and "history.pdo.service" cannot both be set: name the connection or give a DSN.'];
         yield 'retention' => [['retention_days' => 0], '"history.retention_days" must be >= 1, got 0.'];
     }
 

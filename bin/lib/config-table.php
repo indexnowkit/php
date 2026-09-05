@@ -14,6 +14,7 @@ declare(strict_types=1);
  */
 
 use IndexNowKit\Config;
+use IndexNowKit\History\HistoryConfig;
 use IndexNowKit\Sitemap\SitemapConfig;
 use IndexNowKit\Verify\VerifyConfig;
 use IndexNowKit\SymfonyBundle\DependencyInjection\IndexNowKitConfiguration;
@@ -153,6 +154,10 @@ function config_table_render(): string
     $lines[] = '### Verify keys (`indexnowkit/verify`)';
     $lines[] = '';
     $lines[] = 'The `verify` block is the same in the three adapters and is owned by the verify package (its `docs/configuration.md` has the table): ' . implode(', ', array_map(static fn(string $k): string => '`' . $k . '`', VerifyConfig::OPTIONS)) . '.';
+    $lines[] = '';
+    $lines[] = '### History keys (`indexnowkit/history`)';
+    $lines[] = '';
+    $lines[] = 'The `history` block is the same in the three adapters and is owned by the history package (its `docs/configuration.md` has the table): ' . implode(', ', array_map(static fn(string $k): string => '`' . $k . '`', HistoryConfig::OPTIONS)) . '.';
     $lines[] = '';
     $lines[] = '### One concept, three keys';
     $lines[] = '';

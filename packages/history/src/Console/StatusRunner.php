@@ -13,6 +13,7 @@ use IndexNowKit\History\HistoryStoreInterface;
 use IndexNowKit\Key\KeyProviderInterface;
 use IndexNowKit\ResultStatus;
 use IndexNowKit\Retry\ForbiddenCounter;
+use IndexNowKit\Submission\NullSubmissionStore;
 use IndexNowKit\Submission\SubmissionStoreInterface;
 use IndexNowKit\Version;
 use Psr\Clock\ClockInterface;
@@ -34,7 +35,7 @@ final class StatusRunner
     /**
      * @param string                                  $debounceStore a description of the debounce store (`cache.app (RedisAdapter)`, `memory`)
      * @param (Closure(): array<string, scalar|null>)|null $adapterFacts what the adapter adds to the dispatch section (`queue`, `connection`, `transport`)
-     * @param SubmissionStoreInterface|null           $history       the history store; null when `history.store` is null
+     * @param SubmissionStoreInterface|null           $history       the submission store; null (or the core's `NullSubmissionStore`) when `history.store` is null
      */
     public function __construct(
         private readonly Config $config,
@@ -112,7 +113,7 @@ final class StatusRunner
      */
     private function history(): array
     {
-        if ($this->history === null) {
+        if ($this->history === null || $this->history instanceof NullSubmissionStore) {
             return ['store' => null, 'records' => null, 'last_success' => null, 'error' => null];
         }
         $store = $this->history instanceof HistoryStoreInterface ? 'history' : 'custom';

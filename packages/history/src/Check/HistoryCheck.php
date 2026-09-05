@@ -9,6 +9,7 @@ use IndexNowKit\Check\CheckReport;
 use IndexNowKit\Clock\SystemClock;
 use IndexNowKit\History\HistoryConfig;
 use IndexNowKit\History\HistoryStoreInterface;
+use IndexNowKit\Submission\NullSubmissionStore;
 use IndexNowKit\Submission\SubmissionStoreInterface;
 use Psr\Clock\ClockInterface;
 use Throwable;
@@ -25,7 +26,8 @@ final class HistoryCheck implements CheckInterface
     private readonly ClockInterface $clock;
 
     /**
-     * @param SubmissionStoreInterface|null $store null = `history.store` is null (nothing is recorded)
+     * @param SubmissionStoreInterface|null $store null, or the core's `NullSubmissionStore` = `history.store` is null
+     *                                             (nothing is recorded); an adapter passes its submission store as is
      */
     public function __construct(private readonly HistoryConfig $config, private readonly ?SubmissionStoreInterface $store, ?ClockInterface $clock = null)
     {
@@ -34,7 +36,7 @@ final class HistoryCheck implements CheckInterface
 
     public function check(CheckReport $report): void
     {
-        if ($this->store === null) {
+        if ($this->store === null || $this->store instanceof NullSubmissionStore) {
             $report->ok('history: installed, no store configured (history.store)', self::CODE_STORE);
 
             return;
