@@ -1,0 +1,37 @@
+name: Psalm taint analysis (sitemap)
+
+# The sitemap reader parses XML fetched from the network: the one place in the family where untrusted input flows
+# through the code. Psalm's taint analysis runs weekly (and on demand), separately from the phpstan pipeline of
+# ci.yml, against packages/sitemap/psalm.xml. Psalm is installed for the job only; it is not a dev dependency.
+
+on:
+  schedule:
+    - cron: '17 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  taint:
+    runs-on: ubuntu-latest
+    env:
+      COMPOSER: composer.monorepo.json
+    defaults:
+      run:
+        working-directory: packages/sitemap
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: xmlreader, zlib
+          coverage: none
+      - name: Link the sibling packages
+        run: ../../bin/link sitemap
+      - name: Install (highest)
+        run: composer run ci:install:highest
+      - name: Install Psalm
+        run: composer global require --no-interaction vimeo/psalm:^6
+      - name: Taint analysis
+        run: "$(composer global config home)/vendor/bin/psalm --no-cache --taint-analysis --output-format=github"

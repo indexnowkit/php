@@ -1,0 +1,54 @@
+# One weekly PR per package for Composer updates, one for the workflows' actions. Every package has its own
+# composer.json (there is no root manifest), so each directory is an ecosystem entry; `groups` folds the updates of
+# a package into a single PR. Dev-only versions (phpstan, phpunit) update with the rest: CI decides.
+version: 2
+updates:
+  - package-ecosystem: composer
+    directory: /packages/core
+    schedule: { interval: weekly, day: monday }
+    open-pull-requests-limit: 3
+    groups:
+      core: { patterns: ["*"] }
+    commit-message: { prefix: "build(core)" }
+  - package-ecosystem: composer
+    directory: /packages/sitemap
+    schedule: { interval: weekly, day: monday }
+    open-pull-requests-limit: 3
+    groups:
+      sitemap: { patterns: ["*"] }
+    commit-message: { prefix: "build(sitemap)" }
+  - package-ecosystem: composer
+    directory: /packages/doctrine
+    schedule: { interval: weekly, day: monday }
+    open-pull-requests-limit: 3
+    groups:
+      doctrine: { patterns: ["*"] }
+    commit-message: { prefix: "build(doctrine)" }
+  - package-ecosystem: composer
+    directory: /packages/symfony-bundle
+    schedule: { interval: weekly, day: monday }
+    open-pull-requests-limit: 3
+    groups:
+      symfony-bundle: { patterns: ["*"] }
+    commit-message: { prefix: "build(symfony-bundle)" }
+  - package-ecosystem: composer
+    directory: /packages/laravel
+    schedule: { interval: weekly, day: monday }
+    open-pull-requests-limit: 3
+    groups:
+      laravel: { patterns: ["*"] }
+    commit-message: { prefix: "build(laravel)" }
+  - package-ecosystem: composer
+    directory: /packages/yii2
+    schedule: { interval: weekly, day: monday }
+    open-pull-requests-limit: 3
+    groups:
+      yii2: { patterns: ["*"] }
+    commit-message: { prefix: "build(yii2)" }
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: weekly, day: monday }
+    open-pull-requests-limit: 3
+    groups:
+      actions: { patterns: ["*"] }
+    commit-message: { prefix: "ci" }

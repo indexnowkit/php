@@ -1,0 +1,53 @@
+name: Bug report
+description: Something an indexnowkit package does wrong
+labels: [bug]
+body:
+  - type: dropdown
+    id: package
+    attributes:
+      label: Package
+      options:
+        - indexnowkit/core
+        - indexnowkit/sitemap
+        - indexnowkit/doctrine
+        - indexnowkit/symfony-bundle
+        - indexnowkit/laravel
+        - indexnowkit/yii2
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Package version
+      description: "`composer show indexnowkit/<package>`"
+      placeholder: 0.6.0
+    validations:
+      required: true
+  - type: input
+    id: framework
+    attributes:
+      label: Framework and PHP version
+      placeholder: Symfony 7.3 / Laravel 13.1 / Yii 2.0.52, PHP 8.3.12
+    validations:
+      required: true
+  - type: textarea
+    id: check
+    attributes:
+      label: Output of the check command
+      description: "`bin/console indexnow:check`, `php artisan indexnow:check` or `php yii indexnow/check`. Keys are masked by the command; do not paste a full key."
+      render: text
+  - type: textarea
+    id: what
+    attributes:
+      label: What happens, and what you expected
+      description: The log lines on the indexnow channel (they carry the reason and the masked key) help most.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: How to reproduce
+      description: The `#[IndexNow]` declaration, the configuration block (without the key) and the operation that triggers it. A failing test against the FakeTransport is ideal.
+      render: php
+    validations:
+      required: true

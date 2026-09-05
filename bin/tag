@@ -27,3 +27,6 @@ sha="$(git subtree split --prefix=php -q)"
 git push -q "$REPO" "${sha}:refs/heads/main"
 git push -q "$REPO" "${sha}:refs/tags/${tag}"
 echo "tagged $tag on ${sha:0:7} (indexnowkit/php); split.yml pushes $ver to indexnowkit/php-$pkg"
+# What the world sees right now (the new tag reaches the split and Packagist in a minute or two):
+# a stale package page is the usual finding — press "Update" on packagist.org when p2 and the page disagree.
+"$ROOT/bin/packagist-check" "$pkg" || true

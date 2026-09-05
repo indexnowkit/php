@@ -1,0 +1,37 @@
+name: Feature request
+description: Something an indexnowkit package should do
+labels: [enhancement]
+body:
+  - type: dropdown
+    id: package
+    attributes:
+      label: Package
+      options:
+        - indexnowkit/core
+        - indexnowkit/sitemap
+        - indexnowkit/doctrine
+        - indexnowkit/symfony-bundle
+        - indexnowkit/laravel
+        - indexnowkit/yii2
+        - a new adapter (say which framework)
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: The situation
+      description: What you are trying to do and where the package stops you. A concrete site, model or deployment beats an abstract wish.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What you would like
+      description: Configuration key, attribute option, command flag, extension point. If a decorator or a `CheckInterface` of your own already solves it, say so — the docs may just need an example.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checked
+      options:
+        - label: The docs of the package (docs/extending.md, docs/configuration.md) do not already cover it
+        - label: It is about IndexNow, not about a Google / Bing URL Submission API

@@ -52,6 +52,9 @@ jobs:
         run: ../../bin/link ${{ matrix.package }}
       - name: Install (${{ matrix.deps }})
         run: composer run ci:install:${{ matrix.deps }}
+      # known advisories in what was just installed (roave/security-advisories already blocks them at resolution time; this
+      # catches new ones); abandoned packages are reported, not fatal (lowest flavours pull doctrine/cache through ORM 2)
+      - run: composer audit --abandoned=report
       - run: vendor/bin/phpunit
       # doctrine on lowest and dbal3 (DBAL 3 / ORM 2): phpstan.dbal3.neon analyses the DBAL 3 connection instead of the DBAL 4 one.
       - run: vendor/bin/phpstan analyse --memory-limit=1G ${{ matrix.package == 'doctrine' && matrix.deps != 'highest' && '-c phpstan.dbal3.neon' || '' }}
