@@ -2,7 +2,7 @@
     "$schema": "https://context7.com/schema/context7.json",
     "projectTitle": "indexnowkit (PHP)",
     "description": "IndexNow for PHP: core client plus Symfony, Laravel, Yii2 and Doctrine adapters. Declare public pages on the model with #[IndexNow], submissions leave after the transaction commits, debounced and batched; a sitemap reader; check/explain commands.",
-    "folders": ["packages/core", "packages/sitemap", "packages/doctrine", "packages/symfony-bundle", "packages/laravel", "packages/yii2"],
+    "folders": ["packages/core", "packages/testing", "packages/console", "packages/sitemap", "packages/doctrine", "packages/symfony-bundle", "packages/laravel", "packages/yii2"],
     "excludeFolders": ["vendor", "tests", "src", "config", "resources", "docs/plans", "docs/spec", ".github", "bin", "docker"],
     "excludeFiles": ["CHANGELOG.md", "CONTRIBUTING.md", "SECURITY.md", "composer.json", "phpunit.xml.dist", "phpstan.neon.dist", "phpstan.dbal3.neon", "psalm.xml"],
     "rules": [

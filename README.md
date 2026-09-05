@@ -6,6 +6,8 @@ Packages are developed here and split into read-only repositories for Packagist.
 | Package | What |
 |---|---|
 | [`indexnowkit/core`](packages/core) | protocol client, batching, debounce, retry policy, the `#[IndexNow]` rule model, the adapter kit (`Adapter\ConfigFactory`, factories, command bodies) |
+| [`indexnowkit/console`](packages/console) | the bodies of the `check`, `submit`, `submit-<subject>`, `explain` and `key:generate` commands and their definitions (`symfony/console`); required by every framework adapter |
+| [`indexnowkit/testing`](packages/testing) | `require-dev`: the conformance kits (C01–C22, A01–A21), the H01–H05 assertions, `ReadmeAssertions`, the mock IndexNow server |
 | [`indexnowkit/sitemap`](packages/sitemap) | optional add-on: sitemap reader (index, gzip, text) and the body of the `sitemap` command; `composer require indexnowkit/sitemap` next to an adapter |
 | [`indexnowkit/doctrine`](packages/doctrine) | Doctrine ORM listener plus a DBAL middleware, commit-safe |
 | [`indexnowkit/symfony-bundle`](packages/symfony-bundle) | Symfony bundle: config, Messenger, key file route, commands, profiler panel |
@@ -23,7 +25,7 @@ README is the reference for everything underneath it.
 | The `#[IndexNow]` rule model in full | [core/docs/attribute-reference.md](packages/core/docs/attribute-reference.md) |
 | Retries, queues, bulk imports | [core/docs/retries-and-queues.md](packages/core/docs/retries-and-queues.md) |
 | Logging, metrics, "why was nothing submitted" | [core/docs/operations.md](packages/core/docs/operations.md) |
-| Testing with the published doubles | [core/docs/testing.md](packages/core/docs/testing.md) |
+| Testing with the published doubles, the conformance kits of `indexnowkit/testing` | [core/docs/testing.md](packages/core/docs/testing.md), [testing/README.md](packages/testing/README.md) |
 | Writing an adapter for another framework | [core/docs/adapters.md](packages/core/docs/adapters.md) |
 | Compatibility promise | [core/docs/bc.md](packages/core/docs/bc.md) |
 | Symfony: configuration, Messenger, multi-domain, troubleshooting | [symfony-bundle/docs](packages/symfony-bundle/docs) |
@@ -64,10 +66,11 @@ and `minimum-stability: dev`; Composer and the tests run on the same PHP, so no 
 itself is what the split repositories and Packagist ship. The GitHub workflow runs the same steps per package; each split
 repository runs the same `ci:install:*` scripts with the siblings from Packagist.
 
-A mock IndexNow server is available for manual testing:
+A mock IndexNow server is available for manual testing (shipped by `indexnowkit/testing`; the core keeps a
+byte-identical private copy in `packages/core/tests/Support/mock-server/` for its own tests):
 
 ```bash
-php -S 127.0.0.1:8089 packages/core/tests/Support/mock-server/router.php
+php -S 127.0.0.1:8089 packages/testing/resources/mock-server/router.php
 ```
 
 Pick a behaviour with the `X-Mock-Scenario` header: `ok200`, `pending202`, `forbidden403`, `ratelimit429` and the
@@ -76,7 +79,7 @@ loopback hosts only.
 
 ## Releasing
 
-One package at a time, in dependency order (core, then sitemap, then the adapters), each with a `CHANGELOG.md` section
+One package at a time, in dependency order (core, then testing and console, then sitemap, then the adapters), each with a `CHANGELOG.md` section
 `## [x.y.z] — YYYY-MM-DD` and the `branch-alias` bumped in `composer.json`:
 
 ```bash
@@ -85,7 +88,7 @@ bin/packagist-wait core 0.4.0           # poll Packagist before tagging the pack
 bin/release-notes core 0.4.0 --create   # GitHub release on the split repository from the changelog section
 ```
 
-The split workflow mirrors in the same order (core, then sitemap, then the adapters) and, before pushing a package's
+The split workflow mirrors in the same order (core, then testing and console, then sitemap, then the adapters) and, before pushing a package's
 main, waits (`bin/packagist-wait-main`) until Packagist's dev-main of its indexnowkit/* dependencies is the sha just
 pushed, so the split CI of an adapter never resolves a stale core.
 
@@ -99,6 +102,8 @@ registration after the first split push.
 php/
 ├── packages/
 │   ├── core/              # indexnowkit/core          + docs/, tests/Conformance (C01-C22)
+│   ├── console/           # indexnowkit/console       + docs/, tests/ (the command runners and definitions)
+│   ├── testing/           # indexnowkit/testing       + docs/, resources/mock-server/, tests/ (the conformance kits)
 │   ├── sitemap/           # indexnowkit/sitemap       + docs/, tests/
 │   ├── doctrine/          # indexnowkit/doctrine      + tests/ (A01-A21)
 │   ├── symfony-bundle/    # indexnowkit/symfony-bundle + docs/, recipe/, tests/Functional (H01-H06)

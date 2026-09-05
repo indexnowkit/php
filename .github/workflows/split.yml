@@ -1,13 +1,13 @@
 name: Split packages
 
-# Mirrors each package into its own read-only repository (indexnowkit/php-core, php-sitemap, php-doctrine,
-# php-symfony-bundle, php-laravel, php-yii2) on every push to main and on package tags (core@0.4.0, sitemap@0.1.0,
-# doctrine@0.3.0, ...).
+# Mirrors each package into its own read-only repository (indexnowkit/php-core, php-testing, php-console, php-sitemap,
+# php-doctrine, php-symfony-bundle, php-laravel, php-yii2) on every push to main and on package tags (core@0.7.0,
+# testing@0.1.0, console@0.1.0, sitemap@0.3.0, doctrine@0.5.0, ...).
 # Authentication: one write-enabled deploy key per target repository, stored as SPLIT_SSH_KEY_<PACKAGE> secret here.
 # Packagist picks the pushes up through the webhooks it installed on the split repositories.
 #
-# Three stages in dependency order (core, then sitemap, then the adapters) instead of one parallel matrix: the CI of
-# a split repository resolves `indexnowkit/core ^x` to dev-main between releases, and Packagist learns the new
+# Four stages in dependency order (core; then testing and console; then sitemap; then the adapters) instead of one
+# parallel matrix: the CI of a split repository resolves `indexnowkit/core ^x` to dev-main between releases, and Packagist learns the new
 # dev-main only from the webhook of the php-core push. Pushed in parallel, an adapter's CI ran against the previous
 # core ("Class IndexNowKit\Check\StaticCheck not found" on wave C). So each stage waits for the previous one
 # (`needs`) and, before pushing main, bin/packagist-wait-main polls Packagist until dev-main of every indexnowkit/*
@@ -69,8 +69,56 @@ jobs:
             git push "${TARGET}" "${sha}:refs/tags/${TAG}"
           fi
 
-  sitemap:
+  addons:
     needs: core
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - package: testing
+            secret: SPLIT_SSH_KEY_TESTING
+          - package: console
+            secret: SPLIT_SSH_KEY_CONSOLE
+    steps:
+      - name: Resolve tag for this package
+        id: tag
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/${{ matrix.package }}@* ]]; then
+            echo "tag=${GITHUB_REF#refs/tags/${{ matrix.package }}@}" >> "$GITHUB_OUTPUT"
+          elif [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            echo "skip=1" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/checkout@v4
+        if: steps.tag.outputs.skip != '1'
+        with: { fetch-depth: 0 }
+      - uses: webfactory/ssh-agent@v0.9.1
+        if: steps.tag.outputs.skip != '1'
+        with:
+          ssh-private-key: ${{ secrets[matrix.secret] }}
+      - name: Wait for Packagist dev-main
+        if: steps.tag.outputs.skip != '1' && github.ref_type == 'branch'
+        run: bin/packagist-wait-main ${{ matrix.package }}
+      - name: Split and push
+        if: steps.tag.outputs.skip != '1'
+        env:
+          TARGET: git@github.com:indexnowkit/php-${{ matrix.package }}.git
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: |
+          set -euo pipefail
+          git config user.name "indexnowkit-bot"
+          git config user.email "bot@indexnowkit.dev"
+          sha="$(git subtree split --prefix="packages/${{ matrix.package }}")"
+          echo "split sha: ${sha}"
+          if [[ "${GITHUB_REF_TYPE}" == "branch" ]]; then
+            git push "${TARGET}" "${sha}:refs/heads/main"
+          fi
+          if [[ -n "${TAG}" ]]; then
+            git push "${TARGET}" "${sha}:refs/tags/${TAG}"
+          fi
+
+  sitemap:
+    needs: [core, addons]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -116,7 +164,7 @@ jobs:
           fi
 
   adapters:
-    needs: [core, sitemap]
+    needs: [core, addons, sitemap]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false

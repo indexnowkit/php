@@ -18,8 +18,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE = os.path.join(ROOT, 'docs-site')
 OUT = os.path.join(SITE, 'docs')
 BASE_URL = 'https://indexnowkit.github.io/php/'
-PACKAGES = ['core', 'sitemap', 'doctrine', 'symfony-bundle', 'laravel', 'yii2']
-TITLES = {'core': 'Core (plain PHP)', 'sitemap': 'Sitemap', 'doctrine': 'Doctrine', 'symfony-bundle': 'Symfony', 'laravel': 'Laravel', 'yii2': 'Yii2'}
+PACKAGES = ['core', 'console', 'testing', 'sitemap', 'doctrine', 'symfony-bundle', 'laravel', 'yii2']
+TITLES = {'core': 'Core (plain PHP)', 'console': 'Console', 'testing': 'Testing', 'sitemap': 'Sitemap', 'doctrine': 'Doctrine', 'symfony-bundle': 'Symfony', 'laravel': 'Laravel', 'yii2': 'Yii2'}
 
 # Section -> list of (title, "pkg/file.md") shown in the nav in this order; the rest of a package's docs follow under Packages.
 GETTING_STARTED = [('Symfony', 'symfony-bundle/index.md'), ('Laravel', 'laravel/index.md'), ('Yii2', 'yii2/index.md'), ('Plain PHP', 'core/index.md')]
@@ -130,7 +130,7 @@ def main():
     order += sorted(k for k in pages if k.endswith('.ru.md'))
     with open(os.path.join(OUT, 'llms.txt'), 'w', encoding='utf-8') as f:
         f.write("# indexnowkit for PHP\n\n> IndexNow for PHP: a framework-agnostic core plus Symfony, Laravel, Yii2 and Doctrine adapters. Declare public pages on the model with #[IndexNow]; submissions leave after the transaction commits, debounced and batched.\n\n")
-        f.write("Packagist: indexnowkit/core, indexnowkit/sitemap, indexnowkit/doctrine, indexnowkit/symfony-bundle, indexnowkit/laravel, indexnowkit/yii2. Source and issues: https://github.com/indexnowkit/php\n\n## Pages\n\n")
+        f.write("Packagist: indexnowkit/core, indexnowkit/console, indexnowkit/testing, indexnowkit/sitemap, indexnowkit/doctrine, indexnowkit/symfony-bundle, indexnowkit/laravel, indexnowkit/yii2. Source and issues: https://github.com/indexnowkit/php\n\n## Pages\n\n")
         for key in order:
             f.write("- [%s](%s%s)\n" % (pages[key], BASE_URL, key[:-3] + '/' if key != 'index.md' else ''))
         f.write("\n## Full text\n\n- [llms-full.txt](%sllms-full.txt)\n" % BASE_URL)
