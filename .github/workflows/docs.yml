@@ -31,14 +31,15 @@ jobs:
         run: bin/docs-collect
       - name: Build, strict (a broken internal link fails)
         run: mkdocs build --strict -f docs-site/mkdocs.yml -d site
-      - name: Check links
+      # internal links are already guaranteed by the strict build; lychee checks the external ones over the collected sources
+      - name: Check external links
         uses: lycheeverse/lychee-action@v2
         with:
           args: >-
-            --no-progress --accept 200..=299,403,429 --max-retries 2 --timeout 20
-            --exclude '^https://packagist\.org' --exclude '^https://www\.example\.com' --exclude 'example\.(com|de)'
-            --exclude 'localhost' --exclude '^https://yandex\.com/indexnow' --exclude 'indexnow\.org/indexnow$'
-            'docs-site/site/**/*.html'
+            --no-progress --scheme https --scheme http --accept 200..=299,403,429 --max-retries 2 --timeout 20
+            --exclude '^https://packagist\.org' --exclude 'example\.(com|de|net|ru)' --exclude 'localhost'
+            --exclude 'yandex\.com/indexnow' --exclude 'indexnow\.org/indexnow$' --exclude 'indexnowkit\.github\.io'
+            'docs-site/docs/**/*.md'
           fail: true
       - uses: actions/upload-pages-artifact@v3
         with: { path: docs-site/site }
