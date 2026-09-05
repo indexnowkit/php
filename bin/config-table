@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Regenerate (or, with --check, verify) the "One concept, three keys" section of packages/core/docs/configuration.md
+# from the code: bin/lib/config-table.php run inside packages/symfony-bundle (its vendor holds core, sitemap and the
+# bundle; the Laravel and Yii2 key lists are read from the sibling sources). Needs bin/ci symfony-bundle to have run once.
+# Usage: bin/config-table [--check]
+set -euo pipefail
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+[ -f "$ROOT/packages/symfony-bundle/vendor/autoload.php" ] || { echo "config-table: install packages/symfony-bundle first (bin/ci symfony-bundle)" >&2; exit 1; }
+exec "$ROOT/bin/php" -C packages/symfony-bundle ../../bin/lib/config-table.php "$@"

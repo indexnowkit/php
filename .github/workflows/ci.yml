@@ -56,6 +56,9 @@ jobs:
       # catches new ones); abandoned packages are reported, not fatal (lowest flavours pull doctrine/cache through ORM 2)
       - run: composer audit --abandoned=report
       - run: vendor/bin/phpunit
+      # the generated "One concept, three keys" section of core/docs/configuration.md must match the code (needs the bundle's vendor and the sibling sources)
+      - if: matrix.package == 'symfony-bundle' && matrix.deps == 'highest' && matrix.php == '8.3'
+        run: php ../../bin/lib/config-table.php --check
       # doctrine on lowest and dbal3 (DBAL 3 / ORM 2): phpstan.dbal3.neon analyses the DBAL 3 connection instead of the DBAL 4 one.
       - run: vendor/bin/phpstan analyse --memory-limit=1G ${{ matrix.package == 'doctrine' && matrix.deps != 'highest' && '-c phpstan.dbal3.neon' || '' }}
 
