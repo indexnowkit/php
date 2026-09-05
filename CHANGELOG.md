@@ -3,6 +3,16 @@
 All notable changes to the PHP packages are documented here, newest release wave first. Tags: `<package>@<version>`.
 Per-package detail (and the migration notes for every breaking change) lives in each package's own changelog.
 
+## Unreleased — documentation wave (spec 17 §3, no code releases)
+
+Every package: "Notes for AI assistants" in the README (EN/RU) with `ReadmeAiNotesTest`; the three framework
+READMEs carry their quick-start model verbatim from `tests/Readme/Post.php` (`ReadmeQuickstartTest`); the core
+configuration reference gains the generated "One concept, three keys" tables (`bin/config-table`); the operations
+guide opens with the production checklist and adds the SEO honesty texts, monitoring rules and a Sentry filter;
+Yii2 docs reach Laravel's coverage; Russian translations of the attribute reference, the configuration and the three
+troubleshooting guides. Monorepo: `AGENTS.md`, `context7.json`, the Laravel Boost guideline, `core/.phpstorm.meta.php`,
+the docs site (`bin/docs-collect`, MkDocs Material, `docs.yml` → GitHub Pages, `llms.txt`).
+
 ## 2026-09-05 — core@0.6.0, symfony-bundle@0.7.0, laravel@0.8.0, yii2@0.6.0, doctrine@0.4.0, sitemap@0.2.0
 
 Wave 0a of docs/spec/17 ("PHP family to 1.0"): the one audit finding with irreversible consequences, and everything
