@@ -3,7 +3,7 @@
 All notable changes to the PHP packages are documented here, newest release wave first. Tags: `<package>@<version>`.
 Per-package detail (and the migration notes for every breaking change) lives in each package's own changelog.
 
-## 2026-09-05 — core@0.7.0, testing@0.1.0, console@0.1.0, sitemap@0.3.0, doctrine@0.5.0, symfony-bundle@0.8.0, laravel@0.9.0, yii2@0.7.0
+## 2026-09-06 — core@0.7.0, testing@0.1.0, console@0.1.0, sitemap@0.3.0, doctrine@0.5.0, symfony-bundle@0.8.0, laravel@0.9.0, yii2@0.7.0
 
 Wave D of docs/spec/17 ("the composition of the core") plus the documentation wave 0b. Two packages leave the core
 with their FQCN unchanged: **`indexnowkit/testing`** (the conformance kits, the H01–H05 assertions, `ReadmeAssertions`,
