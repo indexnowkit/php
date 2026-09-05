@@ -9,6 +9,7 @@ contain breaking changes, listed under "Changed". What the compatibility promise
 
 - `CheckOutputAssertions::assertEveryItemHasCode(CheckReport $report, string ...$expectedCodes)`: every line of a check
   report names its check (`CheckItem::$code`, core 0.8). Requires `indexnowkit/core ^0.8`.
+- `ReadmeAssertions::FAMILY_COMMANDS` knows `indexnow:config` and `indexnow/config`.
 
 ## [0.1.0] — 2026-09-06
 

@@ -20,9 +20,9 @@ final class ReadmeAssertions
 
     /** Every command of the family, as the notes name the sibling adapters' commands in the pitfalls list. */
     public const FAMILY_COMMANDS = [
-        'indexnow:check', 'indexnow:key:generate', 'indexnow:submit', 'indexnow:submit-entity', 'indexnow:submit-model',
+        'indexnow:check', 'indexnow:config', 'indexnow:key:generate', 'indexnow:submit', 'indexnow:submit-entity', 'indexnow:submit-model',
         'indexnow:explain', 'indexnow:sitemap',
-        'indexnow/check', 'indexnow/key-generate', 'indexnow/submit', 'indexnow/submit-record', 'indexnow/explain', 'indexnow/sitemap',
+        'indexnow/check', 'indexnow/config', 'indexnow/key-generate', 'indexnow/submit', 'indexnow/submit-record', 'indexnow/explain', 'indexnow/sitemap',
     ];
 
     /** Keys of other adapters (or of the framework) the notes compare against; each adapter's own keys come from the caller. */
