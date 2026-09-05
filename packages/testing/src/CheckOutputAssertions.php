@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace IndexNowKit\Testing\Conformance;
 
+use IndexNowKit\Check\CheckItem;
+use IndexNowKit\Check\CheckReport;
 use PHPUnit\Framework\Assert;
 
 /**
@@ -35,6 +37,25 @@ final class CheckOutputAssertions
     public static function assertNotReady(string $output): void
     {
         Assert::assertStringContainsString('IndexNow is not ready', $output);
+    }
+
+    /**
+     * Every line of the report names its check (`CheckItem::$code`, the API of `check --json`): the checks the family
+     * ships all do, and an adapter test runs its whole checker through here so a new check cannot forget its code.
+     * Optional $expectedCodes must each appear at least once.
+     */
+    public static function assertEveryItemHasCode(CheckReport $report, string ...$expectedCodes): void
+    {
+        $codes = [];
+        foreach ($report->items() as $item) {
+            Assert::assertNotNull($item->code, \sprintf('the %s line "%s" has no code; give it one and list it in core/docs/check-codes.md', $item->level->value, $item->message));
+            Assert::assertMatchesRegularExpression('/^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$/', $item->code, \sprintf('the code of "%s" is dotted lower-case', $item->message));
+            $codes[] = $item->code;
+        }
+        foreach ($expectedCodes as $code) {
+            Assert::assertContains($code, $codes, \sprintf('the report has a "%s" line; it has: %s', $code, implode(', ', array_unique($codes))));
+        }
+        Assert::assertContainsOnlyInstancesOf(CheckItem::class, $report->items());
     }
 
     /**
