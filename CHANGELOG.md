@@ -3,15 +3,43 @@
 All notable changes to the PHP packages are documented here, newest release wave first. Tags: `<package>@<version>`.
 Per-package detail (and the migration notes for every breaking change) lives in each package's own changelog.
 
-## Unreleased — documentation wave (spec 17 §3, no code releases)
+## 2026-09-05 — core@0.7.0, testing@0.1.0, console@0.1.0, sitemap@0.3.0, doctrine@0.5.0, symfony-bundle@0.8.0, laravel@0.9.0, yii2@0.7.0
 
-Every package: "Notes for AI assistants" in the README (EN/RU) with `ReadmeAiNotesTest`; the three framework
-READMEs carry their quick-start model verbatim from `tests/Readme/Post.php` (`ReadmeQuickstartTest`); the core
-configuration reference gains the generated "One concept, three keys" tables (`bin/config-table`); the operations
-guide opens with the production checklist and adds the SEO honesty texts, monitoring rules and a Sentry filter;
-Yii2 docs reach Laravel's coverage; Russian translations of the attribute reference, the configuration and the three
-troubleshooting guides. Monorepo: `AGENTS.md`, `context7.json`, the Laravel Boost guideline, `core/.phpstorm.meta.php`,
-the docs site (`bin/docs-collect`, MkDocs Material, `docs.yml` → GitHub Pages, `llms.txt`).
+Wave D of docs/spec/17 ("the composition of the core") plus the documentation wave 0b. Two packages leave the core
+with their FQCN unchanged: **`indexnowkit/testing`** (the conformance kits, the H01–H05 assertions, `ReadmeAssertions`,
+the mock IndexNow server; `require-dev`) and **`indexnowkit/console`** (the command runners and definitions;
+required by every framework adapter and by sitemap). Nothing under `core/src` imports `Symfony\Component\Console\`
+or `PHPUnit\` any more. Breaking, with the migration in every package changelog: three `use` lines.
+
+### core@0.7.0
+
+- `Console\SubmitterFactory` / `SubmitterFactoryInterface` are `Adapter\SubmitterFactory` / `Adapter\SubmitterFactoryInterface`;
+  `Console\ResultSummary` is `Submission\ResultSummary`.
+- `Testing\Conformance\*` and the assertion helpers moved to `indexnowkit/testing` (`Testing\KeyFileAssertions`,
+  `CheckOutputAssertions`, `ReadmeAssertions` → `Testing\Conformance\*`); the four test doubles stay. `Console\*`
+  moved to `indexnowkit/console`. `symfony/console` and `phpunit/phpunit` leave `suggest`.
+- `Adapter\OptionalPackage`: one predicate for an optional package of the family with the three texts the adapters
+  printed from their own copies (`SitemapSupport` of Laravel and Yii2, the bundle's predicate).
+
+### testing@0.1.0, console@0.1.0
+
+First releases (see the moves above); split repositories `php-testing`, `php-console`, split workflow in four stages.
+
+### sitemap@0.3.0, doctrine@0.5.0, symfony-bundle@0.8.0, laravel@0.9.0, yii2@0.7.0
+
+- `core ^0.7`; `indexnowkit/console ^0.1` (all but doctrine); `indexnowkit/testing ^0.1` in `require-dev`.
+- `SitemapConfig::loadOrDisabled()` (sitemap) replaces the invalid-block copies of Laravel and Yii2; the sitemap
+  predicate is an `OptionalPackage` (Laravel: `IndexNowKitServiceProvider::SITEMAP_PACKAGE`; Yii2: component property
+  `sitemapInstalled`; bundle: the existing `sitemapInstalled` argument). The `check` line for a configured but
+  ignored `sitemap` block is a warning.
+- The documentation wave 0b ships with these releases: "Notes for AI assistants" in every README (EN/RU) with
+  `ReadmeAiNotesTest`; the three framework READMEs carry their quick-start model verbatim from `tests/Readme/Post.php`
+  (`ReadmeQuickstartTest`); the core configuration reference gains the generated "One concept, three keys" tables
+  (`bin/config-table`); the operations guide opens with the production checklist and adds the SEO honesty texts,
+  monitoring rules and a Sentry filter; Yii2 docs reach Laravel's coverage; Russian translations of the attribute
+  reference, the configuration and the three troubleshooting guides. Monorepo: `AGENTS.md`, `context7.json`, the
+  Laravel Boost guideline, `core/.phpstorm.meta.php`, the docs site (`bin/docs-collect`, MkDocs Material, `docs.yml`
+  → GitHub Pages, `llms.txt`).
 
 ## 2026-09-05 — core@0.6.0, symfony-bundle@0.7.0, laravel@0.8.0, yii2@0.6.0, doctrine@0.4.0, sitemap@0.2.0
 
