@@ -86,7 +86,7 @@ foreach ($store->recent(10) as $record) { echo $record->at->format(DATE_ATOM), '
 
 ## Requirements
 
-PHP 8.2+, `indexnowkit/core ^0.9`; `ext-pdo` with the driver of your database for `store: pdo` (`sqlite`, `mysql`,
+PHP 8.2+, `indexnowkit/core ^0.10`; `ext-pdo` with the driver of your database for `store: pdo` (`sqlite`, `mysql`,
 `pgsql` schemas shipped); `indexnowkit/console ^0.3` for the commands (every adapter has it).
 
 ## Notes for AI assistants
