@@ -3,7 +3,7 @@
 All notable changes to the PHP packages are documented here, newest release wave first. Tags: `<package>@<version>`.
 Per-package detail (and the migration notes for every breaking change) lives in each package's own changelog.
 
-## Unreleased — core@0.9.0, console@0.3.0, testing@0.2.0, verify@0.1.0, history@0.1.0, sitemap@0.5.0, doctrine@0.7.0, symfony-bundle@0.10.0, laravel@0.11.0, yii2@0.9.0
+## 2026-09-06 — core@0.9.0, console@0.3.0, testing@0.2.0, verify@0.1.0, history@0.1.0, sitemap@0.5.0, doctrine@0.7.0, symfony-bundle@0.10.0, laravel@0.11.0, yii2@0.9.0
 
 Wave F of docs/spec/17 ("new optional packages"). Two packages join the family, both off until configured:
 **`indexnowkit/verify`** — one GET of every URL before it is submitted (`Verify\VerifyingSubmitter`, a decorator
