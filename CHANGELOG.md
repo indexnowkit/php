@@ -3,6 +3,24 @@
 All notable changes to the PHP packages are documented here, newest release wave first. Tags: `<package>@<version>`.
 Per-package detail (and the migration notes for every breaking change) lives in each package's own changelog.
 
+## Unreleased — core@0.12.0, console@0.4.1, testing@0.3.1, sitemap@0.6.1, verify@0.2.1, history@0.2.1, doctrine@0.8.1, symfony-bundle@0.13.0, laravel@0.13.1, yii2@0.12.0
+
+Wave H: the design decisions of the 0.10 audit (`docs/plans/audit-0.10.md` §6), taken as recommended. Core 0.12.0 is the one
+breaking minor that carries the three signature changes, so that the next adapter is written against the final ones:
+`Attribute\Param\FieldCondition` is no longer a `Condition` (no `evaluate()`; `when` takes `string|Condition|FieldCondition|Closure`),
+the `ParamExtractor` is a required parameter of `AttributeUrlResolver`, `ObjectChangeHandler`, `ChangeClassifier::classify()` and
+`UrlRule::appliesTo()` (`ParamExtractor::plain()` for the DSL alone), and `IndexNowKit::create()` without `resolver:` builds the
+attribute resolver like `ServicesBuilder` instead of `NullUrlResolver`. Additive: `IndexNowKit::submitEntities()` (`submitAll()`
+deprecated), Yii2 `router.locales` / `locale_parameter` / `set_app_locale` (old spellings read with a deprecation warning),
+Yii2 console output through `Controller::stdout()` (`Console\ControllerOutput`), Symfony 8 for the bundle (CI on PHP 8.4).
+Documented, not changed: `ObjectChangeHandler::renamed(..., $previous)` stays the before-image contract, `SubjectReaderInterface`
+stays read-only. Left for the Yii3 wave: the wiring of verify/history/sitemap moves into those packages (A10).
+
+### core@0.12.0, console@0.4.1, testing@0.3.1, sitemap@0.6.1, verify@0.2.1, history@0.2.1, doctrine@0.8.1, symfony-bundle@0.13.0, laravel@0.13.1, yii2@0.12.0
+
+core, yii2 and symfony-bundle change code; console (a `FieldCondition` in `explain`), doctrine and laravel adjust to the new
+signatures; testing, sitemap, verify and history are constraint-only patches. Every package requires `indexnowkit/core ^0.12`.
+
 ## 2026-09-07 — core@0.11.0, console@0.4.0, testing@0.3.0, sitemap@0.6.0, verify@0.2.0, history@0.2.0, doctrine@0.8.0, symfony-bundle@0.12.0, laravel@0.13.0, yii2@0.11.0
 
 Wave G: the fixes of the six-lens audit of the family at core 0.10 that needed no design decision (`docs/plans/audit-0.10.md`).
