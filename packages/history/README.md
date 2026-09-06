@@ -50,8 +50,8 @@ enters the history only when a URL carries it.
 
 | Store | Where | For |
 |---|---|---|
-| `psr16` | the adapter's cache behind `debounce.store`, a ring buffer of `history.limit` (500) records under `<debounce.key_prefix>history.<n>` | one process, development, small sites: two workers recording at once may lose a record, an eviction empties the history |
-| `pdo` | the table `history.pdo.table` (one row per URL, the rows of one Result share a `batch`), indexes on `url`, `at`, `(host, at)` | production; `history --purge` removes what is older than `history.retention_days` |
+| `psr16` | the adapter's cache behind `debounce.store`, a ring buffer of `history.limit` (500) records under `<debounce.key_prefix>history.<n>`, the slot from an atomic `increment()` when the cache has one | one process, development, small sites: on a cache without `increment()` (a plain PSR-16 array/file cache) workers recording at the same moment lose all but one of their records, an eviction empties the history |
+| `pdo` | the table `history.pdo.table` (one row per URL, the rows of one Result share a `batch`; one transaction of multi-row INSERTs per Result), indexes on `url`, `at`, `(host, at)` | production; `history --purge` removes what is older than `history.retention_days`. With `dispatch: sync` inside an application transaction the record shares that transaction (a rollback erases the record of a request that has left): give the history its own connection with `history.pdo.dsn` when that matters |
 
 Any other `SubmissionStoreInterface` you bind works with the commands too (`recent()` is enough); counting, "last
 submission" and `--purge` need `History\HistoryStoreInterface` (`count()`, `last()`, `purge()`), which both shipped
@@ -86,8 +86,8 @@ foreach ($store->recent(10) as $record) { echo $record->at->format(DATE_ATOM), '
 
 ## Requirements
 
-PHP 8.2+, `indexnowkit/core ^0.10`; `ext-pdo` with the driver of your database for `store: pdo` (`sqlite`, `mysql`,
-`pgsql` schemas shipped); `indexnowkit/console ^0.3` for the commands (every adapter has it).
+PHP 8.2+, `indexnowkit/core ^0.11`; `ext-pdo` with the driver of your database for `store: pdo` (`sqlite`, `mysql`,
+`pgsql` schemas shipped); `indexnowkit/console ^0.4` for the commands (every adapter has it).
 
 ## Notes for AI assistants
 

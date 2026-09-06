@@ -3,6 +3,19 @@
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: SemVer; until 1.0 minor versions may
 contain breaking changes, listed under "Changed". What the compatibility promise covers: [docs/bc.md](docs/bc.md).
 
+## [0.3.0] — Unreleased
+
+### Changed
+
+- **`ReadmeAssertions::assertAiNotes()` also requires the notes to name every command of the package** (`$commands`):
+  a new command forgotten in "Notes for AI assistants" fails the test, not only a mention of a command that does not exist.
+- Requires `indexnowkit/core ^0.11`.
+
+### Added
+
+- `ConformanceIdsTest` (monorepo): C01–C22, A01–A21 (+A05b/A05c), H01–H06 per adapter, S01–S08 — every id defined exactly
+  once per suite, none missing, none beyond the frozen range.
+
 ## [0.2.1] — 2026-09-06
 
 ### Changed

@@ -50,8 +50,8 @@ records, last 3 min ago` (или исключение с подсказкой п
 
 | Стор | Где | Для чего |
 |---|---|---|
-| `psr16` | кэш адаптера за `debounce.store`, кольцевой буфер из `history.limit` (500) записей под `<debounce.key_prefix>history.<n>` | один процесс, разработка, небольшие сайты: два воркера, пишущие одновременно, могут потерять запись, вытеснение кэша обнуляет историю |
-| `pdo` | таблица `history.pdo.table` (строка на URL, строки одного Result делят `batch`), индексы по `url`, `at`, `(host, at)` | production; `history --purge` удаляет старше `history.retention_days` |
+| `psr16` | кэш адаптера за `debounce.store`, кольцевой буфер из `history.limit` (500) записей под `<debounce.key_prefix>history.<n>`, слот берётся атомарным `increment()`, если он есть у кэша | один процесс, разработка, небольшие сайты: два воркера, пишущие одновременно, могут потерять запись, вытеснение кэша обнуляет историю |
+| `pdo` | таблица `history.pdo.table` (строка на URL, строки одного Result делят `batch`), индексы по `url`, `at`, `(host, at)` | production; `history --purge` удаляет старше `history.retention_days`. При `dispatch: sync` внутри транзакции приложения запись живёт в той же транзакции (откат стирает запись об уже ушедшем запросе): при необходимости дайте истории своё соединение через `history.pdo.dsn` |
 
 Любой другой `SubmissionStoreInterface` тоже работает с командами (достаточно `recent()`); счётчики, «последняя
 отправка» и `--purge` нужны `History\HistoryStoreInterface` (`count()`, `last()`, `purge()`) — оба поставляемых стора
@@ -86,8 +86,8 @@ foreach ($store->recent(10) as $record) { echo $record->at->format(DATE_ATOM), '
 
 ## Требования
 
-PHP 8.2+, `indexnowkit/core ^0.10`; `ext-pdo` с драйвером вашей базы для `store: pdo` (схемы для `sqlite`, `mysql`,
-`pgsql`); `indexnowkit/console ^0.3` для команд (есть у каждого адаптера).
+PHP 8.2+, `indexnowkit/core ^0.11`; `ext-pdo` с драйвером вашей базы для `store: pdo` (схемы для `sqlite`, `mysql`,
+`pgsql`); `indexnowkit/console ^0.4` для команд (есть у каждого адаптера).
 
 ## Заметки для AI-ассистентов
 

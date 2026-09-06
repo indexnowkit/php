@@ -14,6 +14,7 @@ use IndexNowKit\Result;
 use IndexNowKit\ResultStatus;
 use IndexNowKit\Submission\SubmissionRecord;
 use PDO;
+use Throwable;
 
 /**
  * The history in a database table ({@see Schema}), one row per URL of a Result, the rows of one Result sharing a
@@ -41,13 +42,41 @@ final class PdoSubmissionStore implements HistoryStoreInterface
         }
     }
 
+    /** URLs per INSERT statement: 11 columns × 500 rows stays under every driver's placeholder limit. */
+    public const INSERT_ROWS = 500;
+
+    /**
+     * All the rows of one Result in one transaction (its own, or the application's when one is open on this connection):
+     * a batch is either fully in the table or not at all, and 10 000 URLs are a few multi-row INSERTs, not 10 000 commits.
+     */
     public function record(Result $result, DateTimeImmutable $at): void
     {
         $row = RecordCodec::encode($result, $at);
+        if ($row['urls'] === []) {
+            return;
+        }
         $batch = self::batchId($at);
-        $insert = $this->pdo->prepare(\sprintf('INSERT INTO %s (batch, url, host, engine, status, reason, http_status, error, retryable, endpoint, at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', $this->table));
-        foreach ($row['urls'] as $url) {
-            $insert->execute([$batch, $url, $row['host'], $row['engine'], $row['status'], $row['reason'], $row['http_status'], $row['error'], $row['retryable'] ? 1 : 0, $row['endpoint'], $row['at']]);
+        $own = !$this->pdo->inTransaction();
+        if ($own) {
+            $this->pdo->beginTransaction();
+        }
+        try {
+            foreach (array_chunk($row['urls'], self::INSERT_ROWS) as $urls) {
+                $values = [];
+                foreach ($urls as $url) {
+                    array_push($values, $batch, $url, $row['host'], $row['engine'], $row['status'], $row['reason'], $row['http_status'], $row['error'], $row['retryable'] ? 1 : 0, $row['endpoint'], $row['at']);
+                }
+                $this->pdo->prepare(\sprintf('INSERT INTO %s (batch, url, host, engine, status, reason, http_status, error, retryable, endpoint, at) VALUES %s', $this->table, implode(', ', array_fill(0, \count($urls), '(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'))))->execute($values);
+            }
+            if ($own) {
+                $this->pdo->commit();
+            }
+        } catch (Throwable $e) {
+            if ($own && $this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
+
+            throw $e;
         }
     }
 

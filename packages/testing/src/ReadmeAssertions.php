@@ -55,6 +55,9 @@ final class ReadmeAssertions
             foreach (array_unique($found[0]) as $command) {
                 Assert::assertContains($command, self::FAMILY_COMMANDS, \sprintf('%s mentions the command "%s", which no package has', $file, $command));
             }
+            foreach ($commands as $command) {
+                Assert::assertContains($command, $found[0], \sprintf('%s: the notes do not mention the package\'s own command "%s" (an assistant that reads only this section must know it exists)', $file, $command));
+            }
             preg_match_all('/`([a-z_]+(?:\.[a-z_]+)+)`/', $section, $found);
             foreach (array_unique($found[1]) as $key) {
                 Assert::assertContains($key, $keys, \sprintf('%s mentions the configuration key "%s", which no package accepts', $file, $key));

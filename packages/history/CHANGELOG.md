@@ -3,6 +3,23 @@
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: SemVer; until 1.0 minor versions may
 contain breaking changes, listed under "Changed". What the compatibility promise covers: [docs/bc.md](docs/bc.md).
 
+## [0.2.0] — Unreleased
+
+### Changed
+
+- **`Pdo\PdoSubmissionStore::record()` is one transaction of multi-row INSERTs** (500 rows per statement; its own
+  transaction, or the one the application has open on the connection): a batch is in the table whole or not at all, and
+  10 000 URLs are twenty statements, not 10 000 commits. Note in docs: with `dispatch: sync` inside an application
+  transaction the record goes with the application's rollback, although the HTTP request has left — give the history its
+  own connection (`history.pdo.dsn`) when that matters.
+- **`Psr16SubmissionStore` takes the slot from an atomic `increment()`** (`<prefix>history.seq`) when the cache has one
+  (Laravel's repository, a Redis client), so concurrent workers get distinct slots; on a plain PSR-16 cache the
+  read-modify-write race remains and the class documentation now says what it costs. The index records `history.limit`;
+  a changed limit starts the ring over instead of remapping slots. `recent()` no longer relies on the order of
+  `getMultiple()`.
+- `indexnow:config` masks the password of `history.pdo.dsn` (console 0.4.0).
+- Requires `indexnowkit/core ^0.11`, `indexnowkit/console ^0.4`.
+
 ## [0.1.1] — 2026-09-06
 
 ### Changed

@@ -30,15 +30,15 @@
     "require": {
         "php": "^8.2",
         "ext-json": "*",
-        "indexnowkit/core": "^0.10",
+        "indexnowkit/core": "^0.11",
         "psr/clock": "^1.0",
         "psr/log": "^2.0 || ^3.0",
         "psr/simple-cache": "^1.0 || ^2.0 || ^3.0"
     },
     "require-dev": {
         "ext-pdo_sqlite": "*",
-        "indexnowkit/console": "^0.3",
-        "indexnowkit/testing": "^0.2",
+        "indexnowkit/console": "^0.4",
+        "indexnowkit/testing": "^0.3",
         "justinrainbow/json-schema": "^6.0",
         "phpstan/phpstan": "^2.2.13",
         "phpstan/phpstan-phpunit": "^2.0.18",
@@ -48,7 +48,7 @@
         "symfony/console": "^6.4 || ^7.0 || ^8.0"
     },
     "suggest": {
-        "indexnowkit/console": "The history and status commands (^0.3, with symfony/console)",
+        "indexnowkit/console": "The history and status commands (^0.4, with symfony/console)",
         "ext-pdo": "The PDO store (history.store: pdo)"
     },
     "autoload": {
@@ -75,7 +75,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "0.1.x-dev"
+            "dev-main": "0.2.x-dev"
         }
     }
 }
