@@ -31,6 +31,7 @@ REFERENCE = [
     ('Testing', 'core/testing.md'),
     ('Writing an adapter', 'core/adapters.md'),
     ('Compatibility (core)', 'core/bc.md'),
+    ('Supported versions', 'core/compatibility.md'),
 ]
 
 

@@ -30,6 +30,7 @@ README is the reference for everything underneath it.
 | Testing with the published doubles, the conformance kits of `indexnowkit/testing` | [core/docs/testing.md](packages/core/docs/testing.md), [testing/README.md](packages/testing/README.md) |
 | Writing an adapter for another framework | [core/docs/adapters.md](packages/core/docs/adapters.md) |
 | Compatibility promise | [core/docs/bc.md](packages/core/docs/bc.md) |
+| Supported PHP and framework versions, when a version is dropped | [core/docs/compatibility.md](packages/core/docs/compatibility.md) |
 | Symfony: configuration, Messenger, multi-domain, troubleshooting | [symfony-bundle/docs](packages/symfony-bundle/docs) |
 | Cross-language specification and conformance suite | [../docs/spec](../docs/spec) |
 

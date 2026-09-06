@@ -3,6 +3,21 @@
 All notable changes to the PHP packages are documented here, newest release wave first. Tags: `<package>@<version>`.
 Per-package detail (and the migration notes for every breaking change) lives in each package's own changelog.
 
+## Unreleased — core@0.10.0, console@0.3.1, testing@0.2.1, verify@0.1.1, history@0.1.1, sitemap@0.5.1, doctrine@0.7.1, symfony-bundle@0.11.0, laravel@0.12.0, yii2@0.10.0
+
+The last structural item of spec 17 §7 that did not need Yii3: **`Attribute\ParamExtractor` is an injected object**, not a
+static registry. `new ParamExtractor(...$readers)` holds the `SubjectReaderInterface`s of one graph; `IndexNowKit::create(extractor:)`,
+`Adapter\ServicesBuilder::paramExtractor()`, the Laravel binding `ParamExtractor::class`, the Symfony service
+`indexnowkit.param_extractor` (readers autoconfigured with the tag `indexnowkit.subject_reader`) and the Yii2 graph node carry
+it to the resolver, the change handler and `explain`. `registerReader()` / `unregisterReader()` are gone (migration in the
+core changelog). A `FieldCondition` (`Equals`) is now evaluated through the readers too. New `core/docs/compatibility.md`:
+supported PHP and framework versions per package, upstream end-of-life dates, the rule for dropping a version.
+
+### core@0.10.0, console@0.3.1, testing@0.2.1, verify@0.1.1, history@0.1.1, sitemap@0.5.1, doctrine@0.7.1, symfony-bundle@0.11.0, laravel@0.12.0, yii2@0.10.0
+
+See the package changelogs; every constraint moves to `core ^0.10`. Only the core, the three adapters, console (`explain`)
+and doctrine (its own change handler) changed code; testing, sitemap, verify and history are constraint-only patches.
+
 ## 2026-09-06 — core@0.9.0, console@0.3.0, testing@0.2.0, verify@0.1.0, history@0.1.0, sitemap@0.5.0, doctrine@0.7.0, symfony-bundle@0.10.0, laravel@0.11.0, yii2@0.9.0
 
 Wave F of docs/spec/17 ("new optional packages"). Two packages join the family, both off until configured:
