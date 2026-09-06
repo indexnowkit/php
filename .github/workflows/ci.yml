@@ -37,8 +37,10 @@ jobs:
           - { package: doctrine, php: '8.3', deps: dbal3 }
           - { package: symfony-bundle, php: '8.2', deps: lowest }
           - { package: symfony-bundle, php: '8.3', deps: symfony64 }
-          # highest = Laravel 12 on PHP 8.2, Laravel 13 on 8.3+; lowest = Testbench 10.0 and the oldest Laravel 12 without security advisories.
+          # highest = Laravel 12 on PHP 8.2, Laravel 13 on 8.3+; lowest = Testbench 10.0 and the oldest Laravel 12 without security
+          # advisories; lowest-l13 = the oldest Laravel 13 / Testbench 11.
           - { package: laravel, php: '8.2', deps: lowest }
+          - { package: laravel, php: '8.3', deps: lowest-l13 }
           - { package: yii2, php: '8.2', deps: lowest }
     env:
       COMPOSER: composer.monorepo.json
@@ -66,13 +68,53 @@ jobs:
       # doctrine on lowest and dbal3 (DBAL 3 / ORM 2): phpstan.dbal3.neon analyses the DBAL 3 connection instead of the DBAL 4 one.
       - run: vendor/bin/phpstan analyse --memory-limit=1G ${{ matrix.package == 'doctrine' && matrix.deps != 'highest' && '-c phpstan.dbal3.neon' || '' }}
 
+  # The history PDO store on the databases it ships schemas for: the DDL and the DML run, not just the SQL text.
+  history-databases:
+    name: history / ${{ matrix.database }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { database: mysql, dsn: 'mysql:host=127.0.0.1;port=3306;dbname=indexnow', extension: pdo_mysql }
+          - { database: postgres, dsn: 'pgsql:host=127.0.0.1;port=5432;dbname=indexnow', extension: pdo_pgsql }
+    services:
+      mysql:
+        image: mysql:8.4
+        env: { MYSQL_ROOT_PASSWORD: indexnow, MYSQL_DATABASE: indexnow }
+        ports: ['3306:3306']
+        options: --health-cmd="mysqladmin ping -h 127.0.0.1 -pindexnow" --health-interval=5s --health-timeout=5s --health-retries=20
+      postgres:
+        image: postgres:16
+        env: { POSTGRES_PASSWORD: indexnow, POSTGRES_USER: indexnow, POSTGRES_DB: indexnow }
+        ports: ['5432:5432']
+        options: --health-cmd="pg_isready -U indexnow" --health-interval=5s --health-timeout=5s --health-retries=20
+    env:
+      COMPOSER: composer.monorepo.json
+      INDEXNOWKIT_PDO_DSN: ${{ matrix.dsn }}
+      INDEXNOWKIT_PDO_USER: ${{ matrix.database == 'mysql' && 'root' || 'indexnow' }}
+      INDEXNOWKIT_PDO_PASSWORD: indexnow
+    defaults:
+      run:
+        working-directory: packages/history
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: pdo_sqlite, ${{ matrix.extension }}
+          coverage: none
+      - run: ../../bin/link history
+      - run: composer run ci:install:highest
+      - run: vendor/bin/phpunit --filter PdoStoreKitTest
+
   coverage:
     name: coverage / ${{ matrix.package }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        package: [core, sitemap, verify, history]
+        package: [core, testing, console, sitemap, verify, history, doctrine, symfony-bundle, laravel, yii2]
     env:
       COMPOSER: composer.monorepo.json
     defaults:

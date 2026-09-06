@@ -3,6 +3,26 @@
 All notable changes to the PHP packages are documented here, newest release wave first. Tags: `<package>@<version>`.
 Per-package detail (and the migration notes for every breaking change) lives in each package's own changelog.
 
+## Unreleased — core@0.11.0, console@0.4.0, testing@0.3.0, sitemap@0.6.0, verify@0.2.0, history@0.2.0, doctrine@0.8.0, symfony-bundle@0.12.0, laravel@0.13.0, yii2@0.11.0
+
+Wave G: the fixes of the six-lens audit of the family at core 0.10 that needed no design decision (`docs/plans/audit-0.10.md`).
+Secrets: `indexnow:config` masks `history.pdo.dsn` (its password went out in full; for pgsql the DSN is the only place for it),
+`key_location`, and any `dsn`/`password`/`secret`/`token` of a package block; `key:generate --env-file` writes 0600; the
+previous key is masked in logs too. Lost or duplicated URLs: Doctrine `rollBack()` discards staged URLs in a `finally` (a
+throwing rollback made the next commit submit them); Messenger and Laravel retries re-queue only the rejected URLs; the three
+queue dispatchers send one job per `batch.max_urls`; `via` walks are capped by depth × fan-out, detect cycles by object and
+keep the shallower URLs; `X-Robots-Tag: googlebot: noindex, noindex` no longer hides the global `noindex`; robots.txt group
+selection follows RFC 9309; `RobotsCache` keys by origin; `TokenBucket` no longer counts a wait twice; `TransactionStaging`
+catches a throwing sink; `verify.time_budget` keeps a pre-flight inside a queue job's visibility timeout. Yii3-readiness of
+the graph: `Services::changes()` and `clock()` nodes, `events()` as a closure, `null` from a closure for nullable nodes,
+`ObserverHelper::forChanges()`; the facade derives its extractor from the resolver. CI: the history PDO store runs on MySQL
+and PostgreSQL, coverage floors for all ten packages, Laravel 13 at its lowest versions, a conformance-id registry test.
+
+### core@0.11.0, console@0.4.0, testing@0.3.0, sitemap@0.6.0, verify@0.2.0, history@0.2.0, doctrine@0.8.0, symfony-bundle@0.12.0, laravel@0.13.0, yii2@0.11.0
+
+See the package changelogs; the constraints move to `core ^0.11`, `console ^0.4`, `testing ^0.3`, `sitemap ^0.6`, `verify ^0.2`,
+`history ^0.2`, `doctrine ^0.8`.
+
 ## 2026-09-06 — core@0.10.0, console@0.3.1, testing@0.2.1, verify@0.1.1, history@0.1.1, sitemap@0.5.1, doctrine@0.7.1, symfony-bundle@0.11.0, laravel@0.12.0, yii2@0.10.0
 
 The last structural item of spec 17 §7 that did not need Yii3: **`Attribute\ParamExtractor` is an injected object**, not a
