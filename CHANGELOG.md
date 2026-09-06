@@ -3,7 +3,7 @@
 All notable changes to the PHP packages are documented here, newest release wave first. Tags: `<package>@<version>`.
 Per-package detail (and the migration notes for every breaking change) lives in each package's own changelog.
 
-## Unreleased — core@0.12.0, console@0.4.1, testing@0.3.1, sitemap@0.6.1, verify@0.2.1, history@0.2.1, doctrine@0.8.1, symfony-bundle@0.13.0, laravel@0.13.1, yii2@0.12.0
+## 2026-09-07 — core@0.12.0, console@0.4.1, testing@0.3.1, sitemap@0.6.1, verify@0.2.1, history@0.2.1, doctrine@0.8.1, symfony-bundle@0.13.0, laravel@0.13.1, yii2@0.12.0
 
 Wave H: the design decisions of the 0.10 audit (`docs/plans/audit-0.10.md` §6), taken as recommended. Core 0.12.0 is the one
 breaking minor that carries the three signature changes, so that the next adapter is written against the final ones:
