@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # Compare the line coverage of a package (a clover report) with the floor recorded in
 # packages/<package>/tests/coverage-floor.txt; below the floor is a failure. The floor is the coverage measured when
-# it was set (spec 16 §5): raising it is a normal commit, lowering it is a separate commit with the reason.
+# it was set (spec 16 §5): raising it is a normal commit, lowering it is a separate commit with the reason. The reference
+# measurement is the CI coverage job (setup-php 8.3, pcov, a fresh highest install): a local run counts a few statements
+# differently (PHP patch version, the vendor flavour left by the last bin/ci), so record the CI number, not the local one.
 #
 # Usage: bin/coverage-floor <package> <clover.xml>            compare, exit 1 below the floor
 #        bin/coverage-floor <package> <clover.xml> --write    record the current coverage as the floor
