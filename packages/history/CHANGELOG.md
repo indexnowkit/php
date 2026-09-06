@@ -20,6 +20,12 @@ contain breaking changes, listed under "Changed". What the compatibility promise
 - `indexnow:config` masks the password of `history.pdo.dsn` (console 0.4.0).
 - Requires `indexnowkit/core ^0.11`, `indexnowkit/console ^0.4`.
 
+### Fixed
+
+- `Pdo\Schema::sql('pgsql')` gave the `BOOLEAN` column `retryable` the default `0`, which PostgreSQL refuses
+  (`SQLSTATE[42804]`); the default is now `FALSE` there (`0` stays on MySQL and SQLite). A table created after
+  docs/migrations.md was never affected.
+
 ## [0.1.1] — 2026-09-06
 
 ### Changed

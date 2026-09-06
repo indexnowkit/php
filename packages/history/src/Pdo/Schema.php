@@ -34,13 +34,14 @@ final class Schema
             default => throw new ConfigurationException(\sprintf('indexnowkit/history knows no schema for the PDO driver "%s" (sqlite, mysql, pgsql); create the table yourself after docs/migrations.md.', $driver)),
         };
         $datetime = $driver === 'pgsql' ? 'TIMESTAMP' : 'DATETIME';
-        $bool = $driver === 'pgsql' ? 'BOOLEAN' : 'TINYINT(1)';
-        if ($driver === 'sqlite') {
-            $bool = 'INTEGER';
-        }
+        [$bool, $false] = match ($driver) {
+            'pgsql' => ['BOOLEAN', 'FALSE'],
+            'mysql' => ['TINYINT(1)', '0'],
+            default => ['INTEGER', '0'],
+        };
 
         return [
-            \sprintf('CREATE TABLE %s (id %s, batch VARCHAR(26) NOT NULL, url VARCHAR(2048) NOT NULL, host VARCHAR(255) NOT NULL, engine VARCHAR(32) NOT NULL, status VARCHAR(16) NOT NULL, reason VARCHAR(32) NULL, http_status SMALLINT NULL, error TEXT NULL, retryable %s NOT NULL DEFAULT 0, endpoint VARCHAR(255) NOT NULL DEFAULT \'\', at %s NOT NULL)', $table, $id, $bool, $datetime),
+            \sprintf('CREATE TABLE %s (id %s, batch VARCHAR(26) NOT NULL, url VARCHAR(2048) NOT NULL, host VARCHAR(255) NOT NULL, engine VARCHAR(32) NOT NULL, status VARCHAR(16) NOT NULL, reason VARCHAR(32) NULL, http_status SMALLINT NULL, error TEXT NULL, retryable %s NOT NULL DEFAULT %s, endpoint VARCHAR(255) NOT NULL DEFAULT \'\', at %s NOT NULL)', $table, $id, $bool, $false, $datetime),
             \sprintf('CREATE INDEX %s_url ON %s (url%s)', $table, $table, $driver === 'mysql' ? '(255)' : ''),
             \sprintf('CREATE INDEX %s_at ON %s (at)', $table, $table),
             \sprintf('CREATE INDEX %s_host_at ON %s (host, at)', $table, $table),

@@ -16,7 +16,8 @@ selection follows RFC 9309; `RobotsCache` keys by origin; `TokenBucket` no longe
 catches a throwing sink; `verify.time_budget` keeps a pre-flight inside a queue job's visibility timeout. Yii3-readiness of
 the graph: `Services::changes()` and `clock()` nodes, `events()` as a closure, `null` from a closure for nullable nodes,
 `ObserverHelper::forChanges()`; the facade derives its extractor from the resolver. CI: the history PDO store runs on MySQL
-and PostgreSQL, coverage floors for all ten packages, Laravel 13 at its lowest versions, a conformance-id registry test.
+and PostgreSQL (which at once caught `Schema::sql('pgsql')` defaulting a `BOOLEAN` to `0`; fixed in history 0.2.0),
+coverage floors for all ten packages, Laravel 13 at its lowest versions, a conformance-id registry test.
 
 ### core@0.11.0, console@0.4.0, testing@0.3.0, sitemap@0.6.0, verify@0.2.0, history@0.2.0, doctrine@0.8.0, symfony-bundle@0.12.0, laravel@0.13.0, yii2@0.11.0
 
