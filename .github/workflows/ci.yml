@@ -37,6 +37,7 @@ jobs:
           - { package: doctrine, php: '8.3', deps: dbal3 }
           - { package: symfony-bundle, php: '8.2', deps: lowest }
           - { package: symfony-bundle, php: '8.3', deps: symfony64 }
+          - { package: symfony-bundle, php: '8.4', deps: symfony8 }
           # highest = Laravel 12 on PHP 8.2, Laravel 13 on 8.3+; lowest = Testbench 10.0 and the oldest Laravel 12 without security
           # advisories; lowest-l13 = the oldest Laravel 13 / Testbench 11.
           - { package: laravel, php: '8.2', deps: lowest }

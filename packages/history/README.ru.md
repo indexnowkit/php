@@ -112,7 +112,7 @@ $last = $store->lastFor('https://www.example.com/post-1');   // ?SubmissionRecor
   - `--purge` и счётчики нужны поставляемым сторам (`History\HistoryStoreInterface`); свой `SubmissionStoreInterface` по-прежнему показывается `indexnow:history`.
   - `--url` сравнивает URL после нормализации (`normalizer.strip_tracking_params` включён по умолчанию): передавайте URL без `utm_*`.
   - `history.key_prefix` и имя PDO-таблицы не должны содержать `{}()/\@:` (PSR-6) и ничего кроме `[A-Za-z0-9_]` (SQL-идентификатор).
-  - `dispatch: auto` есть в Symfony и Yii2, **нет** в Laravel; локали — `router.locales` (Laravel), `router.languages` (Yii2), `framework.enabled_locales` (Symfony).
+  - `dispatch: auto` есть в Symfony и Yii2, **нет** в Laravel; локали — `router.locales` (Laravel, Yii2), `framework.enabled_locales` (Symfony).
 
 ## Версионирование
 

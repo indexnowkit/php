@@ -112,7 +112,7 @@ $last = $store->lastFor('https://www.example.com/post-1');   // ?SubmissionRecor
   - `--purge` and the record counts need the shipped stores (`History\HistoryStoreInterface`); a custom `SubmissionStoreInterface` still lists with `indexnow:history`.
   - `--url` matches the URL after normalization (`normalizer.strip_tracking_params` is on by default): pass the URL without `utm_*`.
   - `history.key_prefix` and the PDO table name must not carry `{}()/\@:` (PSR-6) or anything but `[A-Za-z0-9_]` (SQL identifier).
-  - `dispatch: auto` exists in Symfony and Yii2, **not** in Laravel; locales are `router.locales` (Laravel), `router.languages` (Yii2), `framework.enabled_locales` (Symfony).
+  - `dispatch: auto` exists in Symfony and Yii2, **not** in Laravel; locales are `router.locales` (Laravel, Yii2), `framework.enabled_locales` (Symfony).
 
 ## Versioning
 
