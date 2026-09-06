@@ -3,7 +3,7 @@
 All notable changes to the PHP packages are documented here, newest release wave first. Tags: `<package>@<version>`.
 Per-package detail (and the migration notes for every breaking change) lives in each package's own changelog.
 
-## Unreleased — core@0.11.0, console@0.4.0, testing@0.3.0, sitemap@0.6.0, verify@0.2.0, history@0.2.0, doctrine@0.8.0, symfony-bundle@0.12.0, laravel@0.13.0, yii2@0.11.0
+## 2026-09-07 — core@0.11.0, console@0.4.0, testing@0.3.0, sitemap@0.6.0, verify@0.2.0, history@0.2.0, doctrine@0.8.0, symfony-bundle@0.12.0, laravel@0.13.0, yii2@0.11.0
 
 Wave G: the fixes of the six-lens audit of the family at core 0.10 that needed no design decision (`docs/plans/audit-0.10.md`).
 Secrets: `indexnow:config` masks `history.pdo.dsn` (its password went out in full; for pgsql the DSN is the only place for it),
