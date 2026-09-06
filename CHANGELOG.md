@@ -3,7 +3,7 @@
 All notable changes to the PHP packages are documented here, newest release wave first. Tags: `<package>@<version>`.
 Per-package detail (and the migration notes for every breaking change) lives in each package's own changelog.
 
-## Unreleased — core@0.10.0, console@0.3.1, testing@0.2.1, verify@0.1.1, history@0.1.1, sitemap@0.5.1, doctrine@0.7.1, symfony-bundle@0.11.0, laravel@0.12.0, yii2@0.10.0
+## 2026-09-06 — core@0.10.0, console@0.3.1, testing@0.2.1, verify@0.1.1, history@0.1.1, sitemap@0.5.1, doctrine@0.7.1, symfony-bundle@0.11.0, laravel@0.12.0, yii2@0.10.0
 
 The last structural item of spec 17 §7 that did not need Yii3: **`Attribute\ParamExtractor` is an injected object**, not a
 static registry. `new ParamExtractor(...$readers)` holds the `SubjectReaderInterface`s of one graph; `IndexNowKit::create(extractor:)`,
