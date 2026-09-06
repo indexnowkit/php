@@ -20,7 +20,7 @@ Read-only (no GET, no POST): enabled / dry_run, the environment, dispatch (and t
 knows), the debounce store, the 403 counter per configured host with its escalation flag (from
 `Retry\ForbiddenCounter` of the core, the shared cache when `debounce.store` is a cache), the last successful
 submission (`last successful submission 3 min ago (2 URLs, api)`), the history size, the core version. `--json`
-follows [status.schema.json](status.schema.json).
+follows [status.schema.json](https://github.com/indexnowkit/php/blob/main/packages/history/docs/status.schema.json).
 
 ## `check`
 

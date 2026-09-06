@@ -68,7 +68,7 @@ bin/console indexnow:status --json                                         # ena
 ```
 
 `indexnow:status` is read-only: nothing is fetched, nothing is sent. Its JSON follows
-[docs/status.schema.json](docs/status.schema.json).
+[docs/status.schema.json](https://github.com/indexnowkit/php/blob/main/packages/history/docs/status.schema.json).
 
 ## Plain PHP
 

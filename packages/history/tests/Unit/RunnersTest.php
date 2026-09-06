@@ -144,7 +144,7 @@ final class RunnersTest extends TestCase
             }
         };
         self::assertSame(ExitCode::FAILURE, $this->runner($plain)->run($this->io(), new HistoryOptions(purge: true)));
-        self::assertStringContainsString('does not support purge', $this->output->fetch());
+        self::assertStringContainsString('does not support purge', (string) preg_replace('/\s+/', ' ', $this->output->fetch()), 'the error block is wrapped at the terminal width');
         self::assertSame(ExitCode::SUCCESS, $this->runner($plain)->run($this->io(), new HistoryOptions()));
         self::assertStringContainsString('No records match.', $this->output->fetch());
         self::assertSame(ExitCode::SUCCESS, $this->runner(new Psr16SubmissionStore(new ArrayCache()))->run($this->io(), new HistoryOptions()));

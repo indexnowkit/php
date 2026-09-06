@@ -68,7 +68,7 @@ bin/console indexnow:status --json                                         # ena
 ```
 
 `indexnow:status` только читает: ничего не запрашивается и не отправляется. JSON — по
-[docs/status.schema.json](docs/status.schema.json).
+[docs/status.schema.json](https://github.com/indexnowkit/php/blob/main/packages/history/docs/status.schema.json).
 
 ## Чистый PHP
 
