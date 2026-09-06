@@ -3,6 +3,17 @@
 All notable changes to the PHP packages are documented here, newest release wave first. Tags: `<package>@<version>`.
 Per-package detail (and the migration notes for every breaking change) lives in each package's own changelog.
 
+## Unreleased — verify@0.3.0, history@0.3.0, sitemap@0.7.0, symfony-bundle@0.14.0, laravel@0.14.0, yii2@0.13.0
+
+Wave I: the last decision of the 0.10 audit (A10). The optional packages wire themselves: `Verify\Adapter\VerifyServices`,
+`History\Adapter\HistoryServices` and `Sitemap\Adapter\SitemapServices` hold what every framework adapter used to copy — the
+predicate, the owned options, the validated block, the transport, the robots cache, the decorators, the stores, the check
+lines and their texts, the runners — with `*For()` twins over the core's runtime graph (`Adapter\Services`). The three
+adapters build on them (Yii2 drops its three copies; Laravel and the bundle keep their ids and definitions), and the next
+adapter keeps only what its framework decides. Adapters `conflict` with older verify/history/sitemap. No core change.
+
+### verify@0.3.0, history@0.3.0, sitemap@0.7.0, symfony-bundle@0.14.0, laravel@0.14.0, yii2@0.13.0
+
 ## 2026-09-07 — core@0.12.0, console@0.4.1, testing@0.3.1, sitemap@0.6.1, verify@0.2.1, history@0.2.1, doctrine@0.8.1, symfony-bundle@0.13.0, laravel@0.13.1, yii2@0.12.0
 
 Wave H: the design decisions of the 0.10 audit (`docs/plans/audit-0.10.md` §6), taken as recommended. Core 0.12.0 is the one

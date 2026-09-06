@@ -84,6 +84,13 @@ $indexNow->submit(['https://www.example.com/post-1']);
 foreach ($store->recent(10) as $record) { echo $record->at->format(DATE_ATOM), ' ', $record->result->status->value, ' ', implode(' ', $record->urls), PHP_EOL; }
 ```
 
+## Авторам адаптеров
+
+`History\Adapter\HistoryServices` — всё, что адаптер фреймворка подключает для этого пакета, в одном месте: предикат (`package()`), свои опции,
+проверенный блок, хранилища поверх PDO или PSR-16, строку `check`, тела `history` и `status`, описание хранилища — статические функции над частями, с двойниками `*For()` поверх
+`Adapter\Services` ядра для рантайм-графа. Symfony-бандл, адаптеры Laravel и Yii2 построены на нём; см.
+[adapters.md](https://github.com/indexnowkit/php-core/blob/main/docs/adapters.md) ядра.
+
 ## Требования
 
 PHP 8.2+, `indexnowkit/core ^0.11`; `ext-pdo` с драйвером вашей базы для `store: pdo` (схемы для `sqlite`, `mysql`,

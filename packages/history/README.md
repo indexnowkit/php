@@ -84,6 +84,13 @@ $indexNow->submit(['https://www.example.com/post-1']);
 foreach ($store->recent(10) as $record) { echo $record->at->format(DATE_ATOM), ' ', $record->result->status->value, ' ', implode(' ', $record->urls), PHP_EOL; }
 ```
 
+## For adapter authors
+
+`History\Adapter\HistoryServices` is what a framework adapter wires for this package, in one place: the predicate (`package()`), the owned
+options, the validated block, the stores over a PDO or a PSR-16 cache, the `check` line, the bodies of `history` and `status`, the store description — as static functions over the pieces, with `*For()` twins over the core's
+`Adapter\Services` for a runtime graph. The Symfony bundle, the Laravel and the Yii2 adapters build on it; see
+[adapters.md](https://github.com/indexnowkit/php-core/blob/main/docs/adapters.md) of the core.
+
 ## Requirements
 
 PHP 8.2+, `indexnowkit/core ^0.11`; `ext-pdo` with the driver of your database for `store: pdo` (`sqlite`, `mysql`,

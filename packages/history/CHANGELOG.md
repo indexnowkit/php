@@ -3,6 +3,16 @@
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: SemVer; until 1.0 minor versions may
 contain breaking changes, listed under "Changed". What the compatibility promise covers: [docs/bc.md](docs/bc.md).
 
+## [0.3.0] — Unreleased
+
+### Added
+
+- **`History\Adapter\HistoryServices`** — what every framework adapter wires for this package, in one place: `package()`,
+  `options()`, `config()`, `pdoFromDsn()`, `pdoStore()` (errors as exceptions), `psr16Store()`, `debounceCacheId()` (the
+  cache `debounce.store` names, null for `memory`/`none`), `forbiddenCounter()`, `check()`, `historyRunner()`,
+  `statusRunner()`, `describe()` (the store line of an "about" screen), and the `*For()` twins over the core's runtime
+  graph (`checksFor()`, `historyRunnerFor()`, `statusRunnerFor()`). The three adapters build on it.
+
 ## [0.2.1] — 2026-09-07
 
 ### Changed
