@@ -81,7 +81,8 @@ final class ConformanceIdsTest extends TestCase
         $adapters = [];
         foreach (glob(\dirname(__DIR__, 3) . '/*/composer.json') ?: [] as $manifest) {
             $package = basename(\dirname($manifest));
-            if (\in_array($package, $libraries, true) || !is_dir(\dirname($manifest) . '/tests')) {
+            // in the split repository the glob finds this package itself, under its repository name (php-testing)
+            if (\dirname($manifest) === \dirname(__DIR__, 2) || \in_array($package, $libraries, true) || !is_dir(\dirname($manifest) . '/tests')) {
                 continue;
             }
             $decoded = json_decode((string) file_get_contents($manifest), true);
