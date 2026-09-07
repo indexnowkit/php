@@ -87,14 +87,14 @@ foreach ($store->recent(10) as $record) { echo $record->at->format(DATE_ATOM), '
 ## For adapter authors
 
 `History\Adapter\HistoryServices` is what a framework adapter wires for this package, in one place: the predicate (`package()`), the owned
-options, the validated block, the stores over a PDO or a PSR-16 cache, the `check` line, the bodies of `history` and `status`, the store description — as static functions over the pieces, with `*For()` twins over the core's
+options, the validated block, the stores over a PDO or a PSR-16 cache, the `check` line, the bodies of `history` and `status` (`historyRunner()`, `statusRunner()`; the commands themselves are `History\Console\HistoryCommand` and `StatusCommand`, the classes an adapter on symfony/console registers over those runners), the store description — as static functions over the pieces, with `*For()` twins over the core's
 `Adapter\Services` for a runtime graph. The Symfony bundle, the Laravel, the Yii2 and the Yii3 adapters build on it; see
 [adapters.md](https://github.com/indexnowkit/php-core/blob/main/docs/adapters.md) of the core.
 
 ## Requirements
 
 PHP 8.2+, `indexnowkit/core ^0.11`; `ext-pdo` with the driver of your database for `store: pdo` (`sqlite`, `mysql`,
-`pgsql` schemas shipped); `indexnowkit/console ^0.4` for the commands (every adapter has it).
+`pgsql` schemas shipped); `indexnowkit/console ^0.5` for the commands (every adapter has it).
 
 ## Notes for AI assistants
 

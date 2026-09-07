@@ -3,9 +3,19 @@
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: SemVer; until 1.0 minor versions may
 contain breaking changes, listed under "Changed". What the compatibility promise covers: [docs/bc.md](docs/bc.md).
 
-## [0.3.1] — Unreleased
+## [0.4.0] — Unreleased
 
 ### Added
+
+- **`Console\HistoryCommand` and `Console\StatusCommand`** (wave L, spec 18): the `indexnow:history` and `indexnow:status`
+  commands themselves as symfony/console classes over `Console\HistoryRunner` / `Console\StatusRunner`, each with its
+  `#[AsCommand]`; the adapter builds the runner (`History\Adapter\HistoryServices::historyRunner()` / `statusRunner()`
+  and their `*For()` twins, the description of the debounce store and the queue facts included) and hands it over. The
+  Symfony bundle and the Yii3 package register these classes instead of copies of their own; without the package an
+  adapter registers `Console\Command\HistoryNotInstalledCommand` and `StatusNotInstalledCommand` of `indexnowkit/console`
+  under the same names. `HistoryCommand::DEFAULT_LIMIT` (`50`) is what a `--limit` that is not a number falls back to.
+  Minor version, not patch: new public classes, by the rule of the family; the `Schema::table()` entry below was written
+  for 0.3.1 and ships here.
 
 - `Pdo\Schema::table(string $table): string` — the table name once it passed the identifier check, the form that reaches
   the SQL; `assertTable()` stays and delegates. `PdoSubmissionStore` and `Schema::sql()` keep the checked value, which is
@@ -17,7 +27,7 @@ contain breaking changes, listed under "Changed". What the compatibility promise
 - `History\Adapter\HistoryServices::package()` delegates to the core's `Adapter\OptionalPackage::history()` (core
   0.13.0): the name, the marker and the feature word live there, so an adapter asks about the package without loading
   this class. Same object, same texts; adapters should call `OptionalPackage::history()` directly.
-- Requires `ext-mbstring` (`RecordCodec` truncates an error text with `mb_substr()` and declared nothing; audit 0.13 W3) and `indexnowkit/core ^0.13`.
+- Requires `ext-mbstring` (`RecordCodec` truncates an error text with `mb_substr()` and declared nothing; audit 0.13 W3) and `indexnowkit/core ^0.13`; the commands need `indexnowkit/console ^0.5` (`require-dev`, `suggest`).
 
 ## [0.3.0] — 2026-09-07
 

@@ -38,7 +38,7 @@
     },
     "require-dev": {
         "ext-pdo_sqlite": "*",
-        "indexnowkit/console": "^0.4",
+        "indexnowkit/console": "^0.5",
         "indexnowkit/testing": "^0.3",
         "justinrainbow/json-schema": "^6.0",
         "phpstan/phpstan": "^2.2.13",
@@ -49,7 +49,7 @@
         "symfony/console": "^6.4 || ^7.0 || ^8.0"
     },
     "suggest": {
-        "indexnowkit/console": "The history and status commands (^0.4, with symfony/console)",
+        "indexnowkit/console": "The history and status commands (^0.5, with symfony/console)",
         "ext-pdo": "The PDO store (history.store: pdo)"
     },
     "autoload": {
@@ -76,7 +76,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "0.3.x-dev"
+            "dev-main": "0.4.x-dev"
         }
     }
 }

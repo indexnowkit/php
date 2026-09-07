@@ -5,7 +5,7 @@
 
 | Tier | Members |
 |---|---|
-| **Call** — signatures only grow by appended, defaulted parameters | `Psr16SubmissionStore`, `Pdo\PdoSubmissionStore` (constructors, `createTable()`), `Pdo\Schema::sql()`, `assertTable()`, `HistoryConfig` (constructor, `fromArray()`, `disabled()`, `loadOrDisabled()`, `toArray()`), `Check\HistoryCheck`, `Console\HistoryRunner`, `Console\StatusRunner`, `Console\HistoryOptions`, `Console\Definitions::*` |
+| **Call** — signatures only grow by appended, defaulted parameters | `Psr16SubmissionStore`, `Pdo\PdoSubmissionStore` (constructors, `createTable()`), `Pdo\Schema::sql()`, `assertTable()`, `HistoryConfig` (constructor, `fromArray()`, `disabled()`, `loadOrDisabled()`, `toArray()`), `Check\HistoryCheck`, `Console\HistoryRunner`, `Console\StatusRunner`, `Console\HistoryCommand` and `Console\StatusCommand` (the names `indexnow:history` / `indexnow:status` are a contract, the descriptions are not), `Console\HistoryOptions`, `Console\Definitions::*` |
 | **Implement** — methods are not added without a major version | `HistoryStoreInterface` |
 | **Value objects** — `final readonly`, properties only appended with defaults | `HistoryConfig` |
 | **Constants** — referenced, not hard-coded | `HistoryConfig::OPTIONS`, `STORES`, `DEFAULT_*`, `Schema::DRIVERS`, `HistoryCheck::CODE_*` |
