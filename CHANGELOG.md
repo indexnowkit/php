@@ -3,7 +3,7 @@
 All notable changes to the PHP packages are documented here, newest release wave first. Tags: `<package>@<version>`.
 Per-package detail (and the migration notes for every breaking change) lives in each package's own changelog.
 
-## Unreleased — core@0.13.0, console@0.4.2, testing@0.3.2, sitemap@0.7.1, verify@0.3.1, history@0.3.1, doctrine@0.8.2, symfony-bundle@0.14.1, laravel@0.14.1, yii2@0.13.1, yii3@0.1.0
+## Unreleased — core@0.13.0, console@0.4.2, testing@0.3.2, sitemap@0.8.0, verify@0.4.0, history@0.3.1, doctrine@0.9.0, symfony-bundle@0.15.0, laravel@0.15.0, yii2@0.14.0, yii3@0.1.0
 
 The Yii3 adapter (spec 15): `indexnowkit/yii3` on `yiisoft/active-record ^1.0`, `yiisoft/db ^2.0`, `yiisoft/router ^4.0`. A
 `yiisoft/config` plugin (params, di, di-web, di-console, params-console, events-web, events-console, routes, bootstrap) wires
@@ -24,9 +24,33 @@ installed, so they proved the texts, not the boot. Core 0.13.0 (additive) carrie
 `Adapter\OptionalPackage::sitemap()` / `verify()` / `history()`, the markers as strings — the three packages' `package()`
 delegate to them, the four adapters call them. A new CI job `optional-packages-absent` removes the three packages and boots
 every adapter with detection (`Testing\Conformance\OptionalPackageAssertions`). Every package requires `core ^0.13`;
-console, doctrine and the three optional packages are constraint-only patches (the optional packages also delegate).
+console and the three optional packages delegate the predicate and require `core ^0.13`.
 
-### core@0.13.0, console@0.4.2, testing@0.3.2, sitemap@0.7.1, verify@0.3.1, history@0.3.1, doctrine@0.8.2, symfony-bundle@0.14.1, laravel@0.14.1, yii2@0.13.1, yii3@0.1.0
+**Audit 0.13** (`docs/plans/audit-0.13.md`, six lenses over the tree above, before the tags), every finding closed in this same
+wave. Two silent URL losses: `Config::fromArray()` read `dry_run`, `enabled`, `strict_hosts` and `collector.detect_leaks` with a
+bare `(bool)`, so `INDEXNOW_DRY_RUN=false` handed to Yii3 as a string switched the dry run **on**; verify-on-commit in Yii2 and
+Yii3 compared the typed values of a record with the raw strings of the driver, so an insert with a DECIMAL, a `timestamptz` or
+a JSON column inside a transaction was discarded — `VerifyingStaging::rowMatches()` now compares only what every driver spells
+the same way, and a later change of the same record merges into the earlier one (`stage(..., key:)`). Secrets: `indexnow:config`
+printed `history.pdo.dsn` unmasked when `indexnowkit/history` was not installed (console 0.4.2); `key:generate --env-file`
+creates the file with 0600 before writing and escapes the previous key. Pre-flight: the verify package no longer uses the
+application's `http.client` for its GETs (a client that follows redirects hid the 3xx the pre-flight exists to see; verify
+0.4.0), a relative `canonical` resolves against `<base href>`, the time budget is taken before the delay; the sitemap command
+skips `<loc>` entries on hosts the site does not manage (sitemap 0.8.0). Graph: the clock node reaches the console
+submitters (`SubmitterFactory`) and is open in every adapter (`FrozenClock` makes a whole flush deterministic); the Laravel,
+Yii2 and Doctrine hooks resolve URLs through `ObserverHelper::forChanges()` without building the client (the observer
+constructors change: laravel 0.15.0, yii2 0.14.0, doctrine 0.9.0); the `--sample` gate in front of the optional verify is one
+core class (`Check\SampleGateCheck`, `Check\SampleOptions`) instead of four copies; `Services::requireRouter()` /
+`requireResolverLocator()`; `HistoryServices::storeFor()` (history 0.3.1); `ArrayResolverLocator` wraps a throwing container
+lookup into one text; the bundle names its verify decorator arguments and gets `indexnowkit.clock` (symfony-bundle 0.15.0).
+Yii3, never audited before, gets its own list: `upsert()` is observed, the hook never throws into `save()`, a change whose
+transaction state cannot be read is staged instead of sent, the cache probe key is PSR-16 safe, the command map uses the
+core's predicates and is exercised by tests. CI: PHPStan level 6 over every test suite (`phpstan.tests.neon`), `failOnDeprecation`
+with `ignoreIndirectDeprecations` in the adapters, PHPUnit `^11.5 || ^12.0 || ^13.0`, Symfony 8 in the dev constraints, ORM 3 on
+DBAL 3 in the Doctrine matrix, C04 no longer skipped in doctrine, the split CIs aligned with the monorepo. Per package: the
+changelogs; the decisions and the lens reports: `docs/plans/audit-0.13.md`.
+
+### core@0.13.0, console@0.4.2, testing@0.3.2, sitemap@0.8.0, verify@0.4.0, history@0.3.1, doctrine@0.9.0, symfony-bundle@0.15.0, laravel@0.15.0, yii2@0.14.0, yii3@0.1.0
 
 ## 2026-09-07 — verify@0.3.0, history@0.3.0, sitemap@0.7.0, symfony-bundle@0.14.0, laravel@0.14.0, yii2@0.13.0
 

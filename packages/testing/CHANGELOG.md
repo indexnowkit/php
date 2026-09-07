@@ -17,6 +17,9 @@ contain breaking changes, listed under "Changed". What the compatibility promise
 
 ### Changed
 
+- `ConformanceIdsTest` (monorepo) reads the list of framework adapters off the file system — every `packages/*` that
+  requires `indexnowkit/core` and has a `tests/` directory, minus the libraries — instead of a hard-coded array of four
+  names, and asserts at least four were found. A new adapter (Bitrix next) now has to bring H01–H06 the day it lands.
 - Requires `indexnowkit/core ^0.13`.
 
 ## [0.3.1] — 2026-09-07

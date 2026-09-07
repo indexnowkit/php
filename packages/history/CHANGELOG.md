@@ -10,7 +10,7 @@ contain breaking changes, listed under "Changed". What the compatibility promise
 - `History\Adapter\HistoryServices::package()` delegates to the core's `Adapter\OptionalPackage::history()` (core
   0.13.0): the name, the marker and the feature word live there, so an adapter asks about the package without loading
   this class. Same object, same texts; adapters should call `OptionalPackage::history()` directly.
-- Requires `indexnowkit/core ^0.13`.
+- Requires `ext-mbstring` (`RecordCodec` truncates an error text with `mb_substr()` and declared nothing; audit 0.13 W3) and `indexnowkit/core ^0.13`.
 
 ## [0.3.0] — 2026-09-07
 
