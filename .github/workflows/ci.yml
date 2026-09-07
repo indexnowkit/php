@@ -210,6 +210,8 @@ jobs:
       - run: composer run ci:install:highest
       - name: Install Infection (tools/infection)
         run: composer install --no-interaction --working-dir ../../tools/infection
+        env:
+          COMPOSER: composer.json   # the job-wide composer.monorepo.json is the package manifest, not the tool's
       - name: Mutation testing against the floor
         run: |
           mkdir -p ../../var/mutation
@@ -250,6 +252,8 @@ jobs:
       - run: ../../bin/link ${{ matrix.package }}
       - run: composer run ci:install:highest
       - run: composer install --no-interaction --working-dir ../../tools/infection
+        env:
+          COMPOSER: composer.json
       - name: Mutation testing of the changed lines
         run: |
           mkdir -p ../../var/mutation

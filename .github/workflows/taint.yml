@@ -47,5 +47,7 @@ jobs:
         run: composer run ci:install:highest
       - name: Install Psalm (tools/psalm)
         run: composer install --no-interaction --working-dir ../../tools/psalm
+        env:
+          COMPOSER: composer.json   # the job-wide composer.monorepo.json is the package manifest, not the tool's
       - name: Taint analysis
         run: ../../tools/psalm/vendor/bin/psalm --taint-analysis --no-cache --no-progress --output-format=github
