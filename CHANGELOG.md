@@ -3,6 +3,19 @@
 All notable changes to the PHP packages are documented here, newest release wave first. Tags: `<package>@<version>`.
 Per-package detail (and the migration notes for every breaking change) lives in each package's own changelog.
 
+## Unreleased — core@0.13.1, sitemap@0.9.0, cli@0.1.0
+
+**Wave N — the `indexnow` command line** (spec 19b, phase B of spec 18): `indexnowkit/cli`, one binary for any host with PHP
+and any CI, no framework — the commands of `console`, `sitemap` and `history` without the `indexnow:` prefix plus
+`key:file <docroot>`; every option a variable (`INDEXNOW_<BLOCK>_<KEY>` for the package blocks, a `.env` under the process
+environment, a JSON file for the rest); one sqlite state file (`.indexnow/state.sqlite`: the debounce window between cron
+runs, the 403 counters, the history — on by default —, the seen sitemap URLs); `symfony/http-client` required and passed
+explicitly, no discovery. Three packagings: Composer, `indexnow.phar` (Box, attached to the GitHub release of `php-cli`), the
+image `ghcr.io/indexnowkit/indexnow` (non-root; a `-action` tag for the GitHub Action `indexnowkit/indexnow-action`, mirrored
+from `packages/cli/action`). Sitemap 0.9.0 adds `sitemap --new-only` over `Sitemap\SeenStoreInterface` (the adapters get the
+option with an honest refusal; the CLI keeps the store); core 0.13.1 adds `Config::arrayFromEnv()` — a patch by the cascade
+rule of the family — and fixes `unknownOptions()` on nested blocks (`history.pdo` was reported unknown by every adapter).
+
 ## 2026-09-08 — core@0.13.0, console@0.5.0, testing@0.3.2, sitemap@0.8.0, verify@0.4.0, history@0.4.0, doctrine@0.9.0, symfony-bundle@0.15.0, laravel@0.15.0, yii2@0.14.0, yii3@0.1.0
 
 The Yii3 adapter (spec 15): `indexnowkit/yii3` on `yiisoft/active-record ^1.0`, `yiisoft/db ^2.0`, `yiisoft/router ^4.0`. A
