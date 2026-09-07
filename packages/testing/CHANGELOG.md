@@ -14,6 +14,9 @@ contain breaking changes, listed under "Changed". What the compatibility promise
   `optional-packages-absent`, which runs `composer remove` of sitemap, verify and history before the detection test of
   each adapter) the absence of all three is an assertion too. The adapters' "not installed" tests pass `false` with the
   packages still installed, which proved the texts but not the boot (core 0.13.0).
+- **`Conformance\Arrays::merge($base, $overrides)`**: overrides on top of test options — a nested associative block merges
+  key by key, a list, an empty array or a scalar replaces. The one implementation of what the `Fixtures` of the Laravel,
+  Yii2 and Yii3 test suites each carried (audit 0.13 W12); they delegate to it now.
 
 ### Changed
 
