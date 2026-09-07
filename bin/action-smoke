@@ -11,7 +11,7 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 image="${1:?usage: bin/action-smoke <image>}"
 key="abcdef1234567890abcdef1234567890"
 work="$(mktemp -d)"
-trap 'rm -rf "$work"' EXIT
+trap 'rm -rf "$work" 2>/dev/null || docker run --rm -v "$work:/w" alpine rm -rf /w/workspace/.indexnow >/dev/null 2>&1; rm -rf "$work" 2>/dev/null || true' EXIT   # the container wrote the state as root
 mkdir -p "$work/workspace" "$work/github"
 cat > "$work/workspace/sitemap.xml" <<XML
 <?xml version="1.0"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>http://127.0.0.1:8089/a</loc><lastmod>2026-01-01</lastmod></url><url><loc>http://127.0.0.1:8089/b</loc></url></urlset>
