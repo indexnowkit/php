@@ -48,7 +48,7 @@ final class ConformanceIdsTest extends TestCase
     public function testAdapters(): void
     {
         $checked = 0;
-        foreach (['symfony-bundle', 'laravel', 'yii2'] as $adapter) {
+        foreach (['symfony-bundle', 'laravel', 'yii2', 'yii3'] as $adapter) {
             $dir = \dirname(__DIR__, 3) . '/' . $adapter . '/tests';
             if (!is_dir($dir)) {
                 continue;

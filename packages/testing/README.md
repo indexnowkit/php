@@ -5,7 +5,7 @@ specification as abstract PHPUnit cases you extend against *your* wiring (C01–
 protocol, A01–A21 for an ORM adapter), the assertions of the HTTP and command scenarios (H01–H05) so a framework test
 parses its own response object and asserts once, an assertion for the README section AI assistants read, and the
 mock IndexNow server for end-to-end runs. It is what `indexnowkit/doctrine`, `indexnowkit/symfony-bundle`,
-`indexnowkit/laravel` and `indexnowkit/yii2` test themselves with; an adapter for another framework starts here.
+`indexnowkit/laravel`, `indexnowkit/yii2` and `indexnowkit/yii3` test themselves with; an adapter for another framework starts here.
 
 The four test doubles (`FakeTransport`, `ArrayLogger`, `FrozenClock`, `RecordingDispatcher`) stay in
 [`indexnowkit/core`](https://github.com/indexnowkit/php/tree/main/packages/core) under `IndexNowKit\Testing`: they

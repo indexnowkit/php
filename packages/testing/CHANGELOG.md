@@ -3,6 +3,12 @@
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: SemVer; until 1.0 minor versions may
 contain breaking changes, listed under "Changed". What the compatibility promise covers: [docs/bc.md](docs/bc.md).
 
+## [0.3.2] — Unreleased
+
+### Added
+
+- `ReadmeAssertions::FAMILY_COMMANDS` knows `indexnow:submit-record` (the Yii3 adapter); `ConformanceIdsTest` checks H01–H06 of `yii3` next door.
+
 ## [0.3.1] — 2026-09-07
 
 ### Changed
