@@ -76,8 +76,9 @@ final class ConformanceIdsTest extends TestCase
      */
     private static function adapters(): array
     {
-        // Libraries, not framework adapters: they carry no HTTP conformance suite (doctrine is the ORM bridge, A ids only).
-        $libraries = ['core', 'console', 'testing', 'sitemap', 'verify', 'history', 'doctrine'];
+        // Libraries, not framework adapters: they carry no HTTP conformance suite (doctrine is the ORM bridge, A ids only;
+        // cli is the composition root of the `indexnow` binary, it serves no key file over HTTP).
+        $libraries = ['core', 'console', 'testing', 'sitemap', 'verify', 'history', 'doctrine', 'cli'];
         $adapters = [];
         foreach (glob(\dirname(__DIR__, 3) . '/*/composer.json') ?: [] as $manifest) {
             $package = basename(\dirname($manifest));
