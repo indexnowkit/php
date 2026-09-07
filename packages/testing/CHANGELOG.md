@@ -8,6 +8,16 @@ contain breaking changes, listed under "Changed". What the compatibility promise
 ### Added
 
 - `ReadmeAssertions::FAMILY_COMMANDS` knows `indexnow:submit-record` (the Yii3 adapter); `ConformanceIdsTest` checks H01–H06 of `yii3` next door.
+- **`Conformance\OptionalPackageAssertions`**: `assertDetected($checkOutput)` — with the predicates left to detection
+  (`installed: null`), the `check` output names exactly the optional packages that are physically absent and none of
+  the present ones; with the environment variable `INDEXNOWKIT_OPTIONAL_PACKAGES=absent` (the CI job
+  `optional-packages-absent`, which runs `composer remove` of sitemap, verify and history before the detection test of
+  each adapter) the absence of all three is an assertion too. The adapters' "not installed" tests pass `false` with the
+  packages still installed, which proved the texts but not the boot (core 0.13.0).
+
+### Changed
+
+- Requires `indexnowkit/core ^0.13`.
 
 ## [0.3.1] — 2026-09-07
 

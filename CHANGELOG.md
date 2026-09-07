@@ -3,7 +3,7 @@
 All notable changes to the PHP packages are documented here, newest release wave first. Tags: `<package>@<version>`.
 Per-package detail (and the migration notes for every breaking change) lives in each package's own changelog.
 
-## Unreleased — yii3@0.1.0, testing@0.3.2
+## Unreleased — core@0.13.0, console@0.4.2, testing@0.3.2, sitemap@0.7.1, verify@0.3.1, history@0.3.1, doctrine@0.8.2, symfony-bundle@0.14.1, laravel@0.14.1, yii2@0.13.1, yii3@0.1.0
 
 The Yii3 adapter (spec 15): `indexnowkit/yii3` on `yiisoft/active-record ^1.0`, `yiisoft/db ^2.0`, `yiisoft/router ^4.0`. A
 `yiisoft/config` plugin (params, di, di-web, di-console, params-console, events-web, events-console, routes, bootstrap) wires
@@ -16,7 +16,17 @@ until `yiisoft/queue` is released (a replaced `DispatcherInterface`). No core ch
 `VerifyingStaging` passed the Yii3 criterion of spec 17 §7. `indexnowkit/testing` 0.3.2 knows `indexnow:submit-record` and
 checks H01–H06 of `yii3`.
 
-### yii3@0.1.0, testing@0.3.2
+Found while writing it, fixed here: **the Symfony bundle, the Laravel and the Yii2 adapters were a fatal without
+`indexnowkit/sitemap`, `indexnowkit/verify` or `indexnowkit/history`** (`Class "IndexNowKit\Sitemap\Adapter\SitemapServices"
+not found` at the first configuration build). They asked the packages' `*Services::package()` whether the package is
+installed, and those classes live in the packages; the tests of wave I passed `installed: false` with the packages still
+installed, so they proved the texts, not the boot. Core 0.13.0 (additive) carries the predicates —
+`Adapter\OptionalPackage::sitemap()` / `verify()` / `history()`, the markers as strings — the three packages' `package()`
+delegate to them, the four adapters call them. A new CI job `optional-packages-absent` removes the three packages and boots
+every adapter with detection (`Testing\Conformance\OptionalPackageAssertions`). Every package requires `core ^0.13`;
+console, doctrine and the three optional packages are constraint-only patches (the optional packages also delegate).
+
+### core@0.13.0, console@0.4.2, testing@0.3.2, sitemap@0.7.1, verify@0.3.1, history@0.3.1, doctrine@0.8.2, symfony-bundle@0.14.1, laravel@0.14.1, yii2@0.13.1, yii3@0.1.0
 
 ## 2026-09-07 — verify@0.3.0, history@0.3.0, sitemap@0.7.0, symfony-bundle@0.14.0, laravel@0.14.0, yii2@0.13.0
 
