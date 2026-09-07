@@ -37,7 +37,7 @@ final class CoreConformanceKitTest extends CoreConformanceTestCase
         return $this->transport ??= new FakeTransport();
     }
 
-    protected function secondHost(): ?string
+    protected function secondHost(): string
     {
         return 'example.de';
     }

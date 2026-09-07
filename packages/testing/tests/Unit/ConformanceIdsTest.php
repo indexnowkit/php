@@ -16,7 +16,8 @@ use SplFileInfo;
  * the adapter kit re-runs eleven of them), A01–A21 with A05b/A05c/A10b (`OrmConformanceTestCase`), S01–S08
  * (`SubmissionStoreConformanceTestCase`), H01–H06 (one `HttpConformanceTest` per framework adapter). Every id is a
  * `#[TestDox('Xnn …')]`, each exactly once per suite, none missing, none beyond the frozen range. Suites that are not next
- * door (a split repository) are skipped.
+ * door (a split repository) are skipped. Which packages are framework adapters is read off the file system
+ * ({@see adapters()}), so a new one cannot land without its H ids.
  */
 final class ConformanceIdsTest extends TestCase
 {
@@ -47,13 +48,13 @@ final class ConformanceIdsTest extends TestCase
     #[TestDox('every framework adapter defines H01–H06 once each')]
     public function testAdapters(): void
     {
-        $checked = 0;
-        foreach (['symfony-bundle', 'laravel', 'yii2', 'yii3'] as $adapter) {
+        $adapters = self::adapters();
+        if ($adapters === []) {
+            self::markTestSkipped('no adapter tests next door (split repository)');
+        }
+        self::assertGreaterThanOrEqual(4, \count($adapters), 'the framework adapters found next door: ' . implode(', ', $adapters));
+        foreach ($adapters as $adapter) {
             $dir = \dirname(__DIR__, 3) . '/' . $adapter . '/tests';
-            if (!is_dir($dir)) {
-                continue;
-            }
-            ++$checked;
             $ids = self::sorted(self::ids($dir), 'H');
             self::assertSame(array_unique($ids), $ids, $adapter . ': an H id is defined twice');
             foreach (self::range('H', 6) as $id) {
@@ -63,9 +64,34 @@ final class ConformanceIdsTest extends TestCase
                 self::assertLessThanOrEqual(6, (int) substr($id, 1, 2), $adapter . ': ' . $id . ' is beyond the frozen range (H01b-style variants of an existing id are fine)');
             }
         }
-        if ($checked === 0) {
-            self::markTestSkipped('no adapter tests next door (split repository)');
+    }
+
+    /**
+     * The framework adapters next door, read off the file system rather than listed here: every `packages/*` whose
+     * `composer.json` requires `indexnowkit/core`, that has a `tests/` directory, and that is not one of the
+     * libraries below. A new adapter (Yii3 was one, Bitrix will be) therefore has to bring H01–H06 the day it lands,
+     * without anyone remembering to extend a literal.
+     *
+     * @return list<string>
+     */
+    private static function adapters(): array
+    {
+        // Libraries, not framework adapters: they carry no HTTP conformance suite (doctrine is the ORM bridge, A ids only).
+        $libraries = ['core', 'console', 'testing', 'sitemap', 'verify', 'history', 'doctrine'];
+        $adapters = [];
+        foreach (glob(\dirname(__DIR__, 3) . '/*/composer.json') ?: [] as $manifest) {
+            $package = basename(\dirname($manifest));
+            if (\in_array($package, $libraries, true) || !is_dir(\dirname($manifest) . '/tests')) {
+                continue;
+            }
+            $decoded = json_decode((string) file_get_contents($manifest), true);
+            if (\is_array($decoded) && \is_array($decoded['require'] ?? null) && isset($decoded['require']['indexnowkit/core'])) {
+                $adapters[] = $package;
+            }
         }
+        sort($adapters);
+
+        return $adapters;
     }
 
     /**
