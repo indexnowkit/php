@@ -1,8 +1,8 @@
 {
     "$schema": "https://context7.com/schema/context7.json",
     "projectTitle": "indexnowkit (PHP)",
-    "description": "IndexNow for PHP: core client plus Symfony, Laravel, Yii2, Yii3 and Doctrine adapters. Declare public pages on the model with #[IndexNow], submissions leave after the transaction commits, debounced and batched; a sitemap reader; check/explain commands.",
-    "folders": ["packages/core", "packages/testing", "packages/console", "packages/sitemap", "packages/doctrine", "packages/symfony-bundle", "packages/laravel", "packages/yii2", "packages/yii3"],
+    "description": "IndexNow for PHP: core client plus Symfony, Laravel, Yii2, Yii3 and Doctrine adapters. Declare public pages on the model with #[IndexNow], submissions leave after the transaction commits, debounced and batched; a sitemap reader; an optional pre-flight GET before every submission (noindex, robots.txt, canonical, redirects); an optional submission history behind the history and status commands; check/explain commands.",
+    "folders": ["packages/core", "packages/testing", "packages/console", "packages/sitemap", "packages/verify", "packages/history", "packages/doctrine", "packages/symfony-bundle", "packages/laravel", "packages/yii2", "packages/yii3"],
     "excludeFolders": ["vendor", "tests", "src", "config", "resources", "docs/plans", "docs/spec", ".github", "bin", "docker"],
     "excludeFiles": ["CHANGELOG.md", "CONTRIBUTING.md", "SECURITY.md", "composer.json", "phpunit.xml.dist", "phpstan.neon.dist", "phpstan.dbal3.neon", "psalm.xml"],
     "rules": [

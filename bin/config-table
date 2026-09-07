@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Regenerate (or, with --check, verify) the "One concept, three keys" section of packages/core/docs/configuration.md
+# Regenerate (or, with --check, verify) the "One concept, four keys" section of packages/core/docs/configuration.md
 # from the code: bin/lib/config-table.php run inside packages/symfony-bundle (its vendor holds core, sitemap and the
 # bundle; the Laravel and Yii2 key lists are read from the sibling sources). Needs bin/ci symfony-bundle to have run once.
 # Usage: bin/config-table [--check]

@@ -130,7 +130,7 @@ def main():
     order += [k for pkg in PACKAGES for k in ['%s/index.md' % pkg] + package_docs[pkg] if k not in order]
     order += sorted(k for k in pages if k.endswith('.ru.md'))
     with open(os.path.join(OUT, 'llms.txt'), 'w', encoding='utf-8') as f:
-        f.write("# indexnowkit for PHP\n\n> IndexNow for PHP: a framework-agnostic core plus Symfony, Laravel, Yii2 and Doctrine adapters. Declare public pages on the model with #[IndexNow]; submissions leave after the transaction commits, debounced and batched.\n\n")
+        f.write("# indexnowkit for PHP\n\n> IndexNow for PHP: a framework-agnostic core plus Symfony, Laravel, Yii2, Yii3 and Doctrine adapters. Declare public pages on the model with #[IndexNow]; submissions leave after the transaction commits, debounced and batched.\n\n")
         f.write("Packagist: indexnowkit/core, indexnowkit/console, indexnowkit/testing, indexnowkit/sitemap, indexnowkit/verify, indexnowkit/history, indexnowkit/doctrine, indexnowkit/symfony-bundle, indexnowkit/laravel, indexnowkit/yii2, indexnowkit/yii3. Source and issues: https://github.com/indexnowkit/php\n\n## Pages\n\n")
         for key in order:
             f.write("- [%s](%s%s)\n" % (pages[key], BASE_URL, key[:-3] + '/' if key != 'index.md' else ''))
@@ -162,7 +162,7 @@ Google does not participate; IndexNow is a notification, not indexing.
 | [History](history/index.md) | the `history` and `status` commands, PSR-16 and PDO stores | `composer require indexnowkit/history` |
 
 Start with the page of your framework, then the [attribute reference](core/attribute-reference.md), the
-[configuration](core/configuration.md) (one table for the three adapters) and the [operations guide](core/operations.md)
+[configuration](core/configuration.md) (one concept, four keys: Symfony, Laravel, Yii2, Yii3) and the [operations guide](core/operations.md)
 with its production checklist. Machine-readable: [llms.txt](llms.txt), [llms-full.txt](llms-full.txt).
 Issues and pull requests: [github.com/indexnowkit/php](https://github.com/indexnowkit/php).
 """

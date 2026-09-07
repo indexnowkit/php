@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /*
- * The "One concept, three keys" section of packages/core/docs/configuration.md, generated from the code so the
+ * The "One concept, four keys" section of packages/core/docs/configuration.md, generated from the code so the
  * documentation cannot drift: the core keys (Config::OPTIONS) with the defaults the bundle's configuration tree
  * declares, the sitemap keys (SitemapConfig::OPTIONS), the adapter-only keys (LARAVEL_OPTIONS, YII_OPTIONS, the
  * bundle tree, YII3_OPTIONS) and the synonyms — the same concept under four names.

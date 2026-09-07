@@ -7,7 +7,7 @@ Packages are developed here and split into read-only repositories for Packagist.
 |---|---|
 | [`indexnowkit/core`](packages/core) | protocol client, batching, debounce, retry policy, the `#[IndexNow]` rule model, the adapter kit (`Adapter\ConfigFactory`, factories, command bodies) |
 | [`indexnowkit/console`](packages/console) | the bodies of the `check`, `submit`, `submit-<subject>`, `explain` and `key:generate` commands and their definitions (`symfony/console`); required by every framework adapter |
-| [`indexnowkit/testing`](packages/testing) | `require-dev`: the conformance kits (C01–C22, A01–A21), the H01–H05 assertions, `ReadmeAssertions`, the mock IndexNow server |
+| [`indexnowkit/testing`](packages/testing) | `require-dev`: the conformance kits (C01–C22, A01–A21), the H01–H06 assertions, `ReadmeAssertions`, the mock IndexNow server |
 | [`indexnowkit/sitemap`](packages/sitemap) | optional add-on: sitemap reader (index, gzip, text) and the body of the `sitemap` command; `composer require indexnowkit/sitemap` next to an adapter |
 | [`indexnowkit/verify`](packages/verify) | optional add-on: one GET before every submission (noindex, robots.txt, canonical, redirects, origin errors) and `check --sample`; `verify.enabled: true` |
 | [`indexnowkit/history`](packages/history) | optional add-on: PSR-16 and PDO implementations of `SubmissionStoreInterface`, the `history` and `status` commands, the profiler table; `history.store: psr16|pdo` |
@@ -32,7 +32,10 @@ README is the reference for everything underneath it.
 | Writing an adapter for another framework | [core/docs/adapters.md](packages/core/docs/adapters.md) |
 | Compatibility promise | [core/docs/bc.md](packages/core/docs/bc.md) |
 | Supported PHP and framework versions, when a version is dropped | [core/docs/compatibility.md](packages/core/docs/compatibility.md) |
-| Symfony: configuration, Messenger, multi-domain, troubleshooting | [symfony-bundle/docs](packages/symfony-bundle/docs) |
+| Symfony: configuration, Messenger, Doctrine, multi-domain, troubleshooting | [symfony-bundle/docs](packages/symfony-bundle/docs) |
+| Laravel: configuration, queue, sitemap, multi-domain, troubleshooting | [laravel/docs](packages/laravel/docs) |
+| Yii2: configuration, queue, commit safety, multi-domain, troubleshooting | [yii2/docs](packages/yii2/docs) |
+| Yii3: configuration, commit safety, multi-domain, testing, troubleshooting | [yii3/docs](packages/yii3/docs) |
 | Cross-language specification and conformance suite | [../docs/spec](../docs/spec) |
 
 Russian READMEs exist for every package (`README.ru.md`); the specification under `docs/spec` is Russian.
