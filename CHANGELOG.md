@@ -3,7 +3,7 @@
 All notable changes to the PHP packages are documented here, newest release wave first. Tags: `<package>@<version>`.
 Per-package detail (and the migration notes for every breaking change) lives in each package's own changelog.
 
-## Unreleased — core@0.13.0, console@0.5.0, testing@0.3.2, sitemap@0.8.0, verify@0.4.0, history@0.4.0, doctrine@0.9.0, symfony-bundle@0.15.0, laravel@0.15.0, yii2@0.14.0, yii3@0.1.0
+## 2026-09-08 — core@0.13.0, console@0.5.0, testing@0.3.2, sitemap@0.8.0, verify@0.4.0, history@0.4.0, doctrine@0.9.0, symfony-bundle@0.15.0, laravel@0.15.0, yii2@0.14.0, yii3@0.1.0
 
 The Yii3 adapter (spec 15): `indexnowkit/yii3` on `yiisoft/active-record ^1.0`, `yiisoft/db ^2.0`, `yiisoft/router ^4.0`. A
 `yiisoft/config` plugin (params, di, di-web, di-console, params-console, events-web, events-console, routes, bootstrap) wires
