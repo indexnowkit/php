@@ -19,5 +19,6 @@ for pkg in "${packages[@]}"; do
     else
         bin/php -C "packages/$pkg" vendor/bin/phpstan analyse --memory-limit=1G
     fi
+    bin/php -C "packages/$pkg" vendor/bin/phpstan analyse --memory-limit=1G -c phpstan.tests.neon   # the test suite at level 6
     echo "::endgroup::"
 done

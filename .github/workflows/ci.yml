@@ -35,6 +35,7 @@ jobs:
           - { package: history, php: '8.2', deps: lowest }
           - { package: doctrine, php: '8.2', deps: lowest }
           - { package: doctrine, php: '8.3', deps: dbal3 }
+          - { package: doctrine, php: '8.4', deps: orm3dbal3 }   # ORM 3 on DBAL 3: the third supported combination (audit 0.13 T6)
           - { package: symfony-bundle, php: '8.2', deps: lowest }
           - { package: symfony-bundle, php: '8.3', deps: symfony64 }
           - { package: symfony-bundle, php: '8.4', deps: symfony8 }
@@ -69,6 +70,8 @@ jobs:
         run: php ../../bin/lib/config-table.php --check
       # doctrine on lowest and dbal3 (DBAL 3 / ORM 2): phpstan.dbal3.neon analyses the DBAL 3 connection instead of the DBAL 4 one.
       - run: vendor/bin/phpstan analyse --memory-limit=1G ${{ matrix.package == 'doctrine' && matrix.deps != 'highest' && '-c phpstan.dbal3.neon' || '' }}
+      # the test suite at level 6 (phpstan.tests.neon), the harnesses and fixtures included
+      - run: vendor/bin/phpstan analyse --memory-limit=1G -c phpstan.tests.neon
 
   # The adapters without indexnowkit/sitemap, indexnowkit/verify and indexnowkit/history in vendor/ at all. Their own
   # "not installed" tests pass `installed: false` with the packages still installed, which proves the texts, not the boot:

@@ -23,6 +23,7 @@ use IndexNowKit\Testing\FakeTransport;
 use PDO;
 use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 /** `History\Adapter\HistoryServices`: what every framework adapter wires, in one place. */
 final class AdapterServicesTest extends TestCase
@@ -67,7 +68,7 @@ final class AdapterServicesTest extends TestCase
         $pdoFor = static function (?string $id) use (&$seen): PDO {
             $seen[] = ['pdo', $id];
             if ($id === 'broken') {
-                throw new \RuntimeException('no such connection');
+                throw new RuntimeException('no such connection');
             }
 
             return new PDO('sqlite::memory:');
@@ -75,7 +76,7 @@ final class AdapterServicesTest extends TestCase
         $cacheFor = static function (?string $id) use (&$seen): ArrayCache {
             $seen[] = ['cache', $id];
             if ($id === 'nope') {
-                throw new \RuntimeException('no such cache');
+                throw new RuntimeException('no such cache');
             }
 
             return new ArrayCache();

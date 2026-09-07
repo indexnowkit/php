@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 $finder = PhpCsFixer\Finder::create()
-    ->in([__DIR__.'/packages/*/src', __DIR__.'/packages/*/tests'])
+    ->in([__DIR__.'/packages/*/src', __DIR__.'/packages/*/tests', __DIR__.'/packages/*/config'])
     ->append([__DIR__.'/bin/link.php']);
 
 return (new PhpCsFixer\Config())
