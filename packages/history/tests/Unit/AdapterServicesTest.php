@@ -60,6 +60,18 @@ final class AdapterServicesTest extends TestCase
         self::assertInstanceOf(ForbiddenCounter::class, HistoryServices::forbiddenCounter($config, null, $logger));
     }
 
+    #[TestDox('describeStore(): memory and none as they are, a shared store as <id> (<ShortClass>), a missing or failing lookup as <id> (missing)')]
+    public function testDescribeStore(): void
+    {
+        $lookup = static fn(string $id): ?object => $id === 'redis' ? new ArrayCache() : null;
+
+        self::assertSame('memory', HistoryServices::describeStore('memory', 'cache', $lookup));
+        self::assertSame('none', HistoryServices::describeStore('none', 'cache', $lookup));
+        self::assertSame('cache (missing)', HistoryServices::describeStore(null, 'cache', $lookup), 'unset: the adapter default');
+        self::assertSame('redis (ArrayCache)', HistoryServices::describeStore('redis', 'cache', $lookup));
+        self::assertSame('other (missing)', HistoryServices::describeStore('other', 'cache', static fn(string $id): ?object => throw new RuntimeException('no such cache')));
+    }
+
     #[TestDox('storeFor(): pdo over a DSN or the framework connection, psr16 over the framework cache the debounce store names; every failure is one ConfigurationException text')]
     public function testStoreFor(): void
     {

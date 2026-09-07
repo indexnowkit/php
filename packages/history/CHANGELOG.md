@@ -7,6 +7,12 @@ contain breaking changes, listed under "Changed". What the compatibility promise
 
 ### Added
 
+- **`Adapter\HistoryServices::describeStore(?string $store, string $default, Closure $lookup)`** (wave M, spec 19 §4.10):
+  the debounce store as `status` prints it — `memory` and `none` as they are, a shared store as `<id> (<ShortClass>)` of
+  what the adapter's lookup resolves the id to, `<id> (missing)` when it resolves to nothing or throws. Laravel, Yii2
+  and Yii3 each built that line themselves; they pass their lookup now. `debounceCacheId()` answers through the core's
+  `DebounceStoreFactory::isShared()`.
+
 - **`Console\HistoryCommand` and `Console\StatusCommand`** (wave L, spec 18): the `indexnow:history` and `indexnow:status`
   commands themselves as symfony/console classes over `Console\HistoryRunner` / `Console\StatusRunner`, each with its
   `#[AsCommand]`; the adapter builds the runner (`History\Adapter\HistoryServices::historyRunner()` / `statusRunner()`

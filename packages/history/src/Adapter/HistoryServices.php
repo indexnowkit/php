@@ -26,6 +26,7 @@ use IndexNowKit\Url\UrlNormalizerInterface;
 use PDO;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
+use ReflectionClass;
 use Throwable;
 
 /**
@@ -97,9 +98,31 @@ final class HistoryServices
      */
     public static function debounceCacheId(Config $config): ?string
     {
-        $store = $config->debounceStore;
+        return DebounceStoreFactory::isShared($config->debounceStore) ? $config->debounceStore : null;
+    }
 
-        return $store === null || \in_array($store, [DebounceStoreFactory::MEMORY, DebounceStoreFactory::NONE], true) ? null : $store;
+    /**
+     * The debounce store as the `status` command describes it: `memory` and `none` as they are, a shared store as
+     * `<id> (<ShortClass>)` of what the adapter's lookup resolves the id to, `<id> (missing)` when it resolves to
+     * nothing (or throws). Three adapters used to build this line themselves.
+     *
+     * @param string|null             $store   `debounce.store` as configured (null = unset)
+     * @param string                  $default what unset means in this adapter (`cache`, `cache.app`)
+     * @param Closure(string): ?object $lookup the adapter's cache by id: the container, the cache manager, the component map
+     */
+    public static function describeStore(?string $store, string $default, Closure $lookup): string
+    {
+        $store ??= $default;
+        if (!DebounceStoreFactory::isShared($store)) {
+            return $store;
+        }
+        try {
+            $cache = $lookup($store);
+        } catch (Throwable) {
+            $cache = null;
+        }
+
+        return \sprintf('%s (%s)', $store, $cache === null ? 'missing' : (new ReflectionClass($cache))->getShortName());
     }
 
     /** The reader of the 403 counters the client keeps (the same cache, prefix, threshold and TTL as `Client`). */
