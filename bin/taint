@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Psalm taint analysis of one package (tools/psalm; Psalm is used for --taint-analysis only, phpstan is the type
+# checker), in Docker, the way .github/workflows/taint.yml does. The package's psalm.xml lists `src` and the entry-point
+# harness tests/Taint/entrypoints.php, which calls the public API with request data ($_GET, $_POST, php://input): a library
+# has no taint source of its own, so without the harness Psalm has nothing to follow and reports nothing.
+#
+# Usage: bin/taint <package> [<psalm options>...]      bin/taint history        bin/taint core --debug-by-line
+set -euo pipefail
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$ROOT"
+pkg="${1:?usage: bin/taint <package> [<psalm options>...]}"
+shift
+[ -f "packages/$pkg/psalm.xml" ] || { echo "taint: packages/$pkg has no psalm.xml (not in the taint matrix)" >&2; exit 1; }
+[ -d "packages/$pkg/vendor" ] || { echo "taint: packages/$pkg/vendor is missing; run bin/ci $pkg first" >&2; exit 1; }
+[ -d tools/psalm/vendor ] || bin/composer -d tools/psalm install --no-interaction --quiet
+exec bin/php -C "packages/$pkg" ../../tools/psalm/vendor/bin/psalm --taint-analysis --no-cache --no-progress --output-format=compact "$@"

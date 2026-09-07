@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# Mutation testing of one package with Infection (tools/infection: Infection needs PHP 8.3 while the packages support
+# 8.2, so it is a tool of the repository, not a dev dependency), in Docker, the way the `mutation` job of
+# .github/workflows/ci.yml does. The package's infection.json5 says what is mutated and what is ignored; the MSI floor is
+# packages/<package>/tests/msi-floor.txt: below it the run fails. The floor is the MSI measured when it was set: raising it
+# is a normal commit, lowering it is a separate commit, one package, with the reason (which mutants escape and why).
+#
+# Usage: bin/mutation <package> [--write] [-- <infection options or paths>...]
+#   bin/mutation core                          the whole src, against the floor
+#   bin/mutation core --write                  record the current MSI as the floor
+#   bin/mutation core -- src/Retry             one directory (paths are positional since Infection 0.34)
+#   bin/mutation core -- --git-diff-lines --git-diff-base=main   only the lines changed on the branch
+# Needs the package's vendor (bin/ci <package> or bin/composer -d packages/<package> update) and pcov (in the image).
+# Reports: var/mutation/<package>.{log,summary.json,json}.
+set -euo pipefail
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$ROOT"
+pkg="${1:?usage: bin/mutation <package> [--write] [-- <infection options>...]}"
+shift
+write=0
+if [ "${1:-}" = "--write" ]; then write=1; shift; fi
+if [ "${1:-}" = "--" ]; then shift; fi
+[ -f "packages/$pkg/infection.json5" ] || { echo "mutation: packages/$pkg has no infection.json5 (not in the mutation matrix)" >&2; exit 1; }
+[ -d "packages/$pkg/vendor" ] || { echo "mutation: packages/$pkg/vendor is missing; run bin/ci $pkg first" >&2; exit 1; }
+[ -d tools/infection/vendor ] || bin/composer -d tools/infection install --no-interaction --quiet
+mkdir -p var/mutation/tmp
+floor_file="packages/$pkg/tests/msi-floor.txt"
+summary="var/mutation/$pkg.summary.json"
+args=(--threads=max --no-progress --no-interaction --logger-summary-json="../../$summary")
+if [ "$write" = 0 ] && [ -f "$floor_file" ]; then
+    args+=("--min-msi=$(tr -d '[:space:]' < "$floor_file")")
+fi
+# 128M, the image's memory_limit, is exhausted by the pretty printer after ~2000 mutants
+bin/php -C "packages/$pkg" -d memory_limit=1G ../../tools/infection/vendor/bin/infection "${args[@]}" "$@"
+if [ "$write" = 1 ]; then
+    msi="$(php -r 'echo json_decode(file_get_contents($argv[1]), true)["stats"]["msi"] ?? "";' "$summary" 2>/dev/null || bin/php -r 'echo json_decode(file_get_contents($argv[1]), true)["stats"]["msi"] ?? "";' "/app/$summary")"
+    [ -n "$msi" ] || { echo "mutation: no msi in $summary" >&2; exit 1; }
+    printf '%s\n' "$msi" > "$floor_file"
+    echo "mutation: $pkg MSI floor set to ${msi}% in $floor_file"
+fi

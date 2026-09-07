@@ -7,3 +7,4 @@
 /packages/*/coverage.xml
 /packages/*/vendor/
 /var/
+/tools/*/vendor/

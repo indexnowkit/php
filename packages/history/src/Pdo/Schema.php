@@ -26,7 +26,7 @@ final class Schema
      */
     public static function sql(string $driver, string $table = HistoryConfig::DEFAULT_TABLE): array
     {
-        self::assertTable($table);
+        $table = self::table($table);
         $id = match ($driver) {
             'sqlite' => 'INTEGER PRIMARY KEY AUTOINCREMENT',
             'mysql' => 'BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY',
@@ -53,8 +53,24 @@ final class Schema
      */
     public static function assertTable(string $table): void
     {
+        self::table($table);
+    }
+
+    /**
+     * The table name once it passed the identifier check, the form that may reach an SQL statement: `[A-Za-z_][A-Za-z0-9_]*`,
+     * so no quoting, no whitespace, nothing an interpolation could smuggle in. The one place the configuration value turns
+     * into an identifier (Psalm's taint analysis takes the return value as escaped for SQL for that reason).
+     *
+     * @psalm-taint-escape sql
+     *
+     * @throws ConfigurationException on an invalid table name
+     */
+    public static function table(string $table): string
+    {
         if (preg_match('/^[A-Za-z_][A-Za-z0-9_]*$/', $table) !== 1) {
             throw new ConfigurationException(\sprintf('"history.pdo.table" must match [A-Za-z_][A-Za-z0-9_]*, got "%s".', $table));
         }
+
+        return $table;
     }
 }

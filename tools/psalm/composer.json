@@ -1,0 +1,11 @@
+{
+    "name": "indexnowkit/tools-psalm",
+    "description": "Psalm for the taint analysis of the monorepo (bin/taint). Not a dependency of any package: phpstan level 9 is the type checker, Psalm is used for --taint-analysis only.",
+    "license": "MIT",
+    "require": {
+        "vimeo/psalm": "^6.16"
+    },
+    "config": {
+        "sort-packages": true
+    }
+}

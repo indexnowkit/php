@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-    Psalm runs the taint analysis of this package only (bin/taint sitemap, .github/workflows/taint.yml); phpstan level 9 is the
+    Psalm runs the taint analysis of this package only (bin/taint console, .github/workflows/taint.yml); phpstan level 9 is the
     type checker. src plus the entry-point harness tests/Taint/entrypoints.php, which calls the public API with request
     data: a library has no taint source of its own. Psalm is a tool of the monorepo (tools/psalm), not a dev dependency.
 -->
@@ -21,11 +21,10 @@
         </ignoreFiles>
     </projectFiles>
     <issueHandlers>
-        <!-- read() takes the operator's sitemap argument (a URL, or a local path on purpose: the sitemap command and
-             sitemap.sources accept files), so the fopen() of a local sitemap is the feature, not a flow to close; a
-             nested sitemap fetched from the network is restricted to the origin of the root document before it is read. -->
+        <!-- key:generate with an env file: the path comes from the operator's command line by design and the file is meant
+             to be written there; Psalm sees the request-shaped harness value reach touch()/chmod()/file_put_contents(). -->
         <TaintedFile>
-            <errorLevel type="suppress"><file name="src/SitemapReader.php"/></errorLevel>
+            <errorLevel type="suppress"><file name="src/KeyGenerateRunner.php"/></errorLevel>
         </TaintedFile>
     </issueHandlers>
 </psalm>

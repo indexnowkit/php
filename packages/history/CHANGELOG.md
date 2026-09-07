@@ -5,6 +5,13 @@ contain breaking changes, listed under "Changed". What the compatibility promise
 
 ## [0.3.1] — Unreleased
 
+### Added
+
+- `Pdo\Schema::table(string $table): string` — the table name once it passed the identifier check, the form that reaches
+  the SQL; `assertTable()` stays and delegates. `PdoSubmissionStore` and `Schema::sql()` keep the checked value, which is
+  what Psalm's taint analysis (`@psalm-taint-escape sql`) reads as the boundary between `history.pdo.table` and the
+  `CREATE TABLE` / `INSERT` statements (audit 0.13 T20).
+
 ### Changed
 
 - `History\Adapter\HistoryServices::package()` delegates to the core's `Adapter\OptionalPackage::history()` (core

@@ -1,0 +1,12 @@
+{
+    "name": "indexnowkit/tools-infection",
+    "description": "Mutation testing tool of the monorepo (bin/mutation). Not a dependency of any package: Infection needs PHP 8.3 while the packages support 8.2.",
+    "license": "MIT",
+    "require": {
+        "infection/infection": "^0.35"
+    },
+    "config": {
+        "allow-plugins": {"infection/extension-installer": true},
+        "sort-packages": true
+    }
+}

@@ -52,6 +52,17 @@ changelogs; the decisions and the lens reports: `docs/plans/audit-0.13.md`.
 
 ### core@0.13.0, console@0.4.2, testing@0.3.2, sitemap@0.8.0, verify@0.4.0, history@0.3.1, doctrine@0.9.0, symfony-bundle@0.15.0, laravel@0.15.0, yii2@0.14.0, yii3@0.1.0
 
+**The three leftovers of the audit** (`docs/plans/config-decomposition.md`, `docs/plans/mutation-and-taint.md`), same wave:
+`core/src/Config.php` is 600 lines instead of 1033 — reading the array and environment shapes is `Config\ConfigParser`, the
+normalisation of the raw maps `Config\ConfigNormalizer`, both `@internal`, the surface unchanged and pinned by
+`ConfigParityTest` to a snapshot taken before the move (W11). Mutation testing with Infection over the whole `src` of core,
+verify, sitemap, history and console, an MSI floor per package (`tests/msi-floor.txt`, `bin/mutation`) with the ratchet of
+the coverage floor, a non-blocking `mutation` job and a `changed lines` job on pull requests; Psalm's taint analysis with an
+entry-point harness per package (`tests/Taint/entrypoints.php` — a library has no taint source of its own, the old
+sitemap-only job proved nothing), blocking, `bin/taint`; both tools live in `tools/` with their locks, since Infection needs
+PHP 8.3 (T20). `Pdo\Schema::table()` in history is the checked identifier the SQL takes (`@psalm-taint-escape sql`).
+`Testing\Conformance\Arrays::merge()` replaces the three copies of the fixtures' merge (W12).
+
 ## 2026-09-07 — verify@0.3.0, history@0.3.0, sitemap@0.7.0, symfony-bundle@0.14.0, laravel@0.14.0, yii2@0.13.0
 
 Wave I: the last decision of the 0.10 audit (A10). The optional packages wire themselves: `Verify\Adapter\VerifyServices`,

@@ -15,6 +15,8 @@ Everything runs in Docker through `bin/*`:
 | `bin/cs [check]` | php-cs-fixer over the repository (sequential on purpose) |
 | `bin/php -C packages/<pkg> vendor/bin/phpunit --filter X` | one test |
 | `bin/composer -d packages/<pkg> …` | Composer in the package (`COMPOSER=composer.monorepo.json` after `bin/link` to use the working copies of siblings) |
+| `bin/mutation <pkg> [--write] [-- <paths>]` | mutation testing of one package with Infection (`tools/infection`) against `tests/msi-floor.txt`; `--write` records the floor |
+| `bin/taint <pkg>` | Psalm taint analysis of one package (`tools/psalm`, the package's `psalm.xml` and `tests/Taint/entrypoints.php`) |
 | `bin/link <pkg>` | writes `composer.monorepo.json` with path repositories for the sibling packages |
 | `bin/tag <pkg> <version>` · `bin/packagist-wait` · `bin/packagist-check` · `bin/release-notes` | release tooling (maintainers) |
 
@@ -36,6 +38,8 @@ Everything runs in Docker through `bin/*`:
 
 1. `bin/ci <package>` green (and `lowest` when dependencies changed).
 2. `bin/cs check` clean.
+   For core, verify, sitemap, history and console: `bin/taint <package>` clean, and `bin/mutation <package>` at or above
+   the floor when the change touches `src` (a lower floor is its own commit with the reason).
 3. Tests for the change; new adapter behaviour named after its conformance id when one applies.
 4. `CHANGELOG.md` of the package under "Unreleased" for anything user-visible; breaking changes under "Changed" with
    the migration.

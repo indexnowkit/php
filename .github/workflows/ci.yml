@@ -177,6 +177,84 @@ jobs:
       # the floor is the coverage measured when it was set (tests/coverage-floor.txt); below it the job fails
       - run: ../../bin/coverage-floor ${{ matrix.package }} coverage.xml
 
+  # Mutation testing (audit 0.13 T20): Infection over the whole src of the packages whose bugs are silent — the protocol,
+  # retries, keys, transactions and URLs of the core, the pre-flight of verify, the sitemap parser, the SQL of history, the
+  # masking of console. The floor is packages/<package>/tests/msi-floor.txt (the MSI measured when it was set; raising it
+  # is a normal commit, lowering it a separate one with the reason — the ratchet of bin/coverage-floor). Infection is a
+  # tool of the monorepo (tools/infection, with its lock): it needs PHP 8.3 while the packages support 8.2. Stage one is
+  # non-blocking (continue-on-error) until every floor below is a CI measurement and three weekly runs held it; the PR job
+  # below mutates only the changed lines. Locally: bin/mutation <package>.
+  mutation:
+    name: mutation / ${{ matrix.package }}
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        package: [core, verify, sitemap, history, console]
+    env:
+      COMPOSER: composer.monorepo.json
+    defaults:
+      run:
+        working-directory: packages/${{ matrix.package }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: pdo_sqlite, intl, xmlreader, zlib
+          coverage: pcov
+          ini-values: memory_limit=1G
+      - run: ../../bin/link ${{ matrix.package }}
+      - run: composer run ci:install:highest
+      - name: Install Infection (tools/infection)
+        run: composer install --no-interaction --working-dir ../../tools/infection
+      - name: Mutation testing against the floor
+        run: |
+          mkdir -p ../../var/mutation
+          ../../tools/infection/vendor/bin/infection --threads=max --no-progress --no-interaction --logger-github             --logger-summary-json=../../var/mutation/${{ matrix.package }}.summary.json             --min-msi="$(tr -d '[:space:]' < tests/msi-floor.txt)"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mutation-${{ matrix.package }}
+          path: var/mutation/${{ matrix.package }}.*
+          if-no-files-found: ignore
+
+  # The same on a pull request, for the lines the pull request changes only (--git-diff-lines against the base branch):
+  # every escaped mutant is an annotation on the diff, and a change whose new lines let mutants escape fails the job.
+  mutation-diff:
+    name: mutation / ${{ matrix.package }} / changed lines
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    continue-on-error: true   # stage one, with the mutation job above
+    strategy:
+      fail-fast: false
+      matrix:
+        package: [core, verify, sitemap, history, console]
+    env:
+      COMPOSER: composer.monorepo.json
+    defaults:
+      run:
+        working-directory: packages/${{ matrix.package }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: pdo_sqlite, intl, xmlreader, zlib
+          coverage: pcov
+          ini-values: memory_limit=1G
+      - run: ../../bin/link ${{ matrix.package }}
+      - run: composer run ci:install:highest
+      - run: composer install --no-interaction --working-dir ../../tools/infection
+      - name: Mutation testing of the changed lines
+        run: |
+          mkdir -p ../../var/mutation
+          ../../tools/infection/vendor/bin/infection --threads=max --no-progress --no-interaction --logger-github             --git-diff-lines --git-diff-base="origin/${{ github.base_ref }}" --ignore-msi-with-no-mutations             --min-msi="$(tr -d '[:space:]' < tests/msi-floor.txt)"
+
   quality:
     runs-on: ubuntu-latest
     steps:

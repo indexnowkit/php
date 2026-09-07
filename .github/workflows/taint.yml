@@ -1,0 +1,51 @@
+name: Taint analysis
+
+# Psalm's taint analysis of the packages that take input from outside the application — the configuration, URLs,
+# documents fetched from other servers, command arguments — into sinks (SQL, files, headers, HTML). Each package's
+# psalm.xml lists its src and the entry-point harness tests/Taint/entrypoints.php, which calls the public API with request
+# data: a library has no taint source of its own, so without the harness Psalm has nothing to follow (audit 0.13 T20).
+# Psalm is a tool of the monorepo (tools/psalm, with its lock), not a dev dependency of any package; phpstan level 9 stays
+# the type checker. Blocking: the flows that are the feature (a file path from the operator's command line, a local
+# sitemap file) are suppressed in the package's psalm.xml with the reason next to them. Locally: bin/taint <package>.
+
+on:
+  push:
+    branches: [main]
+    paths: ['packages/core/**', 'packages/console/**', 'packages/sitemap/**', 'packages/verify/**', 'packages/history/**', 'tools/psalm/**', '.github/workflows/taint.yml']
+  pull_request:
+    paths: ['packages/core/**', 'packages/console/**', 'packages/sitemap/**', 'packages/verify/**', 'packages/history/**', 'tools/psalm/**', '.github/workflows/taint.yml']
+  schedule:
+    - cron: '17 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  taint:
+    name: taint / ${{ matrix.package }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package: [core, console, sitemap, verify, history]
+    env:
+      COMPOSER: composer.monorepo.json
+    defaults:
+      run:
+        working-directory: packages/${{ matrix.package }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: pdo_sqlite, intl, xmlreader, zlib
+          coverage: none
+      - name: Link the sibling packages
+        run: ../../bin/link ${{ matrix.package }}
+      - name: Install (highest)
+        run: composer run ci:install:highest
+      - name: Install Psalm (tools/psalm)
+        run: composer install --no-interaction --working-dir ../../tools/psalm
+      - name: Taint analysis
+        run: ../../tools/psalm/vendor/bin/psalm --taint-analysis --no-cache --no-progress --output-format=github

@@ -28,9 +28,11 @@ final class PdoSubmissionStore implements HistoryStoreInterface
     /**
      * @throws \IndexNowKit\Exception\ConfigurationException on an invalid table name
      */
-    public function __construct(private readonly PDO $pdo, private readonly string $table = HistoryConfig::DEFAULT_TABLE)
+    private readonly string $table;
+
+    public function __construct(private readonly PDO $pdo, string $table = HistoryConfig::DEFAULT_TABLE)
     {
-        Schema::assertTable($table);
+        $this->table = Schema::table($table);
     }
 
     /** Creates the table when it does not exist (tests, `sqlite::memory:`); applications run the migration of docs/migrations.md. */
