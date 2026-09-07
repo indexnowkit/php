@@ -32,8 +32,8 @@ run
 grep -q '^submitted=2$' "$work/github/output" || { echo "action-smoke: expected submitted=2, got:"; cat "$work/github/output"; exit 1; }
 grep -q '^failed=0$' "$work/github/output"
 grep -q 'IndexNow: 2 submitted' "$work/github/summary"
-[ -f "$work/workspace/.indexnow/state.sqlite" ] || { echo "action-smoke: no state file in the workspace" >&2; exit 1; }
-[ -f "$work/workspace/.indexnow/summary.json" ]
+# the container wrote .indexnow as root with mode 0700: look inside it through a container, not as the runner's user
+docker run --rm -v "$work/workspace:/w" --entrypoint sh "$image" -c 'test -f /w/.indexnow/state.sqlite && test -f /w/.indexnow/summary.json' || { echo "action-smoke: no state file or summary in the workspace" >&2; exit 1; }
 echo "--- run 2: nothing new (the state file remembers)"
 : > "$work/github/output"
 run
