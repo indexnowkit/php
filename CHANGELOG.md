@@ -3,7 +3,7 @@
 All notable changes to the PHP packages are documented here, newest release wave first. Tags: `<package>@<version>`.
 Per-package detail (and the migration notes for every breaking change) lives in each package's own changelog.
 
-## Unreleased — core@0.13.1, sitemap@0.9.0, cli@0.1.0
+## 2026-09-08 — core@0.13.1, sitemap@0.9.0, cli@0.1.0
 
 **Wave N — the `indexnow` command line** (spec 19b, phase B of spec 18): `indexnowkit/cli`, one binary for any host with PHP
 and any CI, no framework — the commands of `console`, `sitemap` and `history` without the `indexnow:` prefix plus
