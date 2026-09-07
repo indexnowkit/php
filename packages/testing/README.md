@@ -90,6 +90,13 @@ carry a copy of them.
 of a package README (EN and RU): present, with a PHP snippet that carries its `use` lines, naming only commands of
 the family and configuration keys the package accepts. Every package of the family runs it; an adapter of yours can too.
 
+`OptionalPackageAssertions::assertDetected($checkOutput)` checks what `check` prints about `indexnowkit/sitemap`,
+`indexnowkit/verify` and `indexnowkit/history` when the adapter leaves the predicates to detection: a
+`<feature>: not installed` line with the install command for every package that is really absent, and no such line
+for one that is present. Under `INDEXNOWKIT_OPTIONAL_PACKAGES=absent` (the `optional-packages-absent` CI job, which
+physically removes the three packages) the absence itself becomes an assertion — an adapter that loads a class of the
+package to decide whether it is installed passes with the package in `vendor/` and is a fatal error without it.
+
 ## The mock IndexNow server
 
 For end-to-end runs through a real PSR-18 client, without touching the engines:
