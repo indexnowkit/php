@@ -10,6 +10,7 @@ use IndexNowKit\Adapter\Services;
 use IndexNowKit\Client;
 use IndexNowKit\Config;
 use IndexNowKit\Debounce\DebounceStoreFactory;
+use IndexNowKit\Exception\ConfigurationException;
 use IndexNowKit\History\Check\HistoryCheck;
 use IndexNowKit\History\Console\HistoryRunner;
 use IndexNowKit\History\Console\StatusRunner;
@@ -105,6 +106,46 @@ final class HistoryServices
     public static function forbiddenCounter(Config $config, ?CacheInterface $cache, LoggerInterface $logger): ForbiddenCounter
     {
         return new ForbiddenCounter($cache, $config->debounceKeyPrefix, $config->forbiddenEscalation, Client::FAILURE_CACHE_TTL, $logger);
+    }
+
+    /**
+     * The store `history.store` names, over what the framework decides and nothing else: `pdo` over a PDO built from
+     * `history.pdo.dsn`, else over the PDO of the framework connection `history.pdo.service` names ($pdoFor, called
+     * with the id or null for the default connection); `psr16` over the framework cache the debounce store shares
+     * ({@see debounceCacheId()}; $cacheFor, called with the id or null for $defaultCache). The order of the checks,
+     * the texts and the exception (`ConfigurationException`) are the same in every adapter.
+     *
+     * @param Closure(string|null): PDO            $pdoFor       the PDO of a framework connection by id (null = the default one)
+     * @param Closure(string|null): CacheInterface $cacheFor     a PSR-16 cache by id (null = the default cache)
+     * @param string|null                          $defaultCache the id `debounce.store` means when it names no cache, for the error text
+     *
+     * @throws ConfigurationException when `history.store` names nothing this method builds, or a lookup fails
+     */
+    public static function storeFor(HistoryConfig $history, Config $config, Closure $pdoFor, Closure $cacheFor, ?string $defaultCache = null): SubmissionStoreInterface
+    {
+        if ($history->store === HistoryConfig::STORE_PDO) {
+            if ($history->pdoDsn !== null) {
+                return self::pdoStore(self::pdoFromDsn($history->pdoDsn), $history);
+            }
+            try {
+                $pdo = $pdoFor($history->pdoService);
+            } catch (Throwable $e) {
+                throw new ConfigurationException(\sprintf('history.pdo.service "%s" does not give a PDO connection: %s', $history->pdoService ?? '(default)', $e->getMessage()), 0, $e);
+            }
+
+            return self::pdoStore($pdo, $history);
+        }
+        if ($history->store !== HistoryConfig::STORE_PSR16) {
+            throw new ConfigurationException(\sprintf('history.store "%s" is set but no store was built for it (pdo, psr16, or a store bound by the application).', (string) $history->store));
+        }
+        $id = self::debounceCacheId($config) ?? $defaultCache;
+        try {
+            $cache = $cacheFor($id);
+        } catch (Throwable $e) {
+            throw new ConfigurationException(\sprintf('history.store "psr16" needs a PSR-16 cache under "%s": %s', $id ?? '(default)', $e->getMessage()), 0, $e);
+        }
+
+        return self::psr16Store($cache, $history, $config);
     }
 
     /** The `history.store` and `history.records` lines of `check`, over the graph's store (the null store when there is none). */

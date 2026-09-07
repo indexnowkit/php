@@ -59,6 +59,49 @@ final class AdapterServicesTest extends TestCase
         self::assertInstanceOf(ForbiddenCounter::class, HistoryServices::forbiddenCounter($config, null, $logger));
     }
 
+    #[TestDox('storeFor(): pdo over a DSN or the framework connection, psr16 over the framework cache the debounce store names; every failure is one ConfigurationException text')]
+    public function testStoreFor(): void
+    {
+        $config = Config::fromArray(['key' => self::KEY, 'base_url' => 'https://www.example.com', 'debounce' => ['store' => 'redis']]);
+        $seen = [];
+        $pdoFor = static function (?string $id) use (&$seen): PDO {
+            $seen[] = ['pdo', $id];
+            if ($id === 'broken') {
+                throw new \RuntimeException('no such connection');
+            }
+
+            return new PDO('sqlite::memory:');
+        };
+        $cacheFor = static function (?string $id) use (&$seen): ArrayCache {
+            $seen[] = ['cache', $id];
+            if ($id === 'nope') {
+                throw new \RuntimeException('no such cache');
+            }
+
+            return new ArrayCache();
+        };
+
+        self::assertInstanceOf(PdoSubmissionStore::class, HistoryServices::storeFor(HistoryConfig::fromArray(['store' => 'pdo', 'pdo' => ['dsn' => 'sqlite::memory:']]), $config, $pdoFor, $cacheFor));
+        self::assertSame([], $seen, 'a DSN builds its own PDO');
+        self::assertInstanceOf(PdoSubmissionStore::class, HistoryServices::storeFor(HistoryConfig::fromArray(['store' => 'pdo', 'pdo' => ['service' => 'db2']]), $config, $pdoFor, $cacheFor));
+        self::assertInstanceOf(PdoSubmissionStore::class, HistoryServices::storeFor(HistoryConfig::fromArray(['store' => 'pdo']), $config, $pdoFor, $cacheFor));
+        self::assertInstanceOf(Psr16SubmissionStore::class, HistoryServices::storeFor(HistoryConfig::fromArray(['store' => 'psr16']), $config, $pdoFor, $cacheFor, 'cache.app'));
+        self::assertInstanceOf(Psr16SubmissionStore::class, HistoryServices::storeFor(HistoryConfig::fromArray(['store' => 'psr16']), Config::fromArray(['key' => self::KEY, 'base_url' => 'https://www.example.com']), $pdoFor, $cacheFor, 'cache.app'));
+        self::assertSame([['pdo', 'db2'], ['pdo', null], ['cache', 'redis'], ['cache', 'cache.app']], $seen, 'the debounce cache when it names one, else the adapter default');
+
+        foreach ([
+            [HistoryConfig::fromArray(['store' => 'pdo', 'pdo' => ['service' => 'broken']]), 'history.pdo.service "broken" does not give a PDO connection: no such connection'],
+            [HistoryConfig::fromArray(['store' => 'psr16']), 'history.store "psr16" needs a PSR-16 cache under "nope": no such cache'],
+        ] as [$history, $message]) {
+            try {
+                HistoryServices::storeFor($history, Config::fromArray(['key' => self::KEY, 'base_url' => 'https://www.example.com', 'debounce' => ['store' => $history->store === 'psr16' ? 'nope' : 'memory']]), $pdoFor, $cacheFor);
+                self::fail('expected an exception');
+            } catch (\IndexNowKit\Exception\ConfigurationException $e) {
+                self::assertSame($message, $e->getMessage());
+            }
+        }
+    }
+
     #[TestDox('over a runtime graph: the check, the runners and the store description')]
     public function testGraphPieces(): void
     {
