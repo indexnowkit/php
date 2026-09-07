@@ -1,8 +1,10 @@
 name: Split packages
 
 # Mirrors each package into its own read-only repository (indexnowkit/php-core, php-testing, php-console, php-sitemap,
-# php-verify, php-history, php-doctrine, php-symfony-bundle, php-laravel, php-yii2, php-yii3) on every push to main and on
-# package tags (core@0.9.0, testing@0.2.0, console@0.3.0, sitemap@0.5.0, verify@0.1.0, history@0.1.0, ...).
+# php-verify, php-history, php-doctrine, php-symfony-bundle, php-laravel, php-yii2, php-yii3, php-cli) on every push to main and
+# on package tags (core@0.9.0, testing@0.2.0, console@0.3.0, sitemap@0.5.0, verify@0.1.0, history@0.1.0, cli@0.1.0, ...), and
+# packages/cli/action into indexnowkit/indexnow-action (the GitHub Action; the tag action@1.2.3 becomes v1.2.3 there plus the
+# moving v1 the Marketplace convention wants — the last stage below).
 # Authentication: one write-enabled deploy key per target repository, stored as SPLIT_SSH_KEY_<PACKAGE> secret here.
 # Packagist picks the pushes up through the webhooks it installed on the split repositories.
 #
@@ -184,6 +186,8 @@ jobs:
             secret: SPLIT_SSH_KEY_YII2
           - package: yii3
             secret: SPLIT_SSH_KEY_YII3
+          - package: cli
+            secret: SPLIT_SSH_KEY_CLI
     steps:
       - name: Resolve tag for this package
         id: tag
@@ -219,4 +223,44 @@ jobs:
           fi
           if [[ -n "${TAG}" ]]; then
             git push "${TARGET}" "${sha}:refs/tags/${TAG}"
+          fi
+
+  # The GitHub Action: packages/cli/action mirrored to indexnowkit/indexnow-action, where action.yml must sit at the root.
+  # Not a Composer package (no packagist-wait-main); the tag action@X.Y.Z is pushed as vX.Y.Z and the moving vX.
+  action:
+    needs: [core, addons, optional, adapters]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Resolve tag for this package
+        id: tag
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/action@* ]]; then
+            echo "tag=${GITHUB_REF#refs/tags/action@}" >> "$GITHUB_OUTPUT"
+          elif [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            echo "skip=1" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/checkout@v4
+        if: steps.tag.outputs.skip != '1'
+        with: { fetch-depth: 0 }
+      - uses: webfactory/ssh-agent@v0.9.1
+        if: steps.tag.outputs.skip != '1'
+        with:
+          ssh-private-key: ${{ secrets.SPLIT_SSH_KEY_ACTION }}
+      - name: Split and push
+        if: steps.tag.outputs.skip != '1'
+        env:
+          TARGET: git@github.com:indexnowkit/indexnow-action.git
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: |
+          set -euo pipefail
+          git config user.name "indexnowkit-bot"
+          git config user.email "bot@indexnowkit.dev"
+          sha="$(git subtree split --prefix="packages/cli/action")"
+          echo "split sha: ${sha}"
+          if [[ "${GITHUB_REF_TYPE}" == "branch" ]]; then
+            git push "${TARGET}" "${sha}:refs/heads/main"
+          fi
+          if [[ -n "${TAG}" ]]; then
+            git push "${TARGET}" "${sha}:refs/tags/v${TAG}"
+            git push --force "${TARGET}" "${sha}:refs/tags/v${TAG%%.*}"
           fi

@@ -18,11 +18,11 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE = os.path.join(ROOT, 'docs-site')
 OUT = os.path.join(SITE, 'docs')
 BASE_URL = 'https://indexnowkit.github.io/php/'
-PACKAGES = ['core', 'console', 'testing', 'sitemap', 'verify', 'history', 'doctrine', 'symfony-bundle', 'laravel', 'yii2', 'yii3']
-TITLES = {'core': 'Core (plain PHP)', 'console': 'Console', 'testing': 'Testing', 'sitemap': 'Sitemap', 'verify': 'Verify', 'history': 'History', 'doctrine': 'Doctrine', 'symfony-bundle': 'Symfony', 'laravel': 'Laravel', 'yii2': 'Yii2', 'yii3': 'Yii3'}
+PACKAGES = ['core', 'console', 'testing', 'sitemap', 'verify', 'history', 'cli', 'doctrine', 'symfony-bundle', 'laravel', 'yii2', 'yii3']
+TITLES = {'core': 'Core (plain PHP)', 'console': 'Console', 'testing': 'Testing', 'sitemap': 'Sitemap', 'verify': 'Verify', 'history': 'History', 'cli': 'CLI (indexnow)', 'doctrine': 'Doctrine', 'symfony-bundle': 'Symfony', 'laravel': 'Laravel', 'yii2': 'Yii2', 'yii3': 'Yii3'}
 
 # Section -> list of (title, "pkg/file.md") shown in the nav in this order; the rest of a package's docs follow under Packages.
-GETTING_STARTED = [('Symfony', 'symfony-bundle/index.md'), ('Laravel', 'laravel/index.md'), ('Yii2', 'yii2/index.md'), ('Yii3', 'yii3/index.md'), ('Plain PHP', 'core/index.md')]
+GETTING_STARTED = [('Symfony', 'symfony-bundle/index.md'), ('Laravel', 'laravel/index.md'), ('Yii2', 'yii2/index.md'), ('Yii3', 'yii3/index.md'), ('Any site (CLI, cron, CI)', 'cli/index.md'), ('Plain PHP', 'core/index.md')]
 REFERENCE = [
     ('Attribute reference', 'core/attribute-reference.md'),
     ('Configuration', 'core/configuration.md'),
@@ -131,7 +131,7 @@ def main():
     order += sorted(k for k in pages if k.endswith('.ru.md'))
     with open(os.path.join(OUT, 'llms.txt'), 'w', encoding='utf-8') as f:
         f.write("# indexnowkit for PHP\n\n> IndexNow for PHP: a framework-agnostic core plus Symfony, Laravel, Yii2, Yii3 and Doctrine adapters. Declare public pages on the model with #[IndexNow]; submissions leave after the transaction commits, debounced and batched.\n\n")
-        f.write("Packagist: indexnowkit/core, indexnowkit/console, indexnowkit/testing, indexnowkit/sitemap, indexnowkit/verify, indexnowkit/history, indexnowkit/doctrine, indexnowkit/symfony-bundle, indexnowkit/laravel, indexnowkit/yii2, indexnowkit/yii3. Source and issues: https://github.com/indexnowkit/php\n\n## Pages\n\n")
+        f.write("Packagist: indexnowkit/core, indexnowkit/console, indexnowkit/testing, indexnowkit/sitemap, indexnowkit/verify, indexnowkit/history, indexnowkit/cli, indexnowkit/doctrine, indexnowkit/symfony-bundle, indexnowkit/laravel, indexnowkit/yii2, indexnowkit/yii3. Source and issues: https://github.com/indexnowkit/php\n\n## Pages\n\n")
         for key in order:
             f.write("- [%s](%s%s)\n" % (pages[key], BASE_URL, key[:-3] + '/' if key != 'index.md' else ''))
         f.write("\n## Full text\n\n- [llms-full.txt](%sllms-full.txt)\n" % BASE_URL)
@@ -156,6 +156,7 @@ Google does not participate; IndexNow is a notification, not indexing.
 | [Yii2](yii2/index.md) | Yii 2.0.45+ | `composer require indexnowkit/yii2` |
 | [Yii3](yii3/index.md) | yiisoft/active-record 1.x, yiisoft/db 2.x | `composer require indexnowkit/yii3` |
 | [Doctrine](doctrine/index.md) | Doctrine ORM without Symfony | `composer require indexnowkit/doctrine` |
+| [CLI](cli/index.md) | any site: cron on Bitrix, WordPress, MODX, OpenCart; static sites on deploy (PHAR, Docker image, GitHub Action) | `composer global require indexnowkit/cli` |
 | [Core](core/index.md) | plain PHP, any PSR-18 client | `composer require indexnowkit/core` |
 | [Sitemap](sitemap/index.md) | the `sitemap` command of every adapter | `composer require indexnowkit/sitemap` |
 | [Verify](verify/index.md) | a pre-flight GET before every submission, `check --sample` | `composer require indexnowkit/verify` |

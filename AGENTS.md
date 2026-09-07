@@ -1,6 +1,6 @@
 # Working in this repository (for coding agents and humans alike)
 
-This is the monorepo of the `indexnowkit/*` PHP packages: `packages/{core,testing,console,sitemap,verify,history,doctrine,symfony-bundle,laravel,yii2,yii3}`.
+This is the monorepo of the `indexnowkit/*` PHP packages: `packages/{core,testing,console,sitemap,verify,history,cli,doctrine,symfony-bundle,laravel,yii2,yii3}`.
 Each package is published as a read-only split (`indexnowkit/php-<package>`) and on Packagist; issues and pull
 requests live here. The specification the code follows is `docs/spec/` in the private workspace this repository is
 mirrored from — the README and `docs/*.md` of each package are the public contract.
@@ -18,6 +18,7 @@ Everything runs in Docker through `bin/*`:
 | `bin/mutation <pkg> [--write] [-- <paths>]` | mutation testing of one package with Infection (`tools/infection`) against `tests/msi-floor.txt`; `--write` records the floor |
 | `bin/taint <pkg>` | Psalm taint analysis of one package (`tools/psalm`, the package's `psalm.xml` and `tests/Taint/entrypoints.php`) |
 | `bin/link <pkg>` | writes `composer.monorepo.json` with path repositories for the sibling packages |
+| `bin/phar [cli]` | builds `packages/cli/indexnow.phar` with Box (`tools/box`) against the working copy of the siblings, then smokes it; `docker build --target cli|action packages/cli` builds the image from it; `bin/action-smoke <image>` runs the GitHub Action entrypoint against the mock server |
 | `bin/tag <pkg> <version>` · `bin/packagist-wait` · `bin/packagist-check` · `bin/release-notes` | release tooling (maintainers) |
 
 `PHP_VERSION=8.2 bin/ci core lowest` switches the PHP version (matrix 8.2–8.5).
@@ -38,8 +39,8 @@ Everything runs in Docker through `bin/*`:
 
 1. `bin/ci <package>` green (and `lowest` when dependencies changed).
 2. `bin/cs check` clean.
-   For core, verify, sitemap, history and console: `bin/taint <package>` clean, and `bin/mutation <package>` at or above
-   the floor when the change touches `src` (a lower floor is its own commit with the reason).
+   For core, verify, sitemap, history, console and cli: `bin/taint <package>` clean; for the first five, `bin/mutation <package>`
+   at or above the floor when the change touches `src` (a lower floor is its own commit with the reason).
 3. Tests for the change; new adapter behaviour named after its conformance id when one applies.
 4. `CHANGELOG.md` of the package under "Unreleased" for anything user-visible; breaking changes under "Changed" with
    the migration.

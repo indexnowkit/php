@@ -11,9 +11,9 @@ name: Taint analysis
 on:
   push:
     branches: [main]
-    paths: ['packages/core/**', 'packages/console/**', 'packages/sitemap/**', 'packages/verify/**', 'packages/history/**', 'tools/psalm/**', '.github/workflows/taint.yml']
+    paths: ['packages/core/**', 'packages/console/**', 'packages/sitemap/**', 'packages/verify/**', 'packages/history/**', 'packages/cli/**', 'tools/psalm/**', '.github/workflows/taint.yml']
   pull_request:
-    paths: ['packages/core/**', 'packages/console/**', 'packages/sitemap/**', 'packages/verify/**', 'packages/history/**', 'tools/psalm/**', '.github/workflows/taint.yml']
+    paths: ['packages/core/**', 'packages/console/**', 'packages/sitemap/**', 'packages/verify/**', 'packages/history/**', 'packages/cli/**', 'tools/psalm/**', '.github/workflows/taint.yml']
   schedule:
     - cron: '17 6 * * 1'
   workflow_dispatch:
@@ -28,7 +28,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        package: [core, console, sitemap, verify, history]
+        package: [core, console, sitemap, verify, history, cli]
     env:
       COMPOSER: composer.monorepo.json
     defaults:

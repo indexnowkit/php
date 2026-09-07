@@ -11,6 +11,7 @@ Packages are developed here and split into read-only repositories for Packagist.
 | [`indexnowkit/sitemap`](packages/sitemap) | optional add-on: sitemap reader (index, gzip, text) and the body of the `sitemap` command; `composer require indexnowkit/sitemap` next to an adapter |
 | [`indexnowkit/verify`](packages/verify) | optional add-on: one GET before every submission (noindex, robots.txt, canonical, redirects, origin errors) and `check --sample`; `verify.enabled: true` |
 | [`indexnowkit/history`](packages/history) | optional add-on: PSR-16 and PDO implementations of `SubmissionStoreInterface`, the `history` and `status` commands, the profiler table; `history.store: psr16|pdo` |
+| [`indexnowkit/cli`](packages/cli) | the `indexnow` binary for any host without a framework (cron on Bitrix, WordPress, MODX, OpenCart; static sites on deploy): `check`, `submit`, `sitemap --new-only`, `key:file`, `history`, `status` over `INDEXNOW_*` variables and a sqlite state file; also `indexnow.phar`, the image `ghcr.io/indexnowkit/indexnow` and the GitHub Action `indexnowkit/indexnow-action` |
 | [`indexnowkit/doctrine`](packages/doctrine) | Doctrine ORM listener plus a DBAL middleware, commit-safe |
 | [`indexnowkit/symfony-bundle`](packages/symfony-bundle) | Symfony bundle: config, Messenger, key file route, commands, profiler panel |
 | [`indexnowkit/laravel`](packages/laravel) | Laravel: Eloquent observer, queue dispatch, key file route, artisan commands (Laravel 12–13) |
@@ -101,7 +102,11 @@ pushed, so the split CI of an adapter never resolves a stale core.
 
 A new package needs its read-only repository `indexnowkit/php-<name>`, a write deploy key stored as the
 `SPLIT_SSH_KEY_<NAME>` secret of `indexnowkit/php`, an entry in `.github/workflows/split.yml`, and the Packagist
-registration after the first split push.
+registration after the first split push. The CLI has three more packagings: `bin/phar` builds `indexnow.phar` with Box
+(`tools/box`), the release workflow of `php-cli` attaches it to the GitHub release and pushes the image
+`ghcr.io/indexnowkit/indexnow` (the GHCR package is private after its first push: the organization makes it public once),
+and `packages/cli/action` is mirrored into `indexnowkit/indexnow-action` (the tag `action@1.0.0` becomes `v1.0.0` and `v1`;
+the Marketplace listing is a manual step). `bin/action-smoke <image>` runs the action's entrypoint against the mock server.
 
 ## Layout
 
@@ -118,8 +123,9 @@ php/
 │   ├── symfony-bundle/    # indexnowkit/symfony-bundle + docs/, recipe/, tests/Functional (H01-H06)
 │   ├── laravel/           # indexnowkit/laravel       + docs/, tests/
 │   ├── yii2/              # indexnowkit/yii2          + docs/, tests/
-│   └── yii3/              # indexnowkit/yii3          + docs/, tests/
-├── bin/                   # Docker wrappers: php, composer, link, ci, cs, coverage-floor; release: tag, packagist-wait, release-notes
+│   ├── yii3/              # indexnowkit/yii3          + docs/, tests/
+│   └── cli/               # indexnowkit/cli           + docs/, tests/, box.json, Dockerfile, action/ (the GitHub Action), docker/
+├── bin/                   # Docker wrappers: php, composer, link, ci, cs, coverage-floor, phar, action-smoke; release: tag, packagist-wait, release-notes
 ├── docker/php/            # development image (php:<version>-cli + Composer)
 ├── CHANGELOG.md           # monorepo changelog, per package
 ├── CONTRIBUTING.md

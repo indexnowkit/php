@@ -23,7 +23,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        package: [core, testing, console, sitemap, verify, history, doctrine, symfony-bundle, laravel, yii2, yii3]
+        package: [core, testing, console, sitemap, verify, history, doctrine, symfony-bundle, laravel, yii2, yii3, cli]
         php: ['8.2', '8.3', '8.4', '8.5']
         deps: [highest]
         include:
@@ -45,6 +45,7 @@ jobs:
           - { package: laravel, php: '8.3', deps: lowest-l13 }
           - { package: yii2, php: '8.2', deps: lowest }
           - { package: yii3, php: '8.2', deps: lowest }
+          - { package: cli, php: '8.2', deps: lowest }
     env:
       COMPOSER: composer.monorepo.json
     defaults:
@@ -156,7 +157,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        package: [core, testing, console, sitemap, verify, history, doctrine, symfony-bundle, laravel, yii2, yii3]
+        package: [core, testing, console, sitemap, verify, history, doctrine, symfony-bundle, laravel, yii2, yii3, cli]
     env:
       COMPOSER: composer.monorepo.json
     defaults:
@@ -258,6 +259,67 @@ jobs:
         run: |
           mkdir -p ../../var/mutation
           ../../tools/infection/vendor/bin/infection --threads=max --no-progress --no-interaction --logger-github             --git-diff-lines --git-diff-base="origin/${{ github.base_ref }}" --ignore-msi-with-no-mutations             --min-msi="$(tr -d '[:space:]' < tests/msi-floor.txt)"
+
+  # The three packagings of the CLI (spec 19b §3.6–§3.8): the PHAR built with Box the way the release workflow of php-cli
+  # builds it (bin/phar), run against the mock IndexNow server of indexnowkit/testing — the one place the PHAR-specific
+  # things are proved (the autoloader, no php-http/discovery, the state file next to a PHAR); the Docker image built from
+  # it without a push (the `cli` target runs as uid 1000, the `action` target as root); the entrypoint of the GitHub Action
+  # with INPUT_* variables against the same mock server (bin/action-smoke).
+  cli-packagings:
+    name: cli / phar, docker, action
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: pdo_sqlite, xmlreader, zlib, mbstring
+          coverage: none
+          ini-values: phar.readonly=0
+      - name: Build the PHAR (the steps of bin/phar on the runner's PHP)
+        run: |
+          set -euo pipefail
+          mkdir -p var/phar/siblings
+          for d in packages/*/; do n="$(basename "$d")"; [ "$n" = cli ] && continue; mkdir -p "var/phar/siblings/$n"; tar -C "$d" --exclude=vendor --exclude=tests --exclude=docs --exclude=.phpunit.cache --exclude='composer.monorepo.*' --exclude='*.md' -cf - . | tar -C "var/phar/siblings/$n" -xf -; done
+          mkdir -p var/phar/cli && cp -R packages/cli/bin packages/cli/src packages/cli/composer.json packages/cli/box.json var/phar/cli/
+          php -r '$b = $argv[1]; $m = json_decode(file_get_contents("$b/composer.json"), true); foreach (glob($argv[2] . "/*/composer.json") as $s) { $sm = json_decode(file_get_contents($s), true); $m["repositories"][] = ["type" => "path", "url" => dirname($s), "options" => ["symlink" => false, "versions" => [$sm["name"] => $sm["extra"]["branch-alias"]["dev-main"]]]]; } $m["minimum-stability"] = "dev"; $m["prefer-stable"] = true; file_put_contents("$b/composer.json", json_encode($m, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));' "$PWD/var/phar/cli" "$PWD/var/phar/siblings"
+          composer install -d var/phar/cli --no-dev --no-interaction --prefer-dist --classmap-authoritative
+          composer global require humbug/box:^4.7 --no-interaction
+          cd var/phar/cli && git init -q && git -c user.name=ci -c user.email=ci@indexnowkit.dev add -A && git -c user.name=ci -c user.email=ci@indexnowkit.dev commit -qm build && git tag "dev-${GITHUB_SHA::7}"
+          "$(composer global config bin-dir --absolute --quiet)/box" compile --no-interaction
+          cp indexnow.phar ../../../packages/cli/indexnow.phar
+      - name: The PHAR against the mock IndexNow server
+        env:
+          MOCK_KEYS: abcdef1234567890abcdef1234567890
+          INDEXNOW_KEY: abcdef1234567890abcdef1234567890
+          INDEXNOW_BASE_URL: http://127.0.0.1:8089
+          INDEXNOW_KEY_LOCATION: http://127.0.0.1:8089/abcdef1234567890abcdef1234567890.txt
+          INDEXNOW_ENGINES: http://127.0.0.1:8089/indexnow
+          INDEXNOW_ENV: prod
+          INDEXNOW_STRICT_HOSTS: 'true'
+        run: |
+          set -euo pipefail
+          php -S 127.0.0.1:8089 packages/testing/resources/mock-server/router.php >/dev/null 2>&1 &
+          sleep 1
+          cd "$(mktemp -d)"
+          php "$GITHUB_WORKSPACE/packages/cli/indexnow.phar" --version | grep -E '^indexnow dev-'
+          php "$GITHUB_WORKSPACE/packages/cli/indexnow.phar" check --json | tee check.json
+          php -r '$r = json_decode(file_get_contents("check.json"), true); exit($r["status"] === "ok" ? 0 : 1);'
+          php "$GITHUB_WORKSPACE/packages/cli/indexnow.phar" submit --json http://127.0.0.1:8089/a | tee submit.json
+          php -r '$r = json_decode(file_get_contents("submit.json"), true); exit($r[0]["status"] === "ok" ? 0 : 1);'
+          test -f .indexnow/state.sqlite
+          php "$GITHUB_WORKSPACE/packages/cli/indexnow.phar" status | grep -F 'store state (SqliteCache)'
+      - name: Build the image (both targets, no push)
+        run: |
+          docker build --target cli -t indexnow-cli-test packages/cli
+          docker build --target action -t indexnow-action-test packages/cli
+      - name: Smoke the cli image
+        run: |
+          docker run --rm indexnow-cli-test --version | grep -E '^indexnow dev-'
+          test "$(docker run --rm --entrypoint id indexnow-cli-test -u)" = 1000
+          docker run --rm -e INDEXNOW_KEY=abcdef1234567890abcdef1234567890 -e INDEXNOW_BASE_URL=https://www.example.com -e INDEXNOW_STATE=memory -e INDEXNOW_DRY_RUN=true indexnow-cli-test config --json | php -r '$c = json_decode(stream_get_contents(STDIN), true); exit($c["adapter"]["cli"]["state"] === "memory" ? 0 : 1);'
+      - name: Smoke the action entrypoint
+        run: bin/action-smoke indexnow-action-test
 
   quality:
     runs-on: ubuntu-latest

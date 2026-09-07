@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # Print the <version> section of a package CHANGELOG as GitHub release notes: relative links become absolute links
 # into the split repository (indexnowkit/php-<package>) at that tag. With --create, the release is created there
-# through the gh CLI (bin/tag first; the split workflow must have pushed the tag).
+# through the gh CLI (bin/tag first; the split workflow must have pushed the tag) — or its notes replaced when the
+# release exists already: the release workflow of php-cli creates the release itself to attach the PHAR when it does
+# not find one within ten minutes of the tag (spec 19b §3.6).
 #
 # Usage: bin/release-notes <package> <version> [--create]     bin/release-notes core 0.4.0 --create
 set -euo pipefail
@@ -19,8 +21,13 @@ body="$(awk -v ver="$ver" '
 [ -n "$body" ] || { echo "release-notes: $changelog has no section '## [$ver] — YYYY-MM-DD'" >&2; exit 1; }
 body="$(printf '%s\n' "$body" | perl -pe "s{\]\((?!https?://)([^)]+)\)}{](https://github.com/$repo/blob/$ver/\$1)}g")"
 if [ "$create" = "--create" ]; then
-    printf '%s\n' "$body" | gh release create "$ver" -R "$repo" -t "$ver" -F -
-    echo "release $ver created on $repo"
+    if gh release view "$ver" -R "$repo" >/dev/null 2>&1; then
+        printf '%s\n' "$body" | gh release edit "$ver" -R "$repo" -t "$ver" -F -
+        echo "release $ver exists on $repo: notes replaced"
+    else
+        printf '%s\n' "$body" | gh release create "$ver" -R "$repo" -t "$ver" -F -
+        echo "release $ver created on $repo"
+    fi
 else
     printf '%s\n' "$body"
 fi
