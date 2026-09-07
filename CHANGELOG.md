@@ -3,7 +3,7 @@
 All notable changes to the PHP packages are documented here, newest release wave first. Tags: `<package>@<version>`.
 Per-package detail (and the migration notes for every breaking change) lives in each package's own changelog.
 
-## Unreleased — core@0.13.0, console@0.4.2, testing@0.3.2, sitemap@0.8.0, verify@0.4.0, history@0.3.1, doctrine@0.9.0, symfony-bundle@0.15.0, laravel@0.15.0, yii2@0.14.0, yii3@0.1.0
+## Unreleased — core@0.13.0, console@0.5.0, testing@0.3.2, sitemap@0.8.0, verify@0.4.0, history@0.4.0, doctrine@0.9.0, symfony-bundle@0.15.0, laravel@0.15.0, yii2@0.14.0, yii3@0.1.0
 
 The Yii3 adapter (spec 15): `indexnowkit/yii3` on `yiisoft/active-record ^1.0`, `yiisoft/db ^2.0`, `yiisoft/router ^4.0`. A
 `yiisoft/config` plugin (params, di, di-web, di-console, params-console, events-web, events-console, routes, bootstrap) wires
@@ -50,7 +50,24 @@ with `ignoreIndirectDeprecations` in the adapters, PHPUnit `^11.5 || ^12.0 || ^1
 DBAL 3 in the Doctrine matrix, C04 no longer skipped in doctrine, the split CIs aligned with the monorepo. Per package: the
 changelogs; the decisions and the lens reports: `docs/plans/audit-0.13.md`.
 
-### core@0.13.0, console@0.4.2, testing@0.3.2, sitemap@0.8.0, verify@0.4.0, history@0.3.1, doctrine@0.9.0, symfony-bundle@0.15.0, laravel@0.15.0, yii2@0.14.0, yii3@0.1.0
+### core@0.13.0, console@0.5.0, testing@0.3.2, sitemap@0.8.0, verify@0.4.0, history@0.4.0, doctrine@0.9.0, symfony-bundle@0.15.0, laravel@0.15.0, yii2@0.14.0, yii3@0.1.0
+
+**Wave L — the commands live in the packages** (spec 18), same wave, before the push. Yii3 was the third adapter on
+`symfony/console` and its eleven commands were copies of the bundle's (73–96 % identical lines): what differs between the
+two is not the command but how the adapter hands it its dependencies. The commands are now classes of the packages —
+`IndexNowKit\Console\Command\*` in `indexnowkit/console` 0.5.0 (`submit`, `submit-<subject>` named by the `Vocabulary`,
+`explain`, `check`, `config`, `key:generate`, the three "not installed" stubs), `Sitemap\Console\SitemapCommand` (sitemap
+0.8.0; `SitemapRunner` answers for `sitemap.enabled: false` itself), `History\Console\HistoryCommand` and `StatusCommand`
+(history 0.4.0) — and an adapter on symfony/console registers them and hands over what varies by constructor: the runners,
+the words, a `Console\ConfigSourceInterface` for `check`/`config` (`DependencyInjection\ConsoleConfigSource` in the bundle,
+`Console\ConfigSource` in Yii3), the `.env` of `key:generate`, a `Check\SampleOptions` with the ORM sampler already inside.
+The bundle drops `Command\*Command` (its one breaking change of 0.15.0, with a migration: decorate the runner, or register a
+command of your own under the same name; every `console.command` stays lazy, a test now asserts it), Yii3 drops
+`Console\*` before its first release; ≈ 900 lines less, the functional tests of both pass unchanged. Laravel (artisan) and
+Yii2 (a controller) keep parsing over the runners. In the core, additive: `Key\KeyFileRequestHandler`, the PSR-15 handler
+and middleware of `GET /<key>.txt` for any PSR-7 stack (`psr/http-server-handler` / `-middleware` in `require`); the Yii3
+handler delegates to it. Version cascade: `console ^0.5` everywhere, `history ^0.4` where history is wired. Phase B of the
+spec, `bin/indexnow` for plain PHP and CMS, waits for the Bitrix wave.
 
 **The three leftovers of the audit** (`docs/plans/config-decomposition.md`, `docs/plans/mutation-and-taint.md`), same wave:
 `core/src/Config.php` is 600 lines instead of 1033 — reading the array and environment shapes is `Config\ConfigParser`, the
