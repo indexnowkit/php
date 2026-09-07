@@ -52,6 +52,25 @@ changelogs; the decisions and the lens reports: `docs/plans/audit-0.13.md`.
 
 ### core@0.13.0, console@0.5.0, testing@0.3.2, sitemap@0.8.0, verify@0.4.0, history@0.4.0, doctrine@0.9.0, symfony-bundle@0.15.0, laravel@0.15.0, yii2@0.14.0, yii3@0.1.0
 
+**Wave M — the leftovers after L, and PSR by the letter** (spec 19), same wave, before the push. An audit measured every
+same-role class of the four adapters (`difflib` without comments) and read PSR-1…20 against the standards. Two findings
+changed the shape: spec 18 §9 had said artisan commands must extend `Illuminate\Console\Command` — they need not
+(`Illuminate\Console\Application::resolve()` takes any symfony/console command), so **Laravel registers the command
+classes of the packages** like the bundle and Yii3 (twelve `Laravel\Console\*` classes gone, `submit-model` through a
+`LazyCommand`, the `model` argument kept by the new `classArgument` of the two subject commands; `laravelSignature()`
+removed from console 0.5.0); and four 38-line samplers, four loaders, three locale checks, three queue dispatchers and
+four router bridges shared more than their frameworks — now `Console\SubjectSampler` and `Console\AbstractSubjectLoader`
+(console), `Check\LocalesCheck`, `Dispatch\BatchingDispatcher`, `Url\RouteOrigin`, `Check\DispatchLine`,
+`DebounceStoreFactory::isShared()` (nine `in_array(memory, none)` copies), `DebounceStoreCheck::PROBE_KEY` (two probes
+wrote a key with the colon PSR-16 reserves) and `OptionalPackage::ownedOptions()` / `ignoredBlocks()` in core 0.13.0,
+`HistoryServices::describeStore()` in history 0.4.0. PSR: `SitemapRunner` counts `--changed-since` from the graph's
+PSR-20 clock (sitemap 0.8.0); `Psr18Transport::discover()` / `TransportFactory::lazy()` take the application's PSR-17
+factories (Yii3 hands the container's over); the bundle's `FlushListener` takes a `service_closure` instead of a PSR-11
+locator; Yii2's `YiiLogger` throws on a level PSR-3 does not define and its `YiiCacheDebounceStore` (the core's store
+over the Yii API once more) is gone; the router bridges of Symfony, Yii2 and Yii3 warn once per process when
+`locales: 'all'` meets an empty list, as Laravel's did. `docs/adapters.md` §11–§13: the key-file recipe per stack, redirects
+under PSR-18, PSR-16 only. Per package: the changelogs; the audit with its numbers and decisions: spec 19.
+
 **Wave L — the commands live in the packages** (spec 18), same wave, before the push. Yii3 was the third adapter on
 `symfony/console` and its eleven commands were copies of the bundle's (73–96 % identical lines): what differs between the
 two is not the command but how the adapter hands it its dependencies. The commands are now classes of the packages —
