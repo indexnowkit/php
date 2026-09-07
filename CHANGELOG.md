@@ -3,7 +3,7 @@
 All notable changes to the PHP packages are documented here, newest release wave first. Tags: `<package>@<version>`.
 Per-package detail (and the migration notes for every breaking change) lives in each package's own changelog.
 
-## Unreleased — verify@0.3.0, history@0.3.0, sitemap@0.7.0, symfony-bundle@0.14.0, laravel@0.14.0, yii2@0.13.0
+## 2026-09-07 — verify@0.3.0, history@0.3.0, sitemap@0.7.0, symfony-bundle@0.14.0, laravel@0.14.0, yii2@0.13.0
 
 Wave I: the last decision of the 0.10 audit (A10). The optional packages wire themselves: `Verify\Adapter\VerifyServices`,
 `History\Adapter\HistoryServices` and `Sitemap\Adapter\SitemapServices` hold what every framework adapter used to copy — the
