@@ -83,6 +83,11 @@ final class StoresTest extends TestCase
                 return $next;
             }
 
+            /**
+             * @param iterable<string> $keys
+             *
+             * @return array<string, mixed>
+             */
             public function getMultiple($keys, $default = null): iterable
             {
                 $out = [];
