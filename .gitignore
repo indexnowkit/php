@@ -6,5 +6,6 @@
 /packages/*/composer.monorepo.lock
 /packages/*/coverage.xml
 /packages/*/vendor/
+/packages/cli/indexnow.phar
 /var/
 /tools/*/vendor/

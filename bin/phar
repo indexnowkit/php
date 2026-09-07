@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+# Build indexnow.phar of packages/cli with Box (tools/box), in Docker, the way the `cli / phar` job of
+# .github/workflows/ci.yml and the release workflow of the split repository php-cli do. The package is copied to
+# var/phar/cli (its dev vendor is left alone) and installed --no-dev against the sibling packages of the working copy
+# (path repositories without symlinks: the PHAR must carry the files), then `box compile`; the result is
+# packages/cli/indexnow.phar (git-ignored), which the Dockerfile of the package copies in. Then a smoke test:
+# --version and list.
+#
+# Usage: bin/phar [cli]
+set -euo pipefail
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$ROOT"
+pkg="${1:-cli}"
+build="var/phar/$pkg"
+[ -f "packages/$pkg/box.json" ] || { echo "phar: packages/$pkg has no box.json" >&2; exit 1; }
+[ -d tools/box/vendor ] || bin/composer -d tools/box install --no-interaction --quiet
+rm -rf "$build" "var/phar/siblings" && mkdir -p "$build" var/phar/siblings
+cp -R "packages/$pkg/bin" "packages/$pkg/src" "packages/$pkg/composer.json" "packages/$pkg/box.json" "$build/"
+# the siblings as Packagist would ship them: sources only (a path repository without symlinks copies the directory as it is)
+for d in packages/*/; do
+    name="$(basename "$d")"
+    [ "$name" = "$pkg" ] && continue
+    mkdir -p "var/phar/siblings/$name"
+    tar -C "$d" --exclude=vendor --exclude=tests --exclude=docs --exclude=.phpunit.cache --exclude='composer.monorepo.*' --exclude='*.md' -cf - . | tar -C "var/phar/siblings/$name" -xf -
+done
+# the siblings as path repositories, copied (not symlinked) into vendor, each at its branch alias
+bin/php -r '
+    $build = $argv[1]; $root = $argv[2];
+    $manifest = json_decode(file_get_contents("$build/composer.json"), true, 512, JSON_THROW_ON_ERROR);
+    foreach (glob("$root/var/phar/siblings/*/composer.json") as $sibling) {
+        $m = json_decode(file_get_contents($sibling), true, 512, JSON_THROW_ON_ERROR);
+        if ($m["name"] === $manifest["name"]) { continue; }
+        $manifest["repositories"][] = ["type" => "path", "url" => dirname($sibling), "options" => ["symlink" => false, "versions" => [$m["name"] => $m["extra"]["branch-alias"]["dev-main"]]]];
+    }
+    $manifest["minimum-stability"] = "dev"; $manifest["prefer-stable"] = true;
+    file_put_contents("$build/composer.json", json_encode($manifest, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n");
+' "/app/$build" /app
+bin/composer -d "$build" install --no-dev --no-interaction --prefer-dist --classmap-authoritative --quiet
+# the placeholder @git-version@ is read from git at the build root (the release workflow of php-cli builds at the tag);
+# here the copy gets a repository of its own, tagged dev-<monorepo sha>, so a local PHAR says where it came from
+sha="$(git rev-parse --short HEAD 2>/dev/null || echo local)"
+bin/php -C "$build" -r 'exec("git init -q && git -c user.name=indexnowkit -c user.email=bot@indexnowkit.dev add -A && git -c user.name=indexnowkit -c user.email=bot@indexnowkit.dev commit -qm build && git tag " . escapeshellarg("dev-" . $argv[1]));' "$sha"
+bin/php -C "$build" -d phar.readonly=0 ../../../tools/box/vendor/bin/box compile --no-interaction --no-parallel
+cp "$build/indexnow.phar" "packages/$pkg/indexnow.phar"
+ls -la "packages/$pkg/indexnow.phar"
+bin/php -C "packages/$pkg" indexnow.phar --version
+bin/php -C "packages/$pkg" indexnow.phar list --raw | head -12

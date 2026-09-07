@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+# Smoke test of the GitHub Action entrypoint (packages/cli/docker/indexnow-action) in the `action` target of the image,
+# the way the `cli / action` job of .github/workflows/ci.yml runs it: the mock IndexNow server of indexnowkit/testing
+# inside the container (no network to set up), a sitemap file in a fake workspace, the inputs as INPUT_* variables
+# (dashes kept, as GitHub passes them), GITHUB_OUTPUT and GITHUB_STEP_SUMMARY captured and checked. Needs the image
+# built: docker build --target action -t <image> packages/cli (after bin/phar).
+#
+# Usage: bin/action-smoke <image>        bin/action-smoke indexnow-action-test
+set -euo pipefail
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+image="${1:?usage: bin/action-smoke <image>}"
+key="abcdef1234567890abcdef1234567890"
+work="$(mktemp -d)"
+trap 'rm -rf "$work"' EXIT
+mkdir -p "$work/workspace" "$work/github"
+cat > "$work/workspace/sitemap.xml" <<XML
+<?xml version="1.0"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>http://127.0.0.1:8089/a</loc><lastmod>2026-01-01</lastmod></url><url><loc>http://127.0.0.1:8089/b</loc></url></urlset>
+XML
+: > "$work/github/output"
+: > "$work/github/summary"
+run() {
+    docker run --rm \
+        -v "$ROOT/packages/testing/resources/mock-server/router.php:/mock/router.php:ro" \
+        -v "$work/workspace:/github/workspace" -v "$work/github:/github/home" -w /github/workspace \
+        -e GITHUB_WORKSPACE=/github/workspace -e GITHUB_OUTPUT=/github/home/output -e GITHUB_STEP_SUMMARY=/github/home/summary \
+        -e MOCK_KEYS="$key" -e "INPUT_KEY=$key" -e "INPUT_BASE-URL=http://127.0.0.1:8089" -e "INPUT_KEY-LOCATION=http://127.0.0.1:8089/$key.txt" \
+        -e "INPUT_ENGINES=http://127.0.0.1:8089/indexnow" -e "INPUT_SITEMAP=sitemap.xml" -e "INPUT_NEW-ONLY=true" -e "INPUT_STATE-PATH=.indexnow" "$@" \
+        --entrypoint sh "$image" -c 'php -S 127.0.0.1:8089 /mock/router.php >/dev/null 2>&1 & sleep 1; exec /usr/local/bin/indexnow-action'
+}
+echo "--- run 1: two URLs new"
+run
+grep -q '^submitted=2$' "$work/github/output" || { echo "action-smoke: expected submitted=2, got:"; cat "$work/github/output"; exit 1; }
+grep -q '^failed=0$' "$work/github/output"
+grep -q 'IndexNow: 2 submitted' "$work/github/summary"
+[ -f "$work/workspace/.indexnow/state.sqlite" ] || { echo "action-smoke: no state file in the workspace" >&2; exit 1; }
+[ -f "$work/workspace/.indexnow/summary.json" ]
+echo "--- run 2: nothing new (the state file remembers)"
+: > "$work/github/output"
+run
+grep -q '^submitted=0$' "$work/github/output" || { echo "action-smoke: expected submitted=0 on the second run, got:"; cat "$work/github/output"; exit 1; }
+echo "--- run 3: dry-run with urls, fail-on-error false"
+: > "$work/github/output"
+run -e "INPUT_URLS=http://127.0.0.1:8089/x
+http://127.0.0.1:8089/y" -e "INPUT_DRY-RUN=true" -e "INPUT_FAIL-ON-ERROR=false"
+grep -q '^skipped=2$' "$work/github/output" || { echo "action-smoke: expected skipped=2 (dry run), got:"; cat "$work/github/output"; exit 1; }
+echo "--- run 4: a wrong key is a failed step"
+: > "$work/github/output"
+if run -e "INPUT_KEY=0000000000000000000000000000dead" >/dev/null 2>"$work/stderr"; then echo "action-smoke: a wrong key must fail" >&2; exit 1; fi
+grep -q '::error::indexnow check failed' "$work/stderr"
+echo "action-smoke: ok"

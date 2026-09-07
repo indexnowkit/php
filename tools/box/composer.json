@@ -1,0 +1,11 @@
+{
+    "name": "indexnowkit/tools-box",
+    "description": "Box for the PHAR of indexnowkit/cli (bin/phar). Not a dependency of any package: the PHAR is built in the release workflow of the split repository php-cli and in the monorepo CI.",
+    "license": "MIT",
+    "require": {
+        "humbug/box": "^4.7"
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
