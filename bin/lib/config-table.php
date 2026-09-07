@@ -6,9 +6,9 @@ declare(strict_types=1);
  * The "One concept, three keys" section of packages/core/docs/configuration.md, generated from the code so the
  * documentation cannot drift: the core keys (Config::OPTIONS) with the defaults the bundle's configuration tree
  * declares, the sitemap keys (SitemapConfig::OPTIONS), the adapter-only keys (LARAVEL_OPTIONS, YII_OPTIONS, the
- * bundle tree) and the synonyms — the same concept under three names.
+ * bundle tree, YII3_OPTIONS) and the synonyms — the same concept under four names.
  *
- * Runs inside packages/symfony-bundle (its vendor holds core, sitemap and the bundle); the Laravel and Yii2 key
+ * Runs inside packages/symfony-bundle (its vendor holds core, sitemap and the bundle); the Laravel, Yii2 and Yii3 key
  * lists are read from the sibling sources of the monorepo (a literal array each), not autoloaded.
  * Usage: bin/config-table [--check]   (bin/config-table is the wrapper; --check exits 1 when the file is stale)
  */
@@ -30,15 +30,15 @@ const CONFIG_TABLE_END = '<!-- config-table:end -->';
 
 /** Same concept, one key per adapter: `null` = the adapter has no such knob. */
 const CONFIG_TABLE_SYNONYMS = [
-    ['Delivery mode', 'dispatch', 'dispatch', 'dispatch', '`auto` (Messenger when a transport is set, else `sync`), `messenger`, `sync`, `none` — Symfony; `queue` (default), `sync`, `none` — Laravel, no `auto`; `auto` (default: `queue` when the queue component exists, else `sync`), `queue`, `sync`, `none` — Yii2'],
-    ['Queue / transport', 'messenger.transport', 'queue.connection', 'queue.component', 'Symfony: a `framework.messenger.transports` name (the bundle routes `SubmitUrlsMessage` to it); Laravel: a `queue.connections` name (default: the app default); Yii2: the yii2-queue component id (default `queue`)'],
-    ['Queue delay / extras', 'messenger.delay', 'queue.delay', 'queue.delay', 'Symfony also `messenger.stamps`, `messenger.bus`; Laravel also `queue.queue`; Yii2 also `queue.ttr`, `queue.priority`'],
-    ['Locales for `locales: all`', 'framework.enabled_locales', 'router.locales', 'router.locales', 'Symfony reads the framework setting; Laravel and Yii2 list them in the package configuration (`router.locale_parameter` names the route parameter; `router.set_app_locale` switches the application locale while generating; Yii2 read `router.languages` / `language_parameter` / `set_app_language` before 0.12 and still accepts them)'],
-    ['ORM hook switch', 'doctrine.enabled', 'eloquent.enabled', 'active_record.enabled', 'Symfony also `doctrine.listener_priority`, `doctrine.connections`; Yii2 also `active_record.models` (classes you cannot annotate)'],
-    ['Key file route', 'key_file.path', 'key_file.path', 'key_file.pattern', 'Symfony/Laravel: a path with `{key}` (default `/{key}.txt`); Yii2: a URL rule pattern (default `<key:[A-Za-z0-9-]{8,128}>.txt`); all three: `key_file.enabled`, `key_file.cache_max_age`; Symfony/Laravel also `key_file.host`, `key_file.route_name`; Laravel also `key_file.middleware`'],
-    ['Log destination', 'logging.channel', 'logging.channel', 'logging.category', 'Monolog channel (Symfony, default `indexnow`), log channel name (Laravel), Yii log category (default `indexnow`)'],
-    ['Debounce store', 'debounce.store', 'debounce.store', 'debounce.store', 'Same key, different values: a PSR-6 pool service id (Symfony, default `cache.app`), a cache store name (Laravel, default `cache` = the default store), a cache component id (Yii2, default `cache`); `memory` and `none` everywhere'],
-    ['HTTP client', 'http.client', 'http.client', 'http.client', 'Same key: a service id (PSR-18 or symfony/http-client) in Symfony, a container binding or class in Laravel, a component id or class in Yii2; unset = PSR-18 discovery'],
+    ['Delivery mode', 'dispatch', 'dispatch', 'dispatch', 'dispatch', '`auto` (Messenger when a transport is set, else `sync`), `messenger`, `sync`, `none` — Symfony; `queue` (default), `sync`, `none` — Laravel, no `auto`; `auto` (default: `queue` when the queue component exists, else `sync`), `queue`, `sync`, `none` — Yii2; `sync` (default), `none` — Yii3 (a queue is a replaced `DispatcherInterface`)'],
+    ['Queue / transport', 'messenger.transport', 'queue.connection', 'queue.component', null, 'Symfony: a `framework.messenger.transports` name (the bundle routes `SubmitUrlsMessage` to it); Laravel: a `queue.connections` name (default: the app default); Yii2: the yii2-queue component id (default `queue`); Yii3: none until yiisoft/queue is released'],
+    ['Queue delay / extras', 'messenger.delay', 'queue.delay', 'queue.delay', null, 'Symfony also `messenger.stamps`, `messenger.bus`; Laravel also `queue.queue`; Yii2 also `queue.ttr`, `queue.priority`'],
+    ['Locales for `locales: all`', 'framework.enabled_locales', 'router.locales', 'router.locales', 'router.locales', 'Symfony reads the framework setting; Laravel, Yii2 and Yii3 list them in the package configuration (`router.locale_parameter` names the route parameter, `_language` in Yii3; `router.set_app_locale` switches the application locale while generating in Laravel and Yii2; Yii2 read `router.languages` / `language_parameter` / `set_app_language` before 0.12 and still accepts them)'],
+    ['ORM hook switch', 'doctrine.enabled', 'eloquent.enabled', 'active_record.enabled', 'active_record.enabled', 'Symfony also `doctrine.listener_priority`, `doctrine.connections`; Yii2 and Yii3 also `active_record.models` (classes you cannot annotate); Yii3 also `active_record.namespaces` (short class names of the commands)'],
+    ['Key file route', 'key_file.path', 'key_file.path', 'key_file.pattern', 'key_file.pattern', 'Symfony/Laravel: a path with `{key}` (default `/{key}.txt`); Yii2: a URL rule pattern (default `<key:[A-Za-z0-9-]{8,128}>.txt`); Yii3: a yiisoft/router pattern (default `/{key:[A-Za-z0-9-]{8,128}}.txt`); all four: `key_file.enabled`, `key_file.cache_max_age`; Symfony/Laravel also `key_file.host`, `key_file.route_name`; Laravel also `key_file.middleware`'],
+    ['Log destination', 'logging.channel', 'logging.channel', 'logging.category', 'logging.category', 'Monolog channel (Symfony, default `indexnow`), log channel name (Laravel), Yii log category (Yii2 and Yii3, default `indexnow`)'],
+    ['Debounce store', 'debounce.store', 'debounce.store', 'debounce.store', 'debounce.store', 'Same key, different values: a PSR-6 pool service id (Symfony, default `cache.app`), a cache store name (Laravel, default `cache` = the default store), a cache component id (Yii2, default `cache`), a PSR-16 container id (Yii3, default `Psr\\SimpleCache\\CacheInterface`); `memory` and `none` everywhere'],
+    ['HTTP client', 'http.client', 'http.client', 'http.client', 'http.client', 'Same key: a service id (PSR-18 or symfony/http-client) in Symfony, a container binding or class in Laravel, a component id or class in Yii2, a container id in Yii3; unset = PSR-18 discovery'],
 ];
 
 /**
@@ -112,6 +112,7 @@ function config_table_render(): string
     $root = \dirname(__DIR__, 2) . '/packages';
     $laravel = config_table_constant($root . '/laravel/src/Config/ConfigFactory.php', 'LARAVEL_OPTIONS');
     $yii = config_table_constant($root . '/yii2/src/Config/ConfigFactory.php', 'YII_OPTIONS');
+    $yii3 = config_table_constant($root . '/yii3/src/Config/ConfigFactory.php', 'YII3_OPTIONS');
     $bundle = config_table_bundle_tree();
     // Where the bundle tree leaves a key without a default, the core's own constants apply everywhere.
     $coreDefaults = [
@@ -129,15 +130,16 @@ function config_table_render(): string
     $lines = [];
     $lines[] = CONFIG_TABLE_START;
     $lines[] = '_Generated by `bin/config-table` from `Config::OPTIONS`, `SitemapConfig::OPTIONS`, the bundle configuration tree,';
-    $lines[] = '`ConfigFactory::LARAVEL_OPTIONS` and `ConfigFactory::YII_OPTIONS`; do not edit by hand._';
+    $lines[] = '`ConfigFactory::LARAVEL_OPTIONS`, `ConfigFactory::YII_OPTIONS` and `ConfigFactory::YII3_OPTIONS`; do not edit by hand._';
     $lines[] = '';
     $lines[] = '### Core keys: the same name in every adapter';
     $lines[] = '';
     $lines[] = 'Every key of `Config::OPTIONS` is accepted under this name by the Symfony bundle (`indexnowkit:`), the Laravel package';
-    $lines[] = '(`config/indexnow.php`) and the Yii2 component (`options`). The default column is the one the core ships, as the bundle';
-    $lines[] = 'declares it in its configuration tree (`—` = unset); the two exceptions are in the synonyms table: `dispatch` (`auto` in';
-    $lines[] = 'Symfony and Yii2, `queue` in Laravel) and `debounce.store` (`cache.app` / `cache` / `cache`). `environment` comes from';
-    $lines[] = '`kernel.environment` / `APP_ENV` / `YII_ENV` unless set.';
+    $lines[] = '(`config/indexnow.php`), the Yii2 component (`options`) and the Yii3 params block (`indexnowkit/yii3`). The default column is';
+    $lines[] = 'the one the core ships, as the bundle declares it in its configuration tree (`—` = unset); the two exceptions are in the';
+    $lines[] = 'synonyms table: `dispatch` (`auto` in Symfony and Yii2, `queue` in Laravel, `sync` in Yii3) and `debounce.store` (`cache.app` /';
+    $lines[] = '`cache` / `cache` / the PSR-16 `CacheInterface` of the container). `environment` comes from `kernel.environment` / `APP_ENV` /';
+    $lines[] = '`YII_ENV` unless set.';
     $lines[] = '';
     $lines[] = '| Key | Default |';
     $lines[] = '|---|---|';
@@ -149,22 +151,22 @@ function config_table_render(): string
     $lines[] = '';
     $lines[] = '### Sitemap keys (`indexnowkit/sitemap`)';
     $lines[] = '';
-    $lines[] = 'The `sitemap` block is the same in the three adapters and is owned by the sitemap package: ' . implode(', ', array_map(static fn(string $k): string => '`' . $k . '`', SitemapConfig::OPTIONS)) . '.';
+    $lines[] = 'The `sitemap` block is the same in the four adapters and is owned by the sitemap package: ' . implode(', ', array_map(static fn(string $k): string => '`' . $k . '`', SitemapConfig::OPTIONS)) . '.';
     $lines[] = '';
     $lines[] = '### Verify keys (`indexnowkit/verify`)';
     $lines[] = '';
-    $lines[] = 'The `verify` block is the same in the three adapters and is owned by the verify package (its `docs/configuration.md` has the table): ' . implode(', ', array_map(static fn(string $k): string => '`' . $k . '`', VerifyConfig::OPTIONS)) . '.';
+    $lines[] = 'The `verify` block is the same in the four adapters and is owned by the verify package (its `docs/configuration.md` has the table): ' . implode(', ', array_map(static fn(string $k): string => '`' . $k . '`', VerifyConfig::OPTIONS)) . '.';
     $lines[] = '';
     $lines[] = '### History keys (`indexnowkit/history`)';
     $lines[] = '';
-    $lines[] = 'The `history` block is the same in the three adapters and is owned by the history package (its `docs/configuration.md` has the table): ' . implode(', ', array_map(static fn(string $k): string => '`' . $k . '`', HistoryConfig::OPTIONS)) . '.';
+    $lines[] = 'The `history` block is the same in the four adapters and is owned by the history package (its `docs/configuration.md` has the table): ' . implode(', ', array_map(static fn(string $k): string => '`' . $k . '`', HistoryConfig::OPTIONS)) . '.';
     $lines[] = '';
-    $lines[] = '### One concept, three keys';
+    $lines[] = '### One concept, four keys';
     $lines[] = '';
-    $lines[] = '| Concept | Symfony (`indexnowkit:`) | Laravel (`config/indexnow.php`) | Yii2 (`options`) | Notes |';
-    $lines[] = '|---|---|---|---|---|';
-    foreach (CONFIG_TABLE_SYNONYMS as [$concept, $sf, $lar, $yi, $note]) {
-        $lines[] = \sprintf('| %s | %s | %s | %s | %s |', $concept, config_table_cell($sf), config_table_cell($lar), config_table_cell($yi), $note);
+    $lines[] = '| Concept | Symfony (`indexnowkit:`) | Laravel (`config/indexnow.php`) | Yii2 (`options`) | Yii3 (`indexnowkit/yii3` params) | Notes |';
+    $lines[] = '|---|---|---|---|---|---|';
+    foreach (CONFIG_TABLE_SYNONYMS as [$concept, $sf, $lar, $yi, $yi3, $note]) {
+        $lines[] = \sprintf('| %s | %s | %s | %s | %s | %s |', $concept, config_table_cell($sf), config_table_cell($lar), config_table_cell($yi), config_table_cell($yi3), $note);
     }
     $lines[] = '';
     $lines[] = '### Adapter-only keys';
@@ -174,12 +176,13 @@ function config_table_render(): string
     $lines[] = '| Symfony | ' . implode(', ', array_map(static fn(string $k): string => '`' . $k . '`', $bundleOnly)) . ' |';
     $lines[] = '| Laravel | ' . implode(', ', array_map(static fn(string $k): string => '`' . $k . '`', $laravel)) . ' |';
     $lines[] = '| Yii2 | ' . implode(', ', array_map(static fn(string $k): string => '`' . $k . '`', $yii)) . ' |';
+    $lines[] = '| Yii3 | ' . implode(', ', array_map(static fn(string $k): string => '`' . $k . '`', $yii3)) . ' |';
     $lines[] = CONFIG_TABLE_END;
 
     // Every synonym named for an adapter must be a key that adapter accepts (or a framework key for Symfony).
-    $known = ['symfony' => [...Config::OPTIONS, ...array_keys($bundle), 'framework.enabled_locales'], 'laravel' => [...Config::OPTIONS, ...$laravel], 'yii2' => [...Config::OPTIONS, ...$yii]];
-    foreach (CONFIG_TABLE_SYNONYMS as [$concept, $sf, $lar, $yi]) {
-        foreach (['symfony' => $sf, 'laravel' => $lar, 'yii2' => $yi] as $adapter => $key) {
+    $known = ['symfony' => [...Config::OPTIONS, ...array_keys($bundle), 'framework.enabled_locales'], 'laravel' => [...Config::OPTIONS, ...$laravel], 'yii2' => [...Config::OPTIONS, ...$yii], 'yii3' => [...Config::OPTIONS, ...$yii3]];
+    foreach (CONFIG_TABLE_SYNONYMS as [$concept, $sf, $lar, $yi, $yi3]) {
+        foreach (['symfony' => $sf, 'laravel' => $lar, 'yii2' => $yi, 'yii3' => $yi3] as $adapter => $key) {
             if ($key !== null && !\in_array($key, $known[$adapter], true)) {
                 throw new RuntimeException(\sprintf('config-table: "%s" names %s key "%s", which that adapter does not accept', $concept, $adapter, $key));
             }

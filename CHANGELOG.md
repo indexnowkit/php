@@ -3,6 +3,21 @@
 All notable changes to the PHP packages are documented here, newest release wave first. Tags: `<package>@<version>`.
 Per-package detail (and the migration notes for every breaking change) lives in each package's own changelog.
 
+## Unreleased — yii3@0.1.0, testing@0.3.2
+
+The Yii3 adapter (spec 15): `indexnowkit/yii3` on `yiisoft/active-record ^1.0`, `yiisoft/db ^2.0`, `yiisoft/router ^4.0`. A
+`yiisoft/config` plugin (params, di, di-web, di-console, params-console, events-web, events-console, routes, bootstrap) wires
+everything on `composer require`; `#[IndexNowEvents]` next to `EventsTrait` is the hook; commit safety without any commit
+event through the core's `VerifyingStaging`, verified at the end of the request (`AfterEmit`) or the command
+(`ApplicationShutdown`); every node of the core graph is a container definition whose default is the core's factory over the
+other definitions (`Wiring`), so a replaced `TransportInterface` reaches the client, the checker and the commands; nine
+`./yii indexnow:*` commands over the runners of `indexnowkit/console`, with stubs for the optional packages; no queue mode
+until `yiisoft/queue` is released (a replaced `DispatcherInterface`). No core change: the form of `Adapter\Services` and
+`VerifyingStaging` passed the Yii3 criterion of spec 17 §7. `indexnowkit/testing` 0.3.2 knows `indexnow:submit-record` and
+checks H01–H06 of `yii3`.
+
+### yii3@0.1.0, testing@0.3.2
+
 ## 2026-09-07 — verify@0.3.0, history@0.3.0, sitemap@0.7.0, symfony-bundle@0.14.0, laravel@0.14.0, yii2@0.13.0
 
 Wave I: the last decision of the 0.10 audit (A10). The optional packages wire themselves: `Verify\Adapter\VerifyServices`,

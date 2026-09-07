@@ -23,7 +23,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        package: [core, testing, console, sitemap, verify, history, doctrine, symfony-bundle, laravel, yii2]
+        package: [core, testing, console, sitemap, verify, history, doctrine, symfony-bundle, laravel, yii2, yii3]
         php: ['8.2', '8.3', '8.4', '8.5']
         deps: [highest]
         include:
@@ -43,6 +43,7 @@ jobs:
           - { package: laravel, php: '8.2', deps: lowest }
           - { package: laravel, php: '8.3', deps: lowest-l13 }
           - { package: yii2, php: '8.2', deps: lowest }
+          - { package: yii3, php: '8.2', deps: lowest }
     env:
       COMPOSER: composer.monorepo.json
     defaults:
@@ -115,7 +116,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        package: [core, testing, console, sitemap, verify, history, doctrine, symfony-bundle, laravel, yii2]
+        package: [core, testing, console, sitemap, verify, history, doctrine, symfony-bundle, laravel, yii2, yii3]
     env:
       COMPOSER: composer.monorepo.json
     defaults:

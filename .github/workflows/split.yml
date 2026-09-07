@@ -1,7 +1,7 @@
 name: Split packages
 
 # Mirrors each package into its own read-only repository (indexnowkit/php-core, php-testing, php-console, php-sitemap,
-# php-verify, php-history, php-doctrine, php-symfony-bundle, php-laravel, php-yii2) on every push to main and on
+# php-verify, php-history, php-doctrine, php-symfony-bundle, php-laravel, php-yii2, php-yii3) on every push to main and on
 # package tags (core@0.9.0, testing@0.2.0, console@0.3.0, sitemap@0.5.0, verify@0.1.0, history@0.1.0, ...).
 # Authentication: one write-enabled deploy key per target repository, stored as SPLIT_SSH_KEY_<PACKAGE> secret here.
 # Packagist picks the pushes up through the webhooks it installed on the split repositories.
@@ -182,6 +182,8 @@ jobs:
             secret: SPLIT_SSH_KEY_LARAVEL
           - package: yii2
             secret: SPLIT_SSH_KEY_YII2
+          - package: yii3
+            secret: SPLIT_SSH_KEY_YII3
     steps:
       - name: Resolve tag for this package
         id: tag

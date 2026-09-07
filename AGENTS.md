@@ -1,6 +1,6 @@
 # Working in this repository (for coding agents and humans alike)
 
-This is the monorepo of the `indexnowkit/*` PHP packages: `packages/{core,testing,console,sitemap,doctrine,symfony-bundle,laravel,yii2}`.
+This is the monorepo of the `indexnowkit/*` PHP packages: `packages/{core,testing,console,sitemap,verify,history,doctrine,symfony-bundle,laravel,yii2,yii3}`.
 Each package is published as a read-only split (`indexnowkit/php-<package>`) and on Packagist; issues and pull
 requests live here. The specification the code follows is `docs/spec/` in the private workspace this repository is
 mirrored from — the README and `docs/*.md` of each package are the public contract.
@@ -52,4 +52,4 @@ no attribution trailers. The PR template lists the checklist.
   `ConfigFactory::YII_OPTIONS`, `IndexNowKitConfiguration` (bundle tree). Unknown keys warn at boot.
 - Commands: `Console\Definitions` in `indexnowkit/console` declares arguments and options once; the adapters render them.
 - Checks (`indexnow:check`): `Check\CheckInterface` implementations tagged/registered per adapter.
-- Tests: `tests/Unit`, `tests/Functional` (bundle) / `tests/Feature` (Laravel, Yii2), `tests/Conformance`.
+- Tests: `tests/Unit`, `tests/Functional` (bundle) / `tests/Feature` (Laravel, Yii2, Yii3), `tests/Conformance`.

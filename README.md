@@ -15,6 +15,7 @@ Packages are developed here and split into read-only repositories for Packagist.
 | [`indexnowkit/symfony-bundle`](packages/symfony-bundle) | Symfony bundle: config, Messenger, key file route, commands, profiler panel |
 | [`indexnowkit/laravel`](packages/laravel) | Laravel: Eloquent observer, queue dispatch, key file route, artisan commands (Laravel 12–13) |
 | [`indexnowkit/yii2`](packages/yii2) | Yii2: ActiveRecord events with verify-on-commit, yii2-queue, key file route, console controller |
+| [`indexnowkit/yii3`](packages/yii3) | Yii3: `#[IndexNowEvents]` on yiisoft/active-record with verify-on-commit, a `yiisoft/config` plugin (di, routes, events, commands), key file route |
 
 Start with the package you will actually install. A Symfony application only needs the bundle README; the core
 README is the reference for everything underneath it.
@@ -113,7 +114,8 @@ php/
 │   ├── doctrine/          # indexnowkit/doctrine      + tests/ (A01-A21)
 │   ├── symfony-bundle/    # indexnowkit/symfony-bundle + docs/, recipe/, tests/Functional (H01-H06)
 │   ├── laravel/           # indexnowkit/laravel       + docs/, tests/
-│   └── yii2/              # indexnowkit/yii2          + docs/, tests/
+│   ├── yii2/              # indexnowkit/yii2          + docs/, tests/
+│   └── yii3/              # indexnowkit/yii3          + docs/, tests/
 ├── bin/                   # Docker wrappers: php, composer, link, ci, cs, coverage-floor; release: tag, packagist-wait, release-notes
 ├── docker/php/            # development image (php:<version>-cli + Composer)
 ├── CHANGELOG.md           # monorepo changelog, per package

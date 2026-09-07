@@ -1,7 +1,7 @@
 # Template for docs-site/mkdocs.yml: bin/docs-collect replaces the NAV placeholder line with the generated navigation and writes the
 # real mkdocs.yml next to this file (both docs/ and mkdocs.yml are generated, not committed).
 site_name: indexnowkit for PHP
-site_description: IndexNow for PHP — core client plus Symfony, Laravel, Yii2 and Doctrine adapters
+site_description: IndexNow for PHP — core client plus Symfony, Laravel, Yii2, Yii3 and Doctrine adapters
 site_url: https://indexnowkit.github.io/php/
 repo_url: https://github.com/indexnowkit/php
 repo_name: indexnowkit/php

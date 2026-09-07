@@ -73,6 +73,13 @@ updates:
     groups:
       yii2: { patterns: ["*"] }
     commit-message: { prefix: "build(yii2)" }
+  - package-ecosystem: composer
+    directory: /packages/yii3
+    schedule: { interval: weekly, day: monday }
+    open-pull-requests-limit: 3
+    groups:
+      yii3: { patterns: ["*"] }
+    commit-message: { prefix: "build(yii3)" }
   - package-ecosystem: github-actions
     directory: /
     schedule: { interval: weekly, day: monday }

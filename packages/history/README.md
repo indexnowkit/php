@@ -88,7 +88,7 @@ foreach ($store->recent(10) as $record) { echo $record->at->format(DATE_ATOM), '
 
 `History\Adapter\HistoryServices` is what a framework adapter wires for this package, in one place: the predicate (`package()`), the owned
 options, the validated block, the stores over a PDO or a PSR-16 cache, the `check` line, the bodies of `history` and `status`, the store description — as static functions over the pieces, with `*For()` twins over the core's
-`Adapter\Services` for a runtime graph. The Symfony bundle, the Laravel and the Yii2 adapters build on it; see
+`Adapter\Services` for a runtime graph. The Symfony bundle, the Laravel, the Yii2 and the Yii3 adapters build on it; see
 [adapters.md](https://github.com/indexnowkit/php-core/blob/main/docs/adapters.md) of the core.
 
 ## Requirements
@@ -119,7 +119,7 @@ $last = $store->lastFor('https://www.example.com/post-1');   // ?SubmissionRecor
   - `--purge` and the record counts need the shipped stores (`History\HistoryStoreInterface`); a custom `SubmissionStoreInterface` still lists with `indexnow:history`.
   - `--url` matches the URL after normalization (`normalizer.strip_tracking_params` is on by default): pass the URL without `utm_*`.
   - `history.key_prefix` and the PDO table name must not carry `{}()/\@:` (PSR-6) or anything but `[A-Za-z0-9_]` (SQL identifier).
-  - `dispatch: auto` exists in Symfony and Yii2, **not** in Laravel; locales are `router.locales` (Laravel, Yii2), `framework.enabled_locales` (Symfony).
+  - `dispatch: auto` exists in Symfony and Yii2, **not** in Laravel (Yii3: `sync` | `none`); locales are `router.locales` (Laravel, Yii2, Yii3), `framework.enabled_locales` (Symfony).
 
 ## Versioning
 
