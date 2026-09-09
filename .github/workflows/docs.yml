@@ -1,6 +1,6 @@
 name: Docs site
 
-# Builds https://indexnowkit.github.io/php from the package READMEs and docs (bin/docs-collect + MkDocs Material),
+# Builds https://indexnowkit.dev/php from the package READMEs and docs (bin/docs-collect + MkDocs Material),
 # checks the links (lychee: internal links are strict, external ones tolerate rate limiting) and deploys to GitHub
 # Pages on main. Pages must be enabled once in the repository settings with "GitHub Actions" as the source.
 

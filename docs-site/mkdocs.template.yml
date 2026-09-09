@@ -2,7 +2,7 @@
 # real mkdocs.yml next to this file (both docs/ and mkdocs.yml are generated, not committed).
 site_name: indexnowkit for PHP
 site_description: IndexNow for PHP — core client plus Symfony, Laravel, Yii2, Yii3 and Doctrine adapters
-site_url: https://indexnowkit.github.io/php/
+site_url: https://indexnowkit.dev/php/
 repo_url: https://github.com/indexnowkit/php
 repo_name: indexnowkit/php
 edit_uri: ""
