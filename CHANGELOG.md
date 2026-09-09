@@ -15,6 +15,8 @@ image `ghcr.io/indexnowkit/indexnow` (non-root; a `-action` tag for the GitHub A
 from `packages/cli/action`). Sitemap 0.9.0 adds `sitemap --new-only` over `Sitemap\SeenStoreInterface` (the adapters get the
 option with an honest refusal; the CLI keeps the store); core 0.13.1 adds `Config::arrayFromEnv()` — a patch by the cascade
 rule of the family — and fixes `unknownOptions()` on nested blocks (`history.pdo` was reported unknown by every adapter).
+The action itself is `action@1.0.1` (2026-09-09): the Marketplace caps the description of `action.yml` at 125 characters;
+`v1` points there.
 
 ## 2026-09-08 — core@0.13.0, console@0.5.0, testing@0.3.2, sitemap@0.8.0, verify@0.4.0, history@0.4.0, doctrine@0.9.0, symfony-bundle@0.15.0, laravel@0.15.0, yii2@0.14.0, yii3@0.1.0
 
