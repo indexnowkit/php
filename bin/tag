@@ -4,7 +4,8 @@
 # the tag <version> to it, which Packagist picks up through its webhook.
 #
 # Usage: bin/tag <package> <version>          bin/tag core 0.4.0
-# Refuses a dirty working tree, a version missing from the package CHANGELOG, or a tag that already exists.
+# Refuses a dirty working tree, a version missing from the package CHANGELOG, a tag that already exists, or a package whose
+# split repository has no main yet (the first release waits for the split of main).
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 REPO="git@github.com:indexnowkit/php.git"
@@ -21,6 +22,13 @@ fi
 grep -Eq "^## \[?${ver//./\\.}\]? — [0-9]{4}-[0-9]{2}-[0-9]{2}" "php/packages/$pkg/CHANGELOG.md" || { echo "tag: php/packages/$pkg/CHANGELOG.md has no section '## [$ver] — YYYY-MM-DD'" >&2; exit 1; }
 if git ls-remote --tags "$REPO" "refs/tags/$tag" | grep -q .; then
     echo "tag: $tag already exists on $REPO" >&2
+    exit 1
+fi
+# A tag that reaches a split repository before its first main lands there (a new package: the main split waits for
+# Packagist stage by stage, the tag split does not) sits in a repository without a default branch, where no workflow
+# runs — cli@0.1.0 got no release that way. So the first release of a package waits for the split of main.
+if ! git ls-remote --heads "git@github.com:indexnowkit/php-$pkg.git" main | grep -q .; then
+    echo "tag: indexnowkit/php-$pkg has no main yet — push main first and wait for its split (the tag would land in an empty repository, where no workflow runs)" >&2
     exit 1
 fi
 sha="$(git subtree split --prefix=php -q)"
