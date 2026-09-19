@@ -47,4 +47,35 @@ echo "--- run 4: a wrong key is a failed step"
 : > "$work/github/output"
 if run -e "INPUT_KEY=0000000000000000000000000000dead" >/dev/null 2>"$work/stderr"; then echo "action-smoke: a wrong key must fail" >&2; exit 1; fi
 grep -q '::error::indexnow check failed' "$work/stderr"
+echo "--- run 5: under GITHUB_ACTIONS the state is handed back to the workspace owner"
+# The container runs as root, the CLI creates the state directory 0700: without the hand-back the runner user cannot
+# read it and actions/cache saves nothing. A named volume owned by uid 1000 stands in for the runner's workspace,
+# because a bind mount from the host does not carry ownership on every platform.
+vol="indexnow-action-smoke-$$"
+docker volume create "$vol" >/dev/null
+# The whole workspace lives in the volume, sitemap included: a bind mount nested under it would reset the ownership
+# the test is about.
+docker run --rm -v "$vol:/w" -v "$work/workspace/sitemap.xml:/in/sitemap.xml:ro" --entrypoint sh "$image" \
+    -c 'cp /in/sitemap.xml /w/sitemap.xml && chown -R 1000:1000 /w' >/dev/null
+docker run --rm \
+    -v "$ROOT/packages/testing/resources/mock-server/router.php:/mock/router.php:ro" \
+    -v "$vol:/w" -v "$work/github:/github/home" -w /w \
+    -e GITHUB_ACTIONS=true -e GITHUB_WORKSPACE=/w -e GITHUB_OUTPUT=/github/home/output -e GITHUB_STEP_SUMMARY=/github/home/summary \
+    -e MOCK_KEYS="$key" -e "INPUT_KEY=$key" -e "INPUT_BASE-URL=http://127.0.0.1:8089" -e "INPUT_KEY-LOCATION=http://127.0.0.1:8089/$key.txt" \
+    -e "INPUT_ENGINES=http://127.0.0.1:8089/indexnow" -e "INPUT_SITEMAP=sitemap.xml" -e "INPUT_STATE-PATH=.indexnow" \
+    --entrypoint sh "$image" -c 'php -S 127.0.0.1:8089 /mock/router.php >/dev/null 2>&1 & sleep 1; exec /usr/local/bin/indexnow-action' >/dev/null
+owners="$(docker run --rm -v "$vol:/w" --entrypoint sh "$image" -c 'stat -c %u /w/.indexnow /w/.indexnow/state.sqlite /w/.indexnow/summary.json' | sort -u)"
+docker volume rm "$vol" >/dev/null
+[ "$owners" = "1000" ] || { echo "action-smoke: the state must belong to the workspace owner (1000), got: $owners" >&2; exit 1; }
+
+echo "--- run 6: an absolute state-path keeps the report beside the state file"
+docker run --rm \
+    -v "$ROOT/packages/testing/resources/mock-server/router.php:/mock/router.php:ro" \
+    -v "$work/workspace:/github/workspace" -v "$work/github:/github/home" -w /github/workspace \
+    -e GITHUB_WORKSPACE=/github/workspace -e GITHUB_OUTPUT=/github/home/output -e GITHUB_STEP_SUMMARY=/github/home/summary \
+    -e MOCK_KEYS="$key" -e "INPUT_KEY=$key" -e "INPUT_BASE-URL=http://127.0.0.1:8089" -e "INPUT_KEY-LOCATION=http://127.0.0.1:8089/$key.txt" \
+    -e "INPUT_ENGINES=http://127.0.0.1:8089/indexnow" -e "INPUT_SITEMAP=sitemap.xml" -e "INPUT_STATE-PATH=/tmp/elsewhere" \
+    --entrypoint sh "$image" -c 'php -S 127.0.0.1:8089 /mock/router.php >/dev/null 2>&1 & sleep 1; /usr/local/bin/indexnow-action >/dev/null; test -f /tmp/elsewhere/summary.json && test ! -e /github/workspace/tmp' \
+    || { echo "action-smoke: an absolute state-path must keep summary.json beside the state file" >&2; exit 1; }
+
 echo "action-smoke: ok"
