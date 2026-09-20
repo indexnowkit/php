@@ -3,6 +3,15 @@
 All notable changes to the PHP packages are documented here, newest release wave first. Tags: `<package>@<version>`.
 Per-package detail (and the migration notes for every breaking change) lives in each package's own changelog.
 
+## 2026-09-20 — cli@0.1.1
+
+Two fixes in the GitHub Action's entrypoint, both about where its state ends up. A Docker action runs as root and the
+state directory is `0700`, so `actions/cache` — what makes `--new-only` work between deploys — could not read it and
+the job ended with `EACCES: permission denied, scandir '.indexnow'`: nothing cached, and the next run announcing the
+whole sitemap again. The entrypoint now hands the directory to the owner of `GITHUB_WORKSPACE` on the way out. And an
+absolute `state-path` no longer scatters its `summary.json` into a directory of that shape under the workspace. The
+action is `action@1.0.2`, pointing at the `0.1.1-action` image; `v1` follows.
+
 ## 2026-09-08 — core@0.13.1, sitemap@0.9.0, cli@0.1.0
 
 **Wave N — the `indexnow` command line** (spec 19b, phase B of spec 18): `indexnowkit/cli`, one binary for any host with PHP
